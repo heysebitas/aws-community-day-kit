@@ -36,7 +36,7 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.7.0",
     "mongoose": "^9.11.4",
-    "motion": "^12.38.0",
+    "motion": "^14.14.0",
     "nanoid": "^5.1.16",
     "next": "16.4.6",
     "next-intl": "^4.8.3",
