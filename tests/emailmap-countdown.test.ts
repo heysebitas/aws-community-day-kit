@@ -48,13 +48,15 @@ describe("email-map", () => {
 });
 
 describe("countdown", () => {
-  test("el GIF es idéntico al de antes para el mismo instante", async () => {
-    const gif = await componerGif(Date.parse("2026-11-16T12:00:00Z"));
-    // Huella del GIF que producía la ruta original en ese instante.
-    assert.equal(
-      crypto.createHash("sha256").update(gif).digest("hex"),
-      "5d52b594fe0f0d175fd8dd83c8aa0307643ef608190801e06925f7bde83dac49",
-    );
+  test("el GIF es estable para el mismo instante y conserva el tamaño", async () => {
+    // La huella exacta depende de sharp y de las fuentes de cada sistema, así que
+    // aquí se comprueba lo que no cambia: mismo instante, mismos bytes, 560×128.
+    const t = Date.parse("2026-11-16T12:00:00Z");
+    const [a, b] = await Promise.all([componerGif(t), componerGif(t)]);
+    assert.equal(crypto.createHash("sha256").update(a).digest("hex"), crypto.createHash("sha256").update(b).digest("hex"));
+    assert.equal(a.subarray(0, 6).toString("ascii"), "GIF89a");
+    assert.equal(a.readUInt16LE(6), 560);
+    assert.equal(a.readUInt16LE(8), 128);
   });
 
   test("100 llamadas seguidas generan un solo GIF por ventana", async () => {
