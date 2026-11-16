@@ -1,19 +1,10 @@
 import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { SpeakerProfile } from "@/models/speaker-profile";
+import { csvResponse, csvRow } from "@/lib/csv";
 import { SLUG } from "@/config";
 
 /** Exportación de postulaciones de speaker a CSV. */
-
-// Punto y coma como separador: las descripciones de las charlas traen comas.
-const DELIMITER = ";";
-
-function escapeCsv(value: string): string {
-  if (value.includes(DELIMITER) || value.includes('"') || value.includes("\n") || value.includes("\r")) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
 
 const STATUS_LABELS: Record<string, string> = {
   submitted: "Recibida",
@@ -48,7 +39,7 @@ export async function GET() {
         .filter(Boolean)
         .join(" · ");
 
-      return [
+      return csvRow([
         p?.firstName ?? "",
         p?.lastName ?? "",
         p?.email ?? "",
@@ -74,17 +65,12 @@ export async function GET() {
         sub.approvedBy ?? "",
         sub.submittedAt ? sub.submittedAt.toISOString() : "",
         String(sub._id),
-      ].map(escapeCsv).join(DELIMITER);
+      ]);
     });
 
-    const csv = [COLUMNS.map(escapeCsv).join(DELIMITER), ...rows].join("\r\n");
+    const csv = [csvRow(COLUMNS), ...rows].join("\r\n");
 
-    return new Response(csv, {
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="speakers-${SLUG}.csv"`,
-      },
-    });
+    return csvResponse(csv, `speakers-${SLUG}.csv`);
   } catch (e) {
     const msg = (e as Error).message;
     if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
