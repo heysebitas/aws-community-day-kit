@@ -55,6 +55,7 @@ async function resend(ruta: string, cuerpo: unknown): Promise<{ ok: boolean; jso
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY ?? ""}`, "Content-Type": "application/json" },
     body: JSON.stringify(cuerpo),
+    signal: AbortSignal.timeout(Number(process.env.HTTP_TIMEOUT_MS) || 10_000),
   });
   return { ok: res.ok, status: res.status, json: await res.json().catch(() => ({})) };
 }

@@ -35,6 +35,8 @@ function opciones(uri: string): mongoose.ConnectOptions {
     // Bajo a propósito: en serverless cada instancia abre su propio pool y un
     // pico de tráfico agota las conexiones de la base antes que la CPU.
     maxPoolSize: Number(process.env.MONGODB_POOL) || 10,
+    // Sin esto Mongo espera 30 s antes de fallar y el formulario se queda girando.
+    serverSelectionTimeoutMS: Number(process.env.MONGODB_TIMEOUT_MS) || 5000,
   };
   // DocumentDB no admite escrituras reintentables y exige el CA de Amazon.
   if (/\.docdb\.amazonaws\.com/.test(uri)) o.retryWrites = false;
