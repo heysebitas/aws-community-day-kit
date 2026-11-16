@@ -81,3 +81,7 @@ formularios públicos rechazan todo: es a propósito.
 - Activa las copias de seguridad de la base.
 - Dos semanas antes del evento, haz un ensayo del check-in con el equipo y los
   teléfonos que se van a usar ese día.
+
+## Navegadores soportados
+
+Chrome y Edge 111, Firefox 128 y Safari 16.4 en adelante (`browserslist` de `package.json`). Son los mínimos con los que Tailwind 4 genera el CSS (`@layer`, `color-mix`): por debajo el sitio sale sin estilos aunque el JS funcione. Con estos mínimos se pueden usar `<dialog>`, `inert`, `svh`/`dvh`, `color-mix` y `oklch` sin respaldo; `:has()`, `scrollbar-color` y `popover` todavía no entran y solo van como mejora progresiva.
