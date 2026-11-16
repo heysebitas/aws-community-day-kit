@@ -25,11 +25,14 @@ export function LanguageToggle() {
             "px-3 py-1.5 font-mono text-xs font-bold uppercase transition-colors",
             idioma === locale ? "bg-acento text-surface-900" : "text-surface-400 hover:text-surface-200",
           )}
-          aria-label={NOMBRE[idioma] ?? idioma}
+          // El nombre accesible empieza por lo que se ve («ES»), que es lo que
+          // pide la regla label-content-name-mismatch. El texto va en mayúsculas
+          // en el marcado, no sólo por el CSS, para que coincidan tal cual.
+          aria-label={`${idioma.toUpperCase()}, ${NOMBRE[idioma] ?? idioma}`}
           aria-pressed={idioma === locale}
           lang={idioma}
         >
-          {idioma}
+          {idioma.toUpperCase()}
         </button>
       ))}
     </div>

@@ -250,6 +250,8 @@
     "voluntarios_desc": "Join the volunteer team of [[evento]] and help make it happen.",
     "directorio_title": "Speaker directory",
     "directorio_desc": "The speakers and talks of [[evento]]: who speaks, about what and when.",
+    "privacidad_desc": "How [[evento]] uses and protects the data of the people who register, apply to speak or volunteer.",
+    "codigo_conducta_desc": "The ground rules for [[evento]]: respect, participation and a safe space for everyone.",
     "speaker_suffix": "[[evento]]"
   },
   "CodeOfConduct": {

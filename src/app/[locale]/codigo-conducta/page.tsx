@@ -1,6 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { LegalPage, P, NumberedList, Callout } from "@/components/legal/legal-page";
 import { EXTERNAL_LINKS } from "@/lib/constants";
+import { metadatosDe } from "@/lib/metadatos";
 import type { Metadata } from "next";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -8,7 +9,9 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "CodeOfConduct" });
-  return { title: t("title") };
+  // Con canonical y traducciones propias: si no, la página heredaba los de la
+  // portada y los buscadores veían dos direcciones para el mismo texto.
+  return metadatosDe(locale, "/codigo-conducta", "codigo_conducta", { titulo: t("title") });
 }
 
 export default async function CodeOfConductPage({ params }: Props) {

@@ -250,6 +250,8 @@
     "voluntarios_desc": "Únete al equipo de voluntariado del [[evento]] y ayuda a hacerlo realidad.",
     "directorio_title": "Directorio de speakers",
     "directorio_desc": "Los speakers y las charlas del [[evento]]: quién habla, de qué y a qué hora.",
+    "privacidad_desc": "Cómo [[evento]] usa y protege los datos de quienes se registran, postulan como speakers o se volunteer.",
+    "codigo_conducta_desc": "Las normas de convivencia del [[evento]]: respeto, participación y un entorno seguro para todas las personas.",
     "speaker_suffix": "[[evento]]"
   },
   "CodeOfConduct": {
