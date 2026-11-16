@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { acentoCanvas } from "@/lib/tema-canvas";
+import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /**
@@ -102,7 +102,8 @@ export function WireSolid({
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
 
-    const ACCENT = acentoCanvas();
+    let ACCENT = acentoCanvas();
+    const dejarDeObservar = observarAcento((v) => { ACCENT = v; });
 
     const draw = () => {
       const w = canvas.clientWidth;
@@ -159,6 +160,8 @@ export function WireSolid({
 
     return () => {
       cancelAnimationFrame(raf);
+
+      dejarDeObservar();
       observer.disconnect();
     };
   }, [shape, reduced]);

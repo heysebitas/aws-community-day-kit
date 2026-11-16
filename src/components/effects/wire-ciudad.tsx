@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { acentoCanvas } from "@/lib/tema-canvas";
+import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
 import { siluetaDe } from "./siluetas";
 
 /**
@@ -28,7 +28,8 @@ export function WireCiudad({
     if (!ctx) return;
 
     const { verts, edges, baliza } = siluetaDe(silueta, ciudad);
-    const ACENTO = acentoCanvas();
+    let ACENTO = acentoCanvas();
+    const dejarDeObservar = observarAcento((v) => { ACENTO = v; });
     let raf = 0;
     let angle = 0.6;
     let targetPitch = 0.12;
@@ -121,6 +122,8 @@ export function WireCiudad({
 
     return () => {
       cancelAnimationFrame(raf);
+
+      dejarDeObservar();
       observer.disconnect();
       centinela.disconnect();
       window.removeEventListener("pointermove", onPointer);

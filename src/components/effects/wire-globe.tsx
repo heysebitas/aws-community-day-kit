@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { LAND, encuadre, proyectar, type Punto } from "@/lib/globo";
-import { acentoCanvas } from "@/lib/tema-canvas";
+import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
 
 /**
  * El globo del hero: gira para dejar de frente el punto marcado, se puede
@@ -28,7 +28,8 @@ export function WireGlobe({
     if (!ctx) return;
 
     const { giro: home, inclinacion } = encuadre(marker);
-    const ACENTO = acentoCanvas();
+    let ACENTO = acentoCanvas();
+    const dejarDeObservar = observarAcento((v) => { ACENTO = v; });
 
     let raf = 0;
     let spin = home;
@@ -197,6 +198,8 @@ export function WireGlobe({
 
     return () => {
       cancelAnimationFrame(raf);
+
+      dejarDeObservar();
       observer.disconnect();
       centinela.disconnect();
       canvas.removeEventListener("pointerdown", onDown);
