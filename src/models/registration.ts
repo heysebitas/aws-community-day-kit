@@ -101,7 +101,12 @@ const registrationSchema = new Schema<IRegistration>(
     },
     emailError: { type: String, default: null },
     emailSentAt: { type: Date, default: null },
-    resendId: { type: String, default: null },
+    // Parcial para no indexar los nulos; Mongoose lo crea al iniciar el modelo.
+    resendId: {
+      type: String,
+      default: null,
+      index: { partialFilterExpression: { resendId: { $type: "string" } } },
+    },
     sentCampaigns: { type: [String], default: [] },
 
     confirmation: {
