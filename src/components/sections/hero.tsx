@@ -18,7 +18,7 @@ import { localePath } from "@/lib/utils";
 function Digit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="border-2 border-acento/40 bg-surface-800 px-3 py-2 sm:px-4 sm:py-2.5">
+      <div className="border-2 border-surface-500 bg-surface-800 px-3 py-2 sm:px-4 sm:py-2.5">
         <span className="dot-matrix block text-4xl leading-none text-acento sm:text-5xl md:text-6xl">
           {String(value).padStart(2, "0")}
         </span>
@@ -114,7 +114,7 @@ export function Hero() {
             ) : (
               <>{t("coming_soon").toLowerCase()} · {EVENTO.ciudad.toLowerCase()} · </>
             )}
-            <span className="text-acento">{t("tagline_short")}</span>
+            <span className="text-surface-100">{t("tagline_short")}</span>
           </motion.p>
 
           {confirmada && (

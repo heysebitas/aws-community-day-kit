@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { DotHeading } from "@/components/ui/dot-heading";
 import { cn } from "@/lib/utils";
 
@@ -30,12 +31,13 @@ export function FormShell({
   aside?: React.ReactNode;
   className?: string;
 }) {
+  const tCinta = useTranslations("Strip");
   return (
     <main className="form-block flex min-h-screen flex-col bg-acento pt-28">
       <div className={cn("mx-auto w-full max-w-6xl flex-1 px-5", className)}>
         {/* Cabecera */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease }}
           className="mb-8 flex flex-wrap items-end justify-between gap-6"
@@ -61,7 +63,7 @@ export function FormShell({
         >
           {/* Hoja del formulario */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12, ease }}
             className="border-2 border-tinta p-5 shadow-[8px_8px_0_0_var(--color-tinta)] sm:p-8"
@@ -92,7 +94,7 @@ export function FormShell({
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >
-              {title}
+              {i % 2 === 1 ? title : tCinta("date")}
             </span>
           ))}
         </div>

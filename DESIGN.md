@@ -205,6 +205,7 @@ estilo de cartel, no de capas.
 
 - Do: texto secundario sobre el bloque claro en `text-tinta/70`, y nada más.
 - Do: acento en texto pequeño al 100 % (`text-acento`) sobre negro o `text-acento-profundo` sobre claro.
+- Do: un solo botón lleno de acento por pantalla (la acción principal); los secundarios sobre negro van con borde `surface-500` y texto `surface-100`, y toman el acento solo al pasar el ratón.
 - Do: números de marca de agua (`text-white/10`) con `aria-hidden="true"`.
 - Do: controles con `min-h-11`.
 - Do: controles sin elegir sobre el bloque claro con borde `tinta` al 75 % (≥ 3:1 en todos los temas) y fondo `papel` al 80 %; elegidos en `tinta` sólida con el texto en acento y `aria-pressed`.

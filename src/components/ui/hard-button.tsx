@@ -48,7 +48,7 @@ export function HardButton({
   const outline =
     tone === "block"
       ? "border-2 border-tinta text-tinta hover:bg-tinta hover:text-acento"
-      : "border-2 border-acento text-acento hover:bg-acento hover:text-tinta";
+      : "border-2 border-surface-500 text-surface-100 hover:border-acento hover:text-acento";
 
   const off = "cursor-not-allowed opacity-50 shadow-none hover:translate-x-0 hover:translate-y-0";
 

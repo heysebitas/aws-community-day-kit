@@ -150,19 +150,6 @@ export function WireGlobe({
         const my = cy + m.y;
         const t = reduced ? 0.5 : (Date.now() % 1800) / 1800;
 
-        // Halo recortado a la esfera.
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.clip();
-        const halo = ctx.createRadialGradient(mx, my, 0, mx, my, r * 0.55);
-        halo.addColorStop(0, `rgba(${ACENTO},0.42)`);
-        halo.addColorStop(0.45, `rgba(${ACENTO},0.14)`);
-        halo.addColorStop(1, `rgba(${ACENTO},0)`);
-        ctx.fillStyle = halo;
-        ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-        ctx.restore();
-
         // Anillo que se expande y se apaga.
         ctx.beginPath();
         ctx.arc(mx, my, 5 + t * 22, 0, Math.PI * 2);
