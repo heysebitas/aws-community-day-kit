@@ -5,9 +5,14 @@ import { requireAuth } from "@/lib/auth";
 import { VolunteerSubmission } from "@/models/volunteer-submission";
 import { generateVolunteerCertificate } from "@/lib/pdf/certificate";
 import { VolunteerCertificateEmail } from "@/emails/volunteer-certificate";
-import { sendEmail, EMAIL_FROM } from "@/lib/correo";
+import { sendEmail, sleep, EMAIL_FROM } from "@/lib/correo";
 import { createLog } from "@/lib/log";
 import { SLUG, EVENTO } from "@/config";
+
+export const maxDuration = 300;
+
+/** 100 × ~1 s entra en `maxDuration`. */
+const TOPE_IDS = 100;
 
 const SUBJECT = `Tu certificado de voluntariado — ${EVENTO.nombreCompleto}`;
 
@@ -19,6 +24,9 @@ export async function POST(req: NextRequest) {
     if (!Array.isArray(ids) || ids.length === 0) {
       return NextResponse.json({ error: "ids requerido" }, { status: 400 });
     }
+    if (ids.length > TOPE_IDS) {
+      return NextResponse.json({ error: `Máximo ${TOPE_IDS} por envío` }, { status: 400 });
+    }
     await connectDB();
 
     const vols = await VolunteerSubmission.find({ _id: { $in: ids }, approved: true })
@@ -27,8 +35,6 @@ export async function POST(req: NextRequest) {
 
     // Envío individual (el batch de Resend NO soporta adjuntos) con marcado
     // exacto: solo se marca certSentAt a quienes de verdad les salió el correo.
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const okIds: string[] = [];
     let sentCount = 0, failedCount = 0, skipped = 0;
 
     for (const v of vols) {
@@ -45,15 +51,12 @@ export async function POST(req: NextRequest) {
         html,
         attachments: [{ filename: `certificado-${SLUG}.pdf`, content: pdf.toString("base64") }],
       });
-      if (res.error) { failedCount++; } else { sentCount++; okIds.push(String(v._id)); }
+      if (res.error) { failedCount++; } else {
+        sentCount++;
+        // Uno a uno: si la petición se corta, ya quedó marcado a quien salió.
+        await VolunteerSubmission.updateOne({ _id: v._id }, { $set: { certSentAt: new Date() } });
+      }
       await sleep(550); // rate limit de Resend (~2 req/s)
-    }
-
-    if (okIds.length > 0) {
-      await VolunteerSubmission.updateMany(
-        { _id: { $in: okIds } },
-        { $set: { certSentAt: new Date() } },
-      );
     }
 
     await createLog({

@@ -45,7 +45,7 @@ export function proveedor(): Proveedor {
   return process.env.RESEND_API_KEY ? "resend" : "consola";
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+export const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const fallo = (e: unknown): SendEmailResult => ({ id: null, error: e instanceof Error ? e.message : String(e) });
 
 // ── Resend ───────────────────────────────────────────────────────────────────
@@ -166,4 +166,51 @@ export async function sendEmailBatch(emails: SendEmailOptions[]): Promise<{ sent
   const res = await sendEmailBatchDetallado(emails);
   const sentCount = res.filter((r) => !r.error).length;
   return { sentCount, failedCount: res.length - sentCount };
+}
+
+/**
+ * Manda por tramos y espera a que `alTramo` registre cada uno antes de seguir:
+ * si la función muere, lo enviado hasta el último tramo ya quedó anotado.
+ * Con `limiteMs` no arranca tramos nuevos pasado ese tiempo. Devuelve cuántos
+ * correos se procesaron, siempre del principio de la lista.
+ */
+export async function enviarPorTramos(
+  emails: SendEmailOptions[],
+  tamano: number,
+  alTramo: (inicio: number, resultados: SendEmailResult[]) => Promise<void>,
+  limiteMs = Infinity,
+): Promise<number> {
+  const t0 = Date.now();
+  let hechos = 0;
+  while (hechos < emails.length && Date.now() - t0 < limiteMs) {
+    const tramo = emails.slice(hechos, hechos + tamano);
+    const resultados = await sendEmailBatchDetallado(tramo);
+    await alTramo(hechos, resultados);
+    hechos += tramo.length;
+  }
+  return hechos;
+}
+
+/** Corre `fn` sobre cada elemento con a lo sumo `max` a la vez y `pausaMs` entre uno y otro de cada hilo. */
+export async function conConcurrencia<T, R>(
+  items: T[],
+  max: number,
+  fn: (item: T) => Promise<R>,
+  pausaMs = 0,
+): Promise<PromiseSettledResult<R>[]> {
+  const salida: PromiseSettledResult<R>[] = new Array(items.length);
+  let siguiente = 0;
+  const hilo = async () => {
+    while (siguiente < items.length) {
+      const i = siguiente++;
+      try {
+        salida[i] = { status: "fulfilled", value: await fn(items[i]) };
+      } catch (reason) {
+        salida[i] = { status: "rejected", reason };
+      }
+      if (pausaMs) await sleep(pausaMs);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(max, items.length) }, hilo));
+  return salida;
 }
