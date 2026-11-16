@@ -1,5 +1,6 @@
 import "server-only";
 import jwt from "jsonwebtoken";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { connectDB } from "./db";
 import { PRODUCCION } from "./env";
@@ -57,26 +58,34 @@ export async function clearAuthCookie() {
   cookieStore.delete(COOKIE_SESION);
 }
 
-export async function getAuthUser(): Promise<IUser | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_SESION)?.value;
-  if (!token) return null;
-
+/**
+ * La sesión y el usuario se piden con lo que dice el token, no uno con el
+ * resultado del otro, así que van en paralelo. `cache` lo resuelve una vez por
+ * petición: `requireAuth` y `createLog` comparten la misma consulta.
+ */
+const usuarioDeSesion = cache(async (token: string): Promise<IUser | null> => {
   const payload = verifyToken(token);
   if (!payload) return null;
 
   await connectDB();
 
-  const session = await Session.findOne({ sessionId: payload.sessionId, userId: payload.userId });
-  if (!session) return null;
-
-  const user = await User.findById(payload.userId);
-  if (!user) return null;
+  const [session, user] = await Promise.all([
+    Session.findOne({ sessionId: payload.sessionId, userId: payload.userId }).lean(),
+    User.findById(payload.userId).lean(),
+  ]);
+  if (!session || !user) return null;
 
   // Una sola sesión viva por cuenta.
   if (user.currentSessionId !== payload.sessionId) return null;
 
-  return user;
+  return user as unknown as IUser;
+});
+
+export async function getAuthUser(): Promise<IUser | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_SESION)?.value;
+  if (!token) return null;
+  return usuarioDeSesion(token);
 }
 
 /** Exige sesión y, si se pasan, uno de esos roles. Lanza `Unauthorized` o `Forbidden`. */

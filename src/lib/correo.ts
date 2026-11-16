@@ -84,9 +84,20 @@ async function loteResend(emails: SendEmailOptions[]): Promise<SendEmailResult[]
 
 // ── Amazon SES ───────────────────────────────────────────────────────────────
 
+// Un cliente por proceso; el SDK se importa al primer envío.
+let clienteSes: Promise<import("@aws-sdk/client-sesv2").SESv2Client> | null = null;
+
+function sesCliente() {
+  clienteSes ??= import("@aws-sdk/client-sesv2").then(
+    ({ SESv2Client }) => new SESv2Client({ region: process.env.SES_REGION || process.env.AWS_REGION || "us-east-1" }),
+  );
+  clienteSes.catch(() => { clienteSes = null; });
+  return clienteSes;
+}
+
 async function enviarSes(email: SendEmailOptions): Promise<SendEmailResult> {
-  const { SESv2Client, SendEmailCommand } = await import("@aws-sdk/client-sesv2");
-  const cliente = new SESv2Client({ region: process.env.SES_REGION || process.env.AWS_REGION || "us-east-1" });
+  const { SendEmailCommand } = await import("@aws-sdk/client-sesv2");
+  const cliente = await sesCliente();
   const salida = await cliente.send(
     new SendEmailCommand({
       FromEmailAddress: email.from,
