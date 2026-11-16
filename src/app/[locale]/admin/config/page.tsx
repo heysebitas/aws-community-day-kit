@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/components/ui/toast";
 import { Save, Link as LinkIcon, Users, Trash2, RefreshCw, AlertTriangle, HeartHandshake, UserCheck } from "lucide-react";
@@ -64,6 +65,7 @@ export default function ConfigPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations("Panel");
 
   const [config, setConfig] = useState<Config>({ trackVirtualUrl: "", photosUrl: "", recordingsUrl: "", notifyUrl: "", showSponsorsCta: true, showSpeakerCta: true });
   const [saving, setSaving] = useState(false);
@@ -121,7 +123,7 @@ export default function ConfigPage() {
         {/* Día del evento */}
         <div className="border-2 border-surface-600 bg-surface-800 p-6">
           <h2 className="mb-5 font-mono text-sm font-semibold uppercase tracking-wider text-surface-300">
-            Día del Evento · 26 jun
+            {t("config_dia_title")}
           </h2>
           <UrlField
             label="URL del Track Virtual"
@@ -134,7 +136,7 @@ export default function ConfigPage() {
         {/* Post-evento */}
         <div className="border-2 border-surface-600 bg-surface-800 p-6">
           <h2 className="mb-5 font-mono text-sm font-semibold uppercase tracking-wider text-surface-300">
-            Post-Evento · 27 jun en adelante
+            {t("config_post_title")}
           </h2>
           <div className="flex flex-col gap-5">
             <UrlField
@@ -150,8 +152,8 @@ export default function ConfigPage() {
               onChange={set("recordingsUrl")}
             />
             <UrlField
-              label="Notificación 2027"
-              hint='Botón "Notifícame del 2027" — puede ser un Google Form o newsletter.'
+              label={t("config_notify_label")}
+              hint={t("config_notify_hint")}
               value={config.notifyUrl}
               onChange={set("notifyUrl")}
             />

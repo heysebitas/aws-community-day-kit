@@ -6,12 +6,20 @@ import { requireAccess } from "@/lib/auth";
 import { Passport } from "@/models/passport";
 import { PrintConfig } from "@/models/print-config";
 import { pdfToBuffer } from "@/lib/pdf/common";
-import { SITIO } from "@/config";
+import { resolver, tokensDe } from "@/i18n/tokens";
+import { EVENTO, IDIOMA_BASE, SITIO } from "@/config";
 
 const APP_URL = SITIO;
 const MM = 72 / 25.4; // mm → pt
 const ROLE_LABEL: Record<string, string> = { attendee: "ASISTENTE", speaker: "SPEAKER", volunteer: "VOLUNTARIO", organizer: "ORGANIZADOR" };
 const ft = (s?: string) => (s || "").trim().split(/\s+/)[0] || "";
+
+/** El título del PDF va en el idioma del panel y con el nombre de la edición. */
+async function tituloDelPdf(): Promise<string> {
+  const crudos = (await import(`../../../../messages/${IDIOMA_BASE}.json`)).default;
+  const m = resolver(crudos, tokensDe(IDIOMA_BASE)) as Record<string, Record<string, string>>;
+  return `${m.Panel.escarapelas} ${EVENTO.nombreCompleto}`;
+}
 
 type Person = { shortId: string; role: string; firstName: string; lastName: string; company?: string; jobTitle?: string; viewPin?: string; badgeFirstName?: string; badgeLastName?: string };
 type Align = "left" | "center" | "right";
@@ -162,7 +170,7 @@ export async function POST(req: NextRequest) {
     // Dimensiones lógicas (donde dibujamos). Con giro 90/270 se intercambian.
     const swap = rotate === 90 || rotate === 270;
     const LW = swap ? H : W, LH = swap ? W : H;
-    const pdf = new PDFDocument({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 }, autoFirstPage: false, info: { Title: "Escarapelas AWS SCD 2026" } });
+    const pdf = new PDFDocument({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 }, autoFirstPage: false, info: { Title: await tituloDelPdf() } });
 
     // Abre una página y gira el lienzo si hace falta (el contenido se dibuja en coords lógicas LW×LH).
     const beginPage = () => {
