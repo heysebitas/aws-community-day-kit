@@ -1,0 +1,32 @@
+{
+  "nombre": "AWS Student Community Day",
+  "siglas": "SCD",
+  "pais": "CL",
+  "edicion": "Chile",
+  "anio": 2026,
+  "ciudad": "Santiago",
+  "organiza": "AWS Student Builder Groups Chile",
+  "sitio": "https://scdchile.cl",
+  "inicio": "2026-10-24T08:30",
+  "fin": "2026-10-24T18:00",
+  "sede": {
+    "nombre": "Duoc UC — Sede Maipú",
+    "direccion": "Av. Esquina Blanca 501",
+    "localidad": "Maipú, Santiago",
+    "lat": -33.5120026,
+    "lon": -70.7523787,
+    "mapa": "https://www.openstreetmap.org/#map=16/-33.5120/-70.7524",
+    "comoLlegar": "Llegas en Metro (Línea 5, estación Plaza de Maipú) y desde ahí en micro, o en vehículo particular.",
+    "comoLlegarEn": "Take the Metro (Line 5, Plaza de Maipú station) and a local bus from there, or drive."
+  },
+  "cupos": 300,
+  "presencial": true,
+  "online": true,
+  "tema": "lavanda",
+  "idiomas": ["es", "en"],
+  "instagram": "https://www.instagram.com/aws.scdchile",
+  "linkedin": "",
+  "cfpCierre": "2026-09-23T23:59",
+  "cfpSlides": "2026-10-14T23:59",
+  "contacto": { "general": "contacto@example.com", "privacidad": "privacidad@example.com", "patrocinios": "patrocinios@example.com" }
+}

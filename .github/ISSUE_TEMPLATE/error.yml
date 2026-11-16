@@ -1,0 +1,42 @@
+name: Error
+description: Algo no funciona como debería
+labels: [error]
+body:
+  - type: markdown
+    attributes:
+      value: No pegues datos reales de asistentes, llaves ni tu `.env.local`.
+  - type: textarea
+    id: que
+    attributes:
+      label: Qué pasó
+      description: Qué hiciste, qué esperabas y qué ocurrió. Una captura ayuda.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Cómo reproducirlo
+      placeholder: |
+        1. npm run demo
+        2. Abrir /registro
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: demo
+    attributes:
+      label: ¿Pasa también con `npm run demo`?
+      options: ["Sí", "No", "No lo probé"]
+    validations:
+      required: true
+  - type: input
+    id: entorno
+    attributes:
+      label: Entorno
+      description: Commit o versión del kit, versión de Node, navegador, país configurado.
+  - type: textarea
+    id: registro
+    attributes:
+      label: Mensajes de error
+      description: De la consola del navegador o del servidor.
+      render: text

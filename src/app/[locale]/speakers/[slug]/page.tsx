@@ -1,0 +1,113 @@
+import { notFound } from "next/navigation";
+import { connectDB } from "@/lib/db";
+import { SpeakerProfile } from "@/models/speaker-profile";
+import { AgendaEvent } from "@/models/agenda-event";
+import { setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { PerfilSpeaker } from "./_perfil";
+import type { Metadata } from "next";
+import { EVENTO, PAIS, SITIO } from "@/config";
+
+interface PageProps {
+  params: Promise<{ locale: string; slug: string }>;
+}
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale, slug: "_placeholder" }));
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  await connectDB();
+  const profile = await SpeakerProfile.findOne({ slug, isPublic: true }).lean();
+  if (!profile) return {};
+  return {
+    title: profile.name,
+    description: profile.bio || profile.talkTitle,
+    openGraph: {
+      title: profile.name,
+      description: profile.bio || profile.talkTitle,
+      images: [`/api/og/speaker/${slug}`],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: profile.name,
+      images: [`/api/og/speaker/${slug}`],
+    },
+  };
+}
+
+function formatSessionTime(iso: string | Date) {
+  try {
+    return new Date(iso).toLocaleTimeString(PAIS.locale, {
+      timeZone: EVENTO.zona,
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+  } catch { return ""; }
+}
+
+export default async function SpeakerProfilePage({ params }: PageProps) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  await connectDB();
+  const profile = await SpeakerProfile.findOne({ slug, isPublic: true }).lean();
+  if (!profile) notFound();
+
+  // La hora y la sala salen del bloque de la agenda cuando ya está agendado.
+  let horaFin: string | null = null;
+  let sala: string | null = null;
+  if (profile.sessionId) {
+    const bloque = await AgendaEvent.findById(profile.sessionId).select("endTime room").lean();
+    horaFin = bloque?.endTime ?? null;
+    sala = bloque?.room ?? null;
+  }
+
+  const inicio = profile.scheduledAt ? formatSessionTime(profile.scheduledAt) : "";
+  const hora = inicio ? (horaFin ? `${inicio} – ${horaFin}` : inicio) : undefined;
+
+  const appUrl = SITIO;
+
+  return (
+    <main className="min-h-screen bg-surface-900 px-5 pb-20 pt-24 sm:px-6">
+      <div className="mx-auto max-w-5xl">
+        <Link
+          href={locale === "en" ? "/en/directorio" : "/directorio"}
+          className="mb-8 inline-flex min-h-10 items-center gap-2 border-2 border-surface-600 px-3 font-mono text-xs font-bold text-surface-300 transition-colors hover:border-acento hover:text-acento"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Directorio
+        </Link>
+
+        <PerfilSpeaker
+          persona={{
+            nombre: profile.name,
+            foto: profile.photo,
+            tagline: profile.tagline || profile.role,
+            bio: profile.bio,
+            social: profile.social,
+          }}
+          acompanantes={(profile.coSpeakers ?? []).map((c) => ({
+            nombre: `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim(),
+            foto: c.photo,
+            tagline: c.tagline || c.role,
+            bio: c.bio,
+            social: c.social,
+          }))}
+          track={profile.track}
+          trackLabel={(profile.track ?? "").replace(/-/g, " ")}
+          talkTitle={profile.talkTitle}
+          talkAbstract={profile.talkAbstract}
+          hora={hora}
+          sala={sala ?? undefined}
+          countryCity={profile.countryCity}
+          cardUrl={`${appUrl}/api/og/speaker/${slug}`}
+          profileUrl={`${appUrl}/speakers/${slug}`}
+          slug={slug}
+        />
+      </div>
+    </main>
+  );
+}

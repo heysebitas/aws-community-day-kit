@@ -1,0 +1,300 @@
+@import "tailwindcss";
+
+/* Windows no trae glifos de bandera y dibuja las letras del país. Esta fuente
+   sólo tiene banderas y, por el `unicode-range`, sólo se descarga si la página
+   muestra alguna. */
+@font-face {
+  font-family: "Country Flags";
+  src: url("/fonts/TwemojiCountryFlags.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+1F1E6-1F1FF;
+}
+
+/* El tema. Estos son los valores de «naranja»; el layout los pisa en <html>
+   con los del tema elegido en `evento/config.ts` (ver `src/config/temas.ts`).
+   `--tema-acento-rgb` existe para poder darle transparencia:
+   `rgb(var(--tema-acento-rgb) / 0.3)`. */
+:root {
+  --tema-acento: #FF9900;
+  --tema-acento-rgb: 255 153 0;
+  --tema-claro: #FFC266;
+  --tema-fuerte: #E88B00;
+  --tema-profundo: #6B3300;
+}
+
+@theme inline {
+  --breakpoint-xs: 380px;
+
+  /* Acento: fondo de los bloques claros y color de detalle sobre negro.
+     Encima siempre va texto en `tinta`; sobre él, el acento es `acento-profundo`. */
+  --color-acento: var(--tema-acento);
+  --color-acento-claro: var(--tema-claro);
+  --color-acento-fuerte: var(--tema-fuerte);
+  --color-acento-profundo: var(--tema-profundo);
+  --color-tinta: #000000;
+  --color-papel: #FFFFFF;
+
+  /* Escala neutra, de oscuro a claro. */
+  --color-surface-900: #000000;
+  --color-surface-800: #0A0A0F;
+  --color-surface-700: #16161F;
+  --color-surface-600: #252530;
+  --color-surface-500: #3A3A4A;
+  --color-surface-400: #6B6B80;
+  --color-surface-300: #8E8EA0;
+  --color-surface-200: #B0B0C0;
+  --color-surface-100: #E0E0EB;
+  --color-surface-50: #F5F5FA;
+
+  --color-glass: rgba(10, 10, 15, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-border-hover: rgb(var(--tema-acento-rgb) / 0.35);
+
+  /* Una sola voz de texto: `font-sans` es la monoespaciada. */
+  --font-sans: var(--font-jetbrains);
+  --font-mono: var(--font-jetbrains);
+  --font-display: var(--font-oxanium), var(--font-jetbrains), ui-monospace, monospace;
+  --font-dot: var(--font-handjet), var(--font-jetbrains), ui-monospace, monospace;
+
+  --animate-fade-up: fade-up 0.6s ease-out both;
+}
+
+/* Los keyframes van fuera de `@theme`: Tailwind descarta los que ningún token
+   `--animate-*` referencia, y varios se usan desde `style` o clases propias. */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes color-wave {
+  0%, 100% { color: var(--color-acento); }
+  50%      { color: #FFFFFF; }
+}
+
+@keyframes color-wave-invert {
+  0%, 100% { color: var(--color-tinta); }
+  50%      { color: var(--color-acento-profundo); }
+}
+
+@keyframes flicker {
+  0%   { opacity: 0.97; }
+  5%   { opacity: 0.95; }
+  10%  { opacity: 0.99; }
+  15%  { opacity: 0.96; }
+  20%  { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+@keyframes pulse-highlight {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--tema-acento-rgb) / 0.45); }
+  50%      { box-shadow: 0 0 0 7px rgb(var(--tema-acento-rgb) / 0); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* Pictogramas: cada figura lleva su retardo, así la fila ondula en vez de latir junta. */
+@keyframes glyph-bob {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  30%      { transform: translateY(-5px) scaleY(1.04); }
+  60%      { transform: translateY(1px) scaleY(0.97); }
+}
+@keyframes glyph-drift {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(7px); }
+}
+@keyframes glyph-twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50%      { transform: scale(1.22) rotate(18deg); opacity: 0.72; }
+}
+@keyframes glyph-tick {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(9deg); }
+}
+
+.animate-flicker         { animation: flicker 0.15s infinite; }
+.animate-pulse-highlight { animation: pulse-highlight 2.2s ease-in-out infinite; }
+
+/* Onda de color letra a letra. El retardo lo pone cada <span>. */
+.wave-letter        { animation: color-wave 2.6s ease-in-out infinite; }
+.wave-letter-invert { animation: color-wave-invert 2.6s ease-in-out infinite; }
+
+.glyph-bob     { animation: glyph-bob 2.4s ease-in-out infinite; }
+.glyph-drift   { animation: glyph-drift 4.5s ease-in-out infinite; }
+.glyph-twinkle { animation: glyph-twinkle 2.8s ease-in-out infinite; }
+.glyph-tick    { animation: glyph-tick 3.2s ease-in-out infinite; transform-origin: 50% 50%; }
+
+/* Letrero de matriz de puntos: Handjet con puntos redondos sobre grilla densa. */
+.dot-matrix {
+  font-family: var(--font-dot);
+  font-variation-settings: "ELSH" 16, "ELGR" 1;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.font-flag {
+  font-family: "Country Flags", var(--font-jetbrains), monospace;
+}
+
+html {
+  /* Con desbordamiento lateral el navbar fijo se desalinea del contenido. */
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  /* Deja el ancla por debajo del navbar fijo. */
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--color-surface-900);
+  color: var(--color-surface-100);
+  font-family: var(--font-sans), ui-monospace, monospace;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-surface-900); }
+::-webkit-scrollbar-thumb { background: var(--color-surface-600); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-surface-500); }
+
+::selection {
+  background: rgb(var(--tema-acento-rgb) / 0.3);
+  color: var(--color-surface-50);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Formularios sobre el bloque del tema.
+   Los públicos corren sobre el bloque claro con tinta negra; el panel usa las
+   mismas primitivas en oscuro. En vez de un prop `tone` en cada una, todo lo
+   que cae dentro de `.form-block` se repinta. */
+.form-block {
+  color: var(--color-tinta);
+}
+
+.form-block label,
+.form-block .font-mono.text-sm.text-surface-200,
+.form-block span.text-surface-200 {
+  color: color-mix(in srgb, var(--color-tinta) 88%, transparent);
+  font-weight: 600;
+}
+.form-block .text-surface-300,
+.form-block .text-surface-400 { color: color-mix(in srgb, var(--color-tinta) 65%, transparent); }
+.form-block .text-surface-500,
+.form-block .text-surface-600 { color: color-mix(in srgb, var(--color-tinta) 50%, transparent); }
+.form-block .text-surface-50,
+.form-block .text-surface-100 { color: var(--color-tinta); }
+/* Sobre el bloque el acento no se ve: pasa al profundo. */
+.form-block .text-acento { color: var(--color-acento-profundo); }
+
+.form-block input:not([type="checkbox"]):not([type="radio"]),
+.form-block textarea,
+.form-block select {
+  border-radius: 0;
+  border: 2px solid color-mix(in srgb, var(--color-tinta) 35%, transparent);
+  background: color-mix(in srgb, #ffffff 55%, transparent);
+  color: var(--color-tinta);
+  box-shadow: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+.form-block input::placeholder,
+.form-block textarea::placeholder { color: color-mix(in srgb, var(--color-tinta) 42%, transparent); }
+.form-block input:not([type="checkbox"]):not([type="radio"]):hover,
+.form-block textarea:hover,
+.form-block select:hover {
+  border-color: color-mix(in srgb, var(--color-tinta) 60%, transparent);
+}
+.form-block input:not([type="checkbox"]):not([type="radio"]):focus,
+.form-block textarea:focus,
+.form-block select:focus {
+  border-color: var(--color-tinta);
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--color-tinta) 30%, transparent);
+}
+
+/* La opción elegida se marca en negro: el acento es el color del fondo y no se distinguiría. */
+.form-block [role="radio"] > span:first-child {
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--color-tinta) 45%, transparent);
+  background: color-mix(in srgb, #ffffff 55%, transparent);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.form-block [role="radio"]:hover > span:first-child {
+  border-color: var(--color-tinta);
+}
+.form-block [role="radio"][aria-checked="true"] > span:first-child {
+  border-color: var(--color-tinta);
+  background: var(--color-tinta);
+}
+.form-block [role="radio"][aria-checked="true"] > span:first-child > span {
+  background: var(--color-acento);
+}
+
+.form-block button[type="submit"],
+.form-block .btn-hard {
+  border-radius: 0;
+  background: var(--color-tinta);
+  color: var(--color-acento);
+  font-weight: 700;
+  box-shadow: 5px 5px 0 0 color-mix(in srgb, var(--color-tinta) 35%, transparent);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+.form-block button[type="submit"]:hover:not(:disabled),
+.form-block .btn-hard:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--color-tinta) 35%, transparent);
+}
+.form-block button[type="submit"]:active:not(:disabled),
+.form-block .btn-hard:active:not(:disabled) {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+.form-block button[type="submit"]:disabled { box-shadow: none; opacity: 0.45; }
+
+.form-block button:not([type="submit"]).rounded-xl,
+.form-block button:not([type="submit"]).rounded-full {
+  border-radius: 0;
+}
+
+.form-block .border-red-500\/30 {
+  border-radius: 0;
+  border-color: #7f1d1d;
+  background: color-mix(in srgb, #7f1d1d 12%, transparent);
+}
+.form-block .text-red-400 { color: #7f1d1d; }
+.form-block .border-acento { border-color: var(--color-tinta); }
+
+/* Safari en iOS hace zoom al enfocar un campo de menos de 16px. Bloquearlo con
+   `maximum-scale=1` también bloquea el pellizco para ampliar, así que en
+   pantallas táctiles los campos miden 16px de verdad. El `!important` es
+   porque compite con las utilidades de Tailwind. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

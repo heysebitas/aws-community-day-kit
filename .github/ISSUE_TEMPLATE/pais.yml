@@ -1,0 +1,31 @@
+name: Mi país
+description: Un documento, un formato o un dato legal que falta o está mal
+labels: [pais]
+body:
+  - type: input
+    id: pais
+    attributes:
+      label: País
+    validations:
+      required: true
+  - type: dropdown
+    id: que
+    attributes:
+      label: Qué hay que corregir
+      multiple: true
+      options:
+        - Documentos de identidad
+        - Teléfono
+        - Niveles de estudio o tipos de institución
+        - Zona horaria o formato de fechas
+        - Ley o autoridad de protección de datos
+        - Mi país no está
+    validations:
+      required: true
+  - type: textarea
+    id: detalle
+    attributes:
+      label: Cómo debería ser
+      description: Con un ejemplo inventado del formato y, si existe, un enlace a la fuente oficial. No pongas tu documento real.
+    validations:
+      required: true

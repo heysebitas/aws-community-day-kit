@@ -1,0 +1,28 @@
+# Ejemplo: el sitio y un MongoDB en la misma máquina.
+#   docker compose up --build
+# Lee las variables de .env.local. En producción, usa una base administrada y
+# quita el servicio `base`.
+services:
+  sitio:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+    env_file: .env.local
+    environment:
+      MONGODB_URI: mongodb://base:27017/evento
+    ports:
+      - "3000:3000"
+    depends_on:
+      - base
+    restart: unless-stopped
+
+  base:
+    image: mongo:8
+    volumes:
+      - datos:/data/db
+    restart: unless-stopped
+
+volumes:
+  datos:

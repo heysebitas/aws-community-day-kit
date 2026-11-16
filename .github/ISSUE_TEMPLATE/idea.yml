@@ -1,0 +1,22 @@
+name: Idea
+description: Algo que le falta al kit
+labels: [idea]
+body:
+  - type: textarea
+    id: para-que
+    attributes:
+      label: Qué necesitas resolver
+      description: El problema, antes que la solución. ¿En qué momento del evento te hizo falta?
+    validations:
+      required: true
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: Cómo te lo imaginas
+  - type: checkboxes
+    id: alcance
+    attributes:
+      label: Alcance
+      options:
+        - label: Le sirve a cualquier edición, no sólo a la mía
+        - label: Puedo ayudar a hacerlo
