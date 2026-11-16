@@ -17,6 +17,27 @@ const ok = (t: string) => console.log(`  ✓ ${t}`);
 const aviso = (t: string) => console.log(`  ! ${t}`);
 const error = (t: string) => console.log(`  ✗ ${t}`);
 
+const COLECCIONES_UNICAS = ["registrations", "volunteersubmissions"];
+
+/** Correos repetidos que impedirían crear el índice único; sólo lee. */
+export async function buscarDuplicados(uri: string) {
+  const mongoose = (await import("mongoose")).default;
+  const conn = await mongoose.createConnection(uri, { serverSelectionTimeoutMS: 5000 }).asPromise();
+  try {
+    const salida: { coleccion: string; email: string; veces: number }[] = [];
+    for (const coleccion of COLECCIONES_UNICAS) {
+      const grupos = await conn.collection(coleccion).aggregate<{ _id: string; n: number }>([
+        { $group: { _id: "$email", n: { $sum: 1 } } },
+        { $match: { n: { $gt: 1 } } },
+      ]).toArray();
+      for (const g of grupos) salida.push({ coleccion, email: g._id, veces: g.n });
+    }
+    return salida;
+  } finally {
+    await conn.close();
+  }
+}
+
 async function main() {
   let fallos = 0;
 
@@ -80,6 +101,21 @@ async function main() {
     } else aviso(h.texto);
   }
 
+  console.log("\nBase de datos");
+  if (!process.env.MONGODB_URI) aviso("Sin MONGODB_URI: no se buscan correos duplicados.");
+  else {
+    try {
+      const dups = await buscarDuplicados(process.env.MONGODB_URI);
+      if (!dups.length) ok("Sin correos duplicados: el índice único de email se puede crear");
+      for (const d of dups) {
+        fallos++;
+        error(`${d.coleccion}: ${d.email} está ${d.veces} veces; sin quitar los repetidos no se crea el índice único`);
+      }
+    } catch (e) {
+      aviso(`No se pudo revisar la base: ${(e as Error).message}`);
+    }
+  }
+
   console.log(
     fallos
       ? `\n${fallos} cosa(s) por corregir antes de desplegar. Para probar sin nada de esto: npm run demo\n`
@@ -88,4 +124,4 @@ async function main() {
   process.exit(fallos ? 1 : 0);
 }
 
-void main();
+if (require.main === module) void main();

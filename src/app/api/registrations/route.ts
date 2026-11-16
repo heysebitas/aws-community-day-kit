@@ -88,8 +88,7 @@ export async function POST(request: NextRequest) {
     }
     const data = parsed.data;
 
-    // El correo es único: ahora es un campo indexado, así que la consulta no
-    // tiene que mirar dentro de un mapa con tres claves posibles.
+    // Respuesta rápida; la garantía real es el índice único de `email`.
     const existing = await Registration.findOne({ email: data.email });
     if (existing) {
       return Response.json(
@@ -109,16 +108,28 @@ export async function POST(request: NextRequest) {
 
     const qrCode = nanoid(12);
 
-    const registration = await Registration.create({
-      ...data,
-      qrCode,
-      isManual: !!manual,
-      ...(manual && initialCheckedIn ? {
-        checkedIn: true,
-        checkedInAt: new Date(),
-        checkedInBy: actor?._id.toString() || null,
-      } : {}),
-    });
+    // El índice único cierra la carrera entre el findOne y el create.
+    let registration;
+    try {
+      registration = await Registration.create({
+        ...data,
+        qrCode,
+        isManual: !!manual,
+        ...(manual && initialCheckedIn ? {
+          checkedIn: true,
+          checkedInAt: new Date(),
+          checkedInBy: actor?._id.toString() || null,
+        } : {}),
+      });
+    } catch (e) {
+      if ((e as { code?: number }).code === 11000) {
+        return Response.json(
+          { error: "Este correo ya está registrado en el evento" },
+          { status: 409 },
+        );
+      }
+      throw e;
+    }
 
     const name = `${data.firstName} ${data.lastName}`.trim();
     const email = data.email;

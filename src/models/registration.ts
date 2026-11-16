@@ -63,7 +63,7 @@ const registrationSchema = new Schema<IRegistration>(
   {
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, lowercase: true, trim: true, index: true },
+    email: { type: String, required: true, lowercase: true, trim: true, unique: true },
 
     attendance: {
       type: String,

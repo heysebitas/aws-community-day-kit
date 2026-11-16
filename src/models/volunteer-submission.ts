@@ -63,7 +63,7 @@ const volunteerSubmissionSchema = new Schema<IVolunteerSubmission>(
   {
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, lowercase: true, trim: true, index: true },
+    email: { type: String, required: true, lowercase: true, trim: true, unique: true },
     phone: { type: String, default: "" },
     // Sin `required` a propósito: el formulario público sí los exige —lo hace
     // `parseVolunteerInput`—, pero una ficha movida desde registros llega sin

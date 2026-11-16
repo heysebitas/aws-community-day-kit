@@ -72,8 +72,7 @@ export async function POST(request: NextRequest) {
     }
     const data = parsed.data;
 
-    // Una postulación por correo. Ahora es un campo indexado, así que no hay
-    // que mirar dentro de un mapa con tres claves posibles.
+    // Una postulación por correo; la garantía real es el índice único.
     const existing = await VolunteerSubmission.findOne({ email: data.email });
     if (existing) {
       return Response.json(
@@ -90,14 +89,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const submission = await VolunteerSubmission.create({
-      ...data,
-      approvedBy: manual && actor ? actor._id.toString() : null,
-      metadata: {
-        ip: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined,
-        userAgent: request.headers.get("user-agent") || undefined,
-      },
-    });
+    // El índice único cierra la carrera entre el findOne y el create.
+    let submission;
+    try {
+      submission = await VolunteerSubmission.create({
+        ...data,
+        approvedBy: manual && actor ? actor._id.toString() : null,
+        metadata: {
+          ip: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined,
+          userAgent: request.headers.get("user-agent") || undefined,
+        },
+      });
+    } catch (e) {
+      if ((e as { code?: number }).code === 11000) {
+        return Response.json(
+          { error: "Ya enviaste una solicitud como voluntario" },
+          { status: 409 },
+        );
+      }
+      throw e;
+    }
 
     return Response.json({ id: submission._id }, { status: 201 });
   } catch (e) {
