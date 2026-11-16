@@ -14,30 +14,26 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-    const passport = await Passport.findOne({ shortId });
-    if (!passport) return NextResponse.json({ found: false }, { status: 404 });
-
-    const meals = passport.meals ?? {};
-    const existing = (meals as Record<string, { claimedAt?: Date; claimedBy?: string } | undefined>)[type];
-
-    if (existing?.claimedAt) {
+    // Solo cambia si aún no se reclamó: dos escaneos a la vez no entregan dos veces.
+    const passport = await Passport.findOneAndUpdate(
+      { shortId, [`meals.${type}.claimedAt`]: null },
+      { $set: { [`meals.${type}`]: { claimedAt: new Date(), claimedBy: user.name } } },
+      { returnDocument: "after" },
+    );
+    if (!passport) {
+      const previo = await Passport.findOne({ shortId });
+      if (!previo) return NextResponse.json({ found: false }, { status: 404 });
+      const existing = (previo.meals ?? {}) as Record<string, { claimedAt?: Date; claimedBy?: string } | undefined>;
       return NextResponse.json({
         found: true,
         alreadyClaimed: true,
-        claimedAt: existing.claimedAt,
-        claimedBy: existing.claimedBy,
-        firstName: passport.firstName,
-        lastName: passport.lastName,
-        role: passport.role,
+        claimedAt: existing[type]?.claimedAt,
+        claimedBy: existing[type]?.claimedBy,
+        firstName: previo.firstName,
+        lastName: previo.lastName,
+        role: previo.role,
       });
     }
-
-    passport.meals = meals;
-    (passport.meals as Record<string, { claimedAt: Date; claimedBy: string }>)[type] = {
-      claimedAt: new Date(),
-      claimedBy: user.name,
-    };
-    await passport.save();
 
     await createLog({
       userId: String(user._id),

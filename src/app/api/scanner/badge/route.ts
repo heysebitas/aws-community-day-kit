@@ -37,22 +37,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ found: false, error: "Badge inválido o inactivo" }, { status: 404 });
     }
 
-    const passport = await Passport.findOne({ shortId });
-    if (!passport) return NextResponse.json({ found: false }, { status: 404 });
-
+    // El filtro exige que el sello aún no esté: solo un escaneo lo agrega.
     const sid = String(sponsor._id);
-    const already = (passport.stamps ?? []).some((s: { sponsorId: string }) => s.sponsorId === sid);
-    if (already) {
+    const passport = await Passport.findOneAndUpdate(
+      { shortId, "stamps.sponsorId": { $ne: sid } },
+      { $push: { stamps: { sponsorId: sid, sponsorName: sponsor.sponsorName, stampedAt: new Date() } } },
+      { returnDocument: "after" },
+    );
+    if (!passport) {
+      const previo = await Passport.findOne({ shortId });
+      if (!previo) return NextResponse.json({ found: false }, { status: 404 });
       return NextResponse.json({
         found: true, alreadyHas: true,
-        firstName: passport.firstName, lastName: passport.lastName, role: passport.role,
+        firstName: previo.firstName, lastName: previo.lastName, role: previo.role,
         sponsorName: sponsor.sponsorName,
       });
     }
-
-    passport.stamps = passport.stamps ?? [];
-    passport.stamps.push({ sponsorId: sid, sponsorName: sponsor.sponsorName, stampedAt: new Date() });
-    await passport.save();
     await SponsorPin.findByIdAndUpdate(sponsor._id, { $inc: { totalStamps: 1 } });
 
     await createLog({
