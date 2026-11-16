@@ -64,7 +64,8 @@ export function WireGlobe({
       tiltTarget = 0;
     };
     canvas.style.cursor = "grab";
-    canvas.style.touchAction = "none";
+    // El gesto vertical sigue siendo scroll de la página; el horizontal gira el globo.
+    canvas.style.touchAction = "pan-y";
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerup", onUp);
@@ -87,11 +88,18 @@ export function WireGlobe({
 
     // Fuera de pantalla no se dibuja.
     let visible = true;
-    const centinela = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { rootMargin: "100px" });
+    const centinela = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(draw);
+    }, { rootMargin: "100px" });
     centinela.observe(canvas);
 
     const draw = () => {
-      if (!size || !visible) {
+      if (!visible) {
+        raf = 0;
+        return;
+      }
+      if (!size) {
         raf = requestAnimationFrame(draw);
         return;
       }
