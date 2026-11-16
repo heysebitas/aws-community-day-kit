@@ -37,7 +37,7 @@ export function Marca({
             {l}
           </span>
         ))}
-        <span className={cn("block truncate font-mono text-[10px] tracking-widest", tono === "tinta" ? "text-tinta" : "text-acento")}>
+        <span className={cn("block truncate font-mono text-xs tracking-widest", tono === "tinta" ? "text-tinta" : "text-acento")}>
           {EVENTO.edicion} {EVENTO.anio}
         </span>
       </span>

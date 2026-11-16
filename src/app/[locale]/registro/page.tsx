@@ -35,6 +35,7 @@ export default async function RegistroPage({ params }: Props) {
       isOpen={isOpen}
       volunteersOpen={volunteersOpen}
       locale={locale}
+      title={t("registration_title")}
       lead={t("registration_lead")}
       closedTitle={t("unavailable_registration")}
       closedLead={t("unavailable_follow")}

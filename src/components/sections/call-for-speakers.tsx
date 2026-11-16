@@ -53,7 +53,7 @@ function DeadlineCountdown() {
 
   return (
     <div>
-      <p className="dot-matrix mb-2.5 text-sm text-tinta/70">
+      <p className="etiqueta mb-2.5 text-tinta/70">
         {t("countdown_label")}
       </p>
       <div className="flex gap-2">
@@ -64,7 +64,7 @@ function DeadlineCountdown() {
                 {String(b.value).padStart(2, "0")}
               </span>
             </div>
-            <span className="dot-matrix mt-1.5 text-xs text-tinta/70">
+            <span className="etiqueta mt-1.5 text-tinta/70">
               {b.label}
             </span>
           </div>
@@ -171,7 +171,7 @@ export function CallForSpeakers() {
             <Row
               dot
               left={
-                <time className="dot-matrix text-base text-tinta md:text-lg">
+                <time className="dot-matrix text-lg text-tinta">
                   {t(m.dateKey)}
                 </time>
               }

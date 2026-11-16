@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { TEMAS, contraste, derivarTema, resolverTema } from "@/config/temas";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { TEMAS, aRgb, contraste, derivarTema, resolverTema } from "@/config/temas";
 
 const HEX = /^#[0-9A-F]{6}$/i;
 
@@ -41,4 +43,33 @@ describe("resolverTema", () => {
   it("un nombre que no existe dice cuáles hay", () => {
     assert.throws(() => resolverTema("fucsia" as never), /naranja/);
   });
+});
+
+// Lo que pinta el bloque claro encima del acento (ver `.form-block` en globals.css):
+// texto secundario al 70 %, borde de los controles al 75 % y el rojo de error.
+describe("el bloque claro se lee con cualquier tema", () => {
+  const css = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
+  const error = css.match(/--color-error:\s*(#[0-9A-F]{6})/i)?.[1] ?? "";
+  const sobre = (acento: string, alfa: number) => {
+    const [r, g, b] = aRgb(acento).map((v) => Math.round(v * (1 - alfa)));
+    return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+  };
+  const temas = [
+    ...Object.entries(TEMAS),
+    ...["#000080", "#12AB34", "#8B0000", "#333"].map((c) => [c, derivarTema(c)] as const),
+  ];
+
+  it("globals.css usa los valores que aquí se comprueban", () => {
+    assert.match(error, HEX);
+    assert.match(css, /\.form-block \.text-surface-600 \{ color: color-mix\(in srgb, var\(--color-tinta\) 70%/);
+    assert.match(css, /border: 2px solid color-mix\(in srgb, var\(--color-tinta\) 75%/);
+  });
+
+  for (const [nombre, tema] of temas) {
+    it(`${nombre}: secundario, borde de control y error`, () => {
+      assert.ok(contraste(sobre(tema.acento, 0.7), tema.acento) >= 4.5, "tinta al 70 %");
+      assert.ok(contraste(sobre(tema.acento, 0.75), tema.acento) >= 3, "borde al 75 %");
+      assert.ok(contraste(error, tema.acento) >= 4.5, `error ${contraste(error, tema.acento).toFixed(2)}:1`);
+    });
+  }
 });

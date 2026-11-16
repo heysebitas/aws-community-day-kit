@@ -85,7 +85,7 @@ function Numero({
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-20 shrink-0 border-2 border-surface-600 bg-surface-800 px-2 py-1 text-center font-mono text-xs text-acento focus:border-acento focus:outline-none"
       />
-      {sufijo && <span className="w-6 shrink-0 font-mono text-[10px] text-surface-500">{sufijo}</span>}
+      {sufijo && <span className="w-6 shrink-0 font-mono text-[10px] text-surface-300">{sufijo}</span>}
     </label>
   );
 }
@@ -678,7 +678,7 @@ function CanvasEditorInner() {
                 rows={3}
                 className="w-full resize-y border-2 border-surface-600 bg-surface-800 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none"
               />
-              <span className="font-mono text-[10px] text-surface-500">
+              <span className="font-mono text-[10px] text-surface-300">
                 {ajustes.talkTitleCard.length} caracteres · se dibuja a {tamTitulo}px
               </span>
             </label>
@@ -777,7 +777,7 @@ function CanvasEditorInner() {
               />
               <span className="font-mono text-[11px] leading-relaxed text-surface-300">
                 Mostrar <strong className="text-surface-100">{DOMINIO}</strong> bajo el QR.
-                <span className="block text-surface-500">
+                <span className="block text-surface-300">
                   Vale para todas las tarjetas. El QR no se toca: es el que lleva al perfil.
                 </span>
               </span>

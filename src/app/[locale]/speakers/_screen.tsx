@@ -405,7 +405,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
               Ver speakers confirmados
             </Link>
           </div>
-          <p className="mt-8 font-mono text-xs text-surface-600">
+          <p className="mt-8 font-mono text-xs text-surface-400">
             {EVENTO.ciudad} · {fechaCorta(EVENTO.inicio)} · Gratuito
           </p>
         </motion.div>
@@ -489,7 +489,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                   "px-5 py-2 font-mono text-xs font-bold transition-colors",
                   lang === l
                     ? "bg-tinta text-acento"
-                    : "text-tinta/60 hover:bg-tinta/10 hover:text-tinta",
+                    : "text-tinta/70 hover:bg-tinta/10 hover:text-tinta",
                 )}
               >
                 {l === "es" ? "Español" : "English"}
@@ -519,7 +519,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                       "flex h-10 w-10 items-center justify-center border-2 font-mono text-xs font-bold transition-all",
                       done || current
                         ? "border-tinta bg-tinta text-acento"
-                        : "border-tinta/30 bg-acento text-tinta/40",
+                        : "border-tinta/30 bg-acento text-tinta/70",
                       current && "shadow-[3px_3px_0_0_rgba(0,0,0,0.35)]",
                     )}
                     aria-current={current ? "step" : undefined}
@@ -528,8 +528,8 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                   </div>
                   <span
                     className={cn(
-                      "hidden text-center font-mono text-[10px] leading-tight sm:block",
-                      current ? "font-bold text-tinta" : "text-tinta/50",
+                      "hidden text-center font-mono text-xs leading-tight sm:block",
+                      current ? "font-bold text-tinta" : "text-tinta/70",
                     )}
                   >
                     {label}
@@ -581,7 +581,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                     {form.sessionType === "online" && (
                       <Field label={t.preRecordingDate} error={errors.preRecordingDate}>
                         <div className="relative">
-                          <Calendar className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-surface-500" />
+                          <Calendar className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-surface-300" />
                           <TextInput
                             value={form.preRecordingDate}
                             onChange={(v) => { set("preRecordingDate", v); clearErr("preRecordingDate"); }}
@@ -599,7 +599,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                         value={form.track as never}
                         onChange={(v) => { set("track", v); clearErr("track"); }}
                       />
-                      <p className="mt-2 font-mono text-[11px] leading-relaxed text-surface-400">
+                      <p className="mt-2 font-mono text-xs leading-relaxed text-surface-400">
                         {t.track_hint}
                       </p>
                     </Field>
@@ -617,11 +617,12 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                         {([["es", t.lang_es], ["en", t.lang_en]] as const).map(([val, lbl]) => (
                           <button key={val} type="button" onClick={() => set("language", val)}
                             // Mismo tratamiento que CardSelector: elegido en tinta sólida.
+                            aria-pressed={form.language === val}
                             className={cn(
                               "flex-1 border-2 py-3 font-mono text-xs font-bold transition-all",
                               form.language === val
                                 ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                                : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                                : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                             )}
                           >{lbl}</button>
                         ))}
@@ -652,7 +653,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                         />
                         <div className="flex min-w-0 flex-col gap-1 text-surface-400">
                           <p className="font-mono text-xs leading-relaxed">{t.photo_hint}</p>
-                          <p className="font-mono text-[10px] text-surface-500">JPG · PNG · WEBP · máx 8 MB</p>
+                          <p className="font-mono text-xs text-surface-300">JPG · PNG · WEBP · máx 8 MB</p>
                         </div>
                       </div>
 
@@ -668,12 +669,12 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                             className="overflow-hidden"
                           >
                             <div className="mt-4 border-l-4 border-tinta bg-white/35 py-3 pl-4 pr-3">
-                              <p className="dot-matrix m-0 mb-2 text-sm leading-none text-acento-profundo">
+                              <p className="etiqueta m-0 mb-2 leading-none text-acento-profundo">
                                 {t.photo_tips_title}
                               </p>
                               <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
                                 {[t.photo_tip_1, t.photo_tip_2, t.photo_tip_3, t.photo_tip_4].map((tip, i) => (
-                                  <li key={i} className="flex gap-2 font-mono text-[11px] leading-relaxed text-tinta/75">
+                                  <li key={i} className="flex gap-2 font-mono text-xs leading-relaxed text-tinta/75">
                                     <span className="shrink-0 font-bold text-acento-profundo">·</span>
                                     <span>{tip}</span>
                                   </li>
@@ -743,11 +744,12 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                       <div className="flex gap-3">
                         {([true, false] as const).map((val) => (
                           <button key={String(val)} type="button" onClick={() => { set("firstTimeSpeaker", val); clearErr("firstTimeSpeaker"); }}
+                            aria-pressed={form.firstTimeSpeaker === val}
                             className={cn(
                               "flex-1 border-2 py-3 font-mono text-sm font-bold transition-all",
                               form.firstTimeSpeaker === val
                                 ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                                : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                                : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                             )}
                           >
                             {val ? t.yes_opt : t.no_opt}
@@ -773,7 +775,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                                 campo un `transform`, que crea un contexto de
                                 apilamiento y lo pinta por encima del icono.
                                 Sin esto el logo desaparecia al hacer clic. */}
-                            <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-tinta/60">
+                            <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-tinta/70">
                               {icon}
                             </span>
                             <input
@@ -785,11 +787,11 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                               aria-label={label}
                               className={cn(
                                 "w-full py-2.5 pl-10 pr-3 font-mono text-xs",
-                                socialErrors[key] && "border-[#7f1d1d]",
+                                socialErrors[key] && "border-error",
                               )}
                             />
                             {socialErrors[key] && (
-                              <p className="m-0 mt-1 font-mono text-[11px] text-[#7f1d1d]">
+                              <p className="m-0 mt-1 font-mono text-xs text-error">
                                 {socialErrors[key]}
                               </p>
                             )}
@@ -810,7 +812,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
 
                     {/* Slug preview */}
                     <div className="border-l-4 border-tinta bg-white/40 py-3 pl-4 pr-3">
-                      <p className="dot-matrix m-0 mb-1.5 text-sm leading-none text-acento-profundo">{t.slug_preview}</p>
+                      <p className="etiqueta m-0 mb-1.5 leading-none text-acento-profundo">{t.slug_preview}</p>
                       <p className="m-0 break-all font-mono text-sm text-tinta">
                         {DOMINIO}/speakers/<span className="font-bold">{computedSlug || "..."}</span>
                       </p>
@@ -826,7 +828,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                               {/* Numero en caja negra, como en las secciones
                                   legales: con tres co-speakers posibles hay que
                                   saber cual se esta llenando. */}
-                              <span className="flex h-7 w-7 shrink-0 items-center justify-center border-2 border-tinta bg-tinta font-mono text-[11px] font-bold tabular-nums text-acento">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center border-2 border-tinta bg-tinta font-mono text-xs font-bold tabular-nums text-acento">
                                 {String(i + 1).padStart(2, "0")}
                               </span>
                               <span className="font-mono text-xs font-bold text-tinta">{t.coSpeaker_label}</span>
@@ -834,7 +836,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                             <button
                               type="button"
                               onClick={() => setForm((f) => ({ ...f, coSpeakers: f.coSpeakers.filter((_, j) => j !== i) }))}
-                              className="shrink-0 border-2 border-[#7f1d1d] px-2.5 py-1 font-mono text-[10px] font-bold text-[#7f1d1d] transition-colors hover:bg-[#7f1d1d] hover:text-acento"
+                              className="shrink-0 border-2 border-error px-2.5 py-1 font-mono text-xs font-bold text-error transition-colors hover:bg-error hover:text-acento"
                             >
                               {t.coSpeaker_remove}
                             </button>
@@ -845,9 +847,9 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                             <span className="mb-1.5 block font-mono text-xs font-semibold text-surface-100">{t.coSpeaker_photo}</span>
                             <div className="flex items-center gap-3">
                               <PhotoUpload value={cs.photo} onChange={(v) => { updateCoSpeaker(i, { photo: v }); clearErr(`cs_${i}_photo`); }} className="aspect-square h-16 w-16 shrink-0" />
-                              <p className="font-mono text-[10px] text-surface-400 leading-relaxed">{t.photo_hint}</p>
+                              <p className="font-mono text-xs text-surface-400 leading-relaxed">{t.photo_hint}</p>
                             </div>
-                            {errors[`cs_${i}_photo`] && <p className="mt-1 font-mono text-xs text-[#7f1d1d]">{errors[`cs_${i}_photo`]}</p>}
+                            {errors[`cs_${i}_photo`] && <p className="mt-1 font-mono text-xs text-error">{errors[`cs_${i}_photo`]}</p>}
                           </div>
 
                           {/* Name row */}
@@ -856,13 +858,13 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                               <input value={cs.firstName} onChange={(e) => { updateCoSpeaker(i, { firstName: e.target.value }); clearErr(`cs_${i}_firstName`); }}
                                 placeholder={t.coSpeaker_firstName_ph} maxLength={80}
                                 className="w-full px-3 py-2.5 font-mono text-sm" />
-                              {errors[`cs_${i}_firstName`] && <p className="font-mono text-xs text-[#7f1d1d]">{errors[`cs_${i}_firstName`]}</p>}
+                              {errors[`cs_${i}_firstName`] && <p className="font-mono text-xs text-error">{errors[`cs_${i}_firstName`]}</p>}
                             </div>
                             <div className="flex flex-col gap-1">
                               <input value={cs.lastName} onChange={(e) => { updateCoSpeaker(i, { lastName: e.target.value }); clearErr(`cs_${i}_lastName`); }}
                                 placeholder={t.coSpeaker_lastName_ph} maxLength={80}
                                 className="w-full px-3 py-2.5 font-mono text-sm" />
-                              {errors[`cs_${i}_lastName`] && <p className="font-mono text-xs text-[#7f1d1d]">{errors[`cs_${i}_lastName`]}</p>}
+                              {errors[`cs_${i}_lastName`] && <p className="font-mono text-xs text-error">{errors[`cs_${i}_lastName`]}</p>}
                             </div>
                           </div>
 
@@ -877,7 +879,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                               type="text" inputMode="email" autoComplete="off" spellCheck={false}
                               maxLength={200}
                               className="w-full px-3 py-2.5 font-mono text-sm" />
-                            {errors[`cs_${i}_email`] && <p className="font-mono text-xs text-[#7f1d1d]">{errors[`cs_${i}_email`]}</p>}
+                            {errors[`cs_${i}_email`] && <p className="font-mono text-xs text-error">{errors[`cs_${i}_email`]}</p>}
                           </div>
 
                           {/* Bio */}
@@ -885,7 +887,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                             <textarea value={cs.bio} onChange={(e) => updateCoSpeaker(i, { bio: e.target.value })}
                               placeholder={t.coSpeaker_bio_ph} maxLength={400} rows={3}
                               className="w-full resize-none px-3 py-2.5 font-mono text-sm" />
-                            <span className={cn("absolute right-3 bottom-3 font-mono text-[10px]", cs.bio.length > 360 ? "text-acento" : "text-surface-500")}>
+                            <span className={cn("absolute right-3 bottom-3 font-mono text-xs", cs.bio.length > 360 ? "text-acento" : "text-surface-300")}>
                               {cs.bio.length}/400
                             </span>
                           </div>
@@ -903,7 +905,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                                 // el icono va dentro del campo, con z-10 para
                                 // que el `transform` del foco no lo tape.
                                 <div key={key} className="relative">
-                                  <span className="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-tinta/60">
+                                  <span className="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-tinta/70">
                                     {icon}
                                   </span>
                                   <input
@@ -915,11 +917,11 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                                     aria-label={`${label} — ${t.coSpeaker_label} ${i + 1}`}
                                     className={cn(
                                       "w-full py-2 pl-8 pr-2.5 font-mono text-xs",
-                                      errors[`cs_${i}_${key}`] && "border-[#7f1d1d]",
+                                      errors[`cs_${i}_${key}`] && "border-error",
                                     )}
                                   />
                                   {errors[`cs_${i}_${key}`] && (
-                                    <p className="m-0 mt-1 font-mono text-[10px] text-[#7f1d1d]">
+                                    <p className="m-0 mt-1 font-mono text-xs text-error">
                                       {errors[`cs_${i}_${key}`]}
                                     </p>
                                   )}
@@ -940,11 +942,11 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                     {/* Legal agreements */}
                     <div className="flex flex-col gap-2">
                       {/* Code of conduct */}
-                      <label className={cn("flex cursor-pointer items-start gap-3 border p-3.5 transition-all", form.codeOfConduct ? "border-tinta/30 bg-tinta/5" : "border-tinta/20 bg-white/20 hover:border-tinta/25")}>
+                      <label className={cn("flex cursor-pointer items-start gap-3 border-2 p-3.5 transition-all", form.codeOfConduct ? "border-tinta bg-tinta/5" : "border-tinta/75 bg-papel/80 hover:border-tinta")}>
                         <div className="relative mt-0.5 shrink-0">
                           <input type="checkbox" checked={form.codeOfConduct} onChange={(e) => { set("codeOfConduct", e.target.checked); clearErr("codeOfConduct"); }} className="sr-only" />
-                          <div className={cn("flex h-4.5 w-4.5 h-5 w-5 items-center justify-center rounded border-2 transition-all", form.codeOfConduct ? "border-tinta bg-tinta" : "border-tinta/20 bg-white/40")}>
-                            {form.codeOfConduct && <CheckCircle2 className="h-3 w-3 text-white" />}
+                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all", form.codeOfConduct ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
+                            {form.codeOfConduct && <CheckCircle2 className="h-3 w-3 text-acento" />}
                           </div>
                         </div>
                         <span className="font-mono text-xs text-surface-200 leading-relaxed">
@@ -952,14 +954,14 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                           <Link href="/codigo-conducta" target="_blank" className="text-acento hover:underline">{t.conduct_link}</Link>
                         </span>
                       </label>
-                      {errors.codeOfConduct && <p className="font-mono text-xs text-[#7f1d1d] px-1">{errors.codeOfConduct}</p>}
+                      {errors.codeOfConduct && <p className="font-mono text-xs text-error px-1">{errors.codeOfConduct}</p>}
 
                       {/* Privacy */}
-                      <label className={cn("flex cursor-pointer items-start gap-3 border p-3.5 transition-all", form.consent ? "border-tinta/30 bg-tinta/5" : "border-tinta/20 bg-white/20 hover:border-tinta/25")}>
+                      <label className={cn("flex cursor-pointer items-start gap-3 border-2 p-3.5 transition-all", form.consent ? "border-tinta bg-tinta/5" : "border-tinta/75 bg-papel/80 hover:border-tinta")}>
                         <div className="relative mt-0.5 shrink-0">
                           <input type="checkbox" checked={form.consent} onChange={(e) => { set("consent", e.target.checked); clearErr("consent"); }} className="sr-only" />
-                          <div className={cn("flex h-5 w-5 items-center justify-center rounded border-2 transition-all", form.consent ? "border-tinta bg-tinta" : "border-tinta/20 bg-white/40")}>
-                            {form.consent && <CheckCircle2 className="h-3 w-3 text-white" />}
+                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all", form.consent ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
+                            {form.consent && <CheckCircle2 className="h-3 w-3 text-acento" />}
                           </div>
                         </div>
                         <span className="font-mono text-xs text-surface-200 leading-relaxed">
@@ -967,7 +969,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                           <Link href="/privacidad" target="_blank" className="text-acento hover:underline">{t.privacy}</Link>
                         </span>
                       </label>
-                      {errors.consent && <p className="font-mono text-xs text-[#7f1d1d] px-1">{errors.consent}</p>}
+                      {errors.consent && <p className="font-mono text-xs text-error px-1">{errors.consent}</p>}
                     </div>
 
                     {/* Turnstile */}
@@ -989,12 +991,12 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                     )}
 
                     {hasCaptcha && !captchaToken && !errors.submit && (
-                      <p className="m-0 text-center font-mono text-xs text-tinta/50">
+                      <p className="m-0 text-center font-mono text-xs text-tinta/70">
                         {tf("captcha_checking")}
                       </p>
                     )}
 
-                    {errors.submit && <p className="border-2 border-[#7f1d1d] bg-[#7f1d1d]/10 px-4 py-3 font-mono text-sm text-[#7f1d1d]">{errors.submit}</p>}
+                    {errors.submit && <p className="border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">{errors.submit}</p>}
 
                     {/* La vista previa va al final: es lo último que se ve antes de enviar. */}
                     <div className="mt-2 border-t-2 border-dashed border-tinta/25 pt-6">

@@ -56,7 +56,7 @@ export function CreditosScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="m-0 inline-flex items-center gap-2 border-2 border-tinta/30 bg-white/30 px-3 py-1.5 font-mono text-[11px] text-tinta/75"
+          className="m-0 inline-flex items-center gap-2 border-2 border-tinta/30 bg-white/30 px-3 py-1.5 font-mono text-xs text-tinta/75"
         >
           <Terminal className="h-3.5 w-3.5" />
           código abierto
@@ -114,7 +114,7 @@ export function CreditosScreen() {
               <span className="text-tinta transition-colors group-hover:text-acento">
                 {e.icon}
               </span>
-              <span className="dot-matrix text-sm leading-none">{e.label}</span>
+              <span className="etiqueta leading-none">{e.label}</span>
               <span className="font-mono text-xs opacity-75">{e.handle}</span>
             </a>
           ))}
@@ -137,7 +137,7 @@ export function CreditosScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.7 }}
-          className="mt-8 font-mono text-xs text-tinta/60 underline underline-offset-4 hover:text-tinta"
+          className="mt-8 font-mono text-xs text-tinta/70 underline underline-offset-4 hover:text-tinta"
         >
           volver al evento
         </motion.a>
@@ -150,7 +150,7 @@ export function CreditosScreen() {
             <span
               key={i}
               className={cn(
-                "dot-matrix whitespace-nowrap px-6 py-2.5 text-base leading-none sm:text-lg",
+                "dot-matrix whitespace-nowrap px-6 py-2.5 text-lg leading-none",
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >

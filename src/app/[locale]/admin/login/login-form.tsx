@@ -89,7 +89,7 @@ export function LoginForm() {
 
   const fieldClass =
     "w-full border-2 border-tinta/35 bg-white/55 px-4 py-3 font-mono text-sm text-tinta " +
-    "placeholder:text-tinta/40 outline-none transition-all " +
+    "placeholder:text-tinta/70 outline-none transition-all " +
     "focus:-translate-y-px focus:border-tinta focus:bg-white " +
     "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
 
@@ -128,14 +128,14 @@ export function LoginForm() {
                   if (error) setError("");
                 }}
                 onBlur={checkEmail}
-                placeholder="tu@correo.cl"
+                placeholder="tu@correo.com"
                 required
                 aria-invalid={!!emailError}
                 aria-describedby={emailError ? "login-email-error" : undefined}
-                className={cn(fieldClass, emailError && "border-[#7f1d1d] bg-[#7f1d1d]/10")}
+                className={cn(fieldClass, emailError && "border-error bg-error/10")}
               />
               {emailError && (
-                <p id="login-email-error" className="m-0 font-mono text-xs text-[#7f1d1d]">
+                <p id="login-email-error" className="m-0 font-mono text-xs text-error">
                   {emailError}
                 </p>
               )}
@@ -166,7 +166,7 @@ export function LoginForm() {
                   // lector de pantalla anuncia el estado sin que la etiqueta baile.
                   aria-pressed={showPassword}
                   aria-label="Mostrar contraseña"
-                  className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center text-tinta/55 transition-colors hover:text-tinta"
+                  className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center text-tinta/70 transition-colors hover:text-tinta"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -191,7 +191,7 @@ export function LoginForm() {
             </div>
 
             {error && (
-              <p className="m-0 border-2 border-[#7f1d1d] bg-[#7f1d1d]/10 px-4 py-3 font-mono text-sm text-[#7f1d1d]">
+              <p className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
                 {error}
               </p>
             )}
@@ -199,7 +199,7 @@ export function LoginForm() {
             {siteKey && !captchaToken && !error && (
               // El widget es invisible, asi que sin esta linea el boton
               // apagado no tiene explicacion a la vista.
-              <p className="m-0 text-center font-mono text-xs text-tinta/50">
+              <p className="m-0 text-center font-mono text-xs text-tinta/70">
                 {tf("captcha_checking")}
               </p>
             )}

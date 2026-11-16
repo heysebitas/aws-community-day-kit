@@ -18,7 +18,7 @@ function Tarjeta({ track, numero, locale }: { track: Track; numero: number; loca
     <article className="group relative flex aspect-[5/7] flex-col justify-between overflow-hidden border-2 border-surface-600 bg-surface-900 p-5 transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 hover:border-acento hover:shadow-[8px_8px_0_0_var(--color-acento-fuerte)]">
       <div className="flex items-start justify-between gap-3">
         <span className="font-mono text-xs text-surface-200">Track {n} _</span>
-        <span className="border-2 border-acento px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-acento">
+        <span className="border-2 border-acento px-2 py-1 font-mono text-xs font-bold uppercase tracking-wider text-acento">
           {labelOf(track.nivel, locale)}
         </span>
       </div>
@@ -47,7 +47,7 @@ export function Tracks() {
   if (!tracks.length) return null;
 
   return (
-    <section id="tracks" className="mx-auto max-w-[1180px] px-6 py-20 md:py-28">
+    <section id="tracks" className="mx-auto max-w-[1180px] px-6 seccion-s">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-8 md:mb-14">
         <ScrollReveal>
           <DotHeading as="div" variant="inverted" className="mb-5 text-xl sm:text-2xl md:text-3xl">

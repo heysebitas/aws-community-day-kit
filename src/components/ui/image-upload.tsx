@@ -131,7 +131,7 @@ export function ImageUpload({
               <p className="font-mono text-xs font-semibold text-surface-300">
                 {dragging ? "Suelta aquí" : "Haz clic o arrastra"}
               </p>
-              <p className="font-mono text-[10px] text-surface-300">JPG, PNG, WEBP, GIF · máx 5 MB</p>
+              <p className="font-mono text-xs text-surface-300">JPG, PNG, WEBP, GIF · máx 5 MB</p>
             </div>
           </div>
         )}

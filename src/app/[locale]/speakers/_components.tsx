@@ -40,7 +40,7 @@ export function Field({ label, error, children, hint }: { label?: string; error?
     <div className="flex flex-col gap-1.5">
       {label && <span className="font-mono text-xs font-semibold text-tinta">{label}</span>}
       {children}
-      {hint && !error && <p className="font-mono text-[10px] text-tinta/50">{hint}</p>}
+      {hint && !error && <p className="font-mono text-xs text-tinta/70">{hint}</p>}
       {error && <p className="font-mono text-xs text-red-400">{error}</p>}
     </div>
   );
@@ -59,10 +59,10 @@ export function TextInput({ value, onChange, onBlur, placeholder, maxLength, cla
         inputMode={inputMode}
         autoComplete={autoComplete ?? "off"}
         spellCheck={false}
-        className={cn("w-full border border-tinta/25 bg-white/40 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/50 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all", className)}
+        className={cn("w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all", className)}
       />
       {maxLength && value.length > maxLength * 0.8 && (
-        <span className="absolute right-3 top-3 font-mono text-[10px] text-tinta/50">{value.length}/{maxLength}</span>
+        <span className="absolute right-3 top-3 font-mono text-xs text-tinta/70">{value.length}/{maxLength}</span>
       )}
     </div>
   );
@@ -78,10 +78,10 @@ export function Textarea({ value, onChange, placeholder, maxLength, rows = 4 }: 
         placeholder={placeholder}
         maxLength={maxLength}
         rows={rows}
-        className="w-full resize-none border border-tinta/25 bg-white/40 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/50 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all"
+        className="w-full resize-none border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all"
       />
       {maxLength && (
-        <span className={cn("absolute right-3 bottom-3 font-mono text-[10px]", value.length > maxLength * 0.9 ? "text-acento-profundo" : "text-tinta/50")}>
+        <span className={cn("absolute right-3 bottom-3 font-mono text-xs", value.length > maxLength * 0.9 ? "text-acento-profundo" : "text-tinta/70")}>
           {value.length}/{maxLength}
         </span>
       )}
@@ -136,7 +136,7 @@ export function PhotoUpload({ value, onChange, className }: { value: string; onC
         )}
         {!value && !uploading && (
           <div className="flex flex-col items-center gap-2 p-4 text-center">
-            <Upload className="h-7 w-7 text-tinta/50" />
+            <Upload className="h-7 w-7 text-tinta/70" />
             <p className="font-mono text-xs font-semibold text-tinta/70">Subir foto</p>
           </div>
         )}
@@ -145,7 +145,7 @@ export function PhotoUpload({ value, onChange, className }: { value: string; onC
             <div className="h-1.5 w-3/4 overflow-hidden bg-tinta/20">
               <div className="h-full bg-tinta transition-all" style={{ width: `${progress}%` }} />
             </div>
-            <span className="font-mono text-xs text-tinta/60">{progress}%</span>
+            <span className="font-mono text-xs text-tinta/70">{progress}%</span>
           </div>
         )}
         {value && !uploading && (
@@ -191,6 +191,7 @@ export function CardSelector<T extends string>({
           type="button"
           disabled={opt.disabled}
           aria-disabled={opt.disabled}
+          aria-pressed={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
             // Elegida = tinta negra sólida: el acento sobre el bloque del tema es el mismo color del fondo.
@@ -198,17 +199,17 @@ export function CardSelector<T extends string>({
             opt.disabled
               // Apagada: punteada, tachada y sin hover. Sigue leyéndose para
               // que se entienda que la modalidad existe y que hoy no va.
-              ? "cursor-not-allowed border-dashed border-tinta/30 bg-transparent text-tinta/45 [&>span:nth-child(2)]:line-through"
+              ? "cursor-not-allowed border-dashed border-tinta/30 bg-transparent text-tinta/70 [&>span:nth-child(2)]:line-through"
               : value === opt.value
                 ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
           )}
         >
           <span className="flex h-8 w-8 items-center justify-center">
             {opt.icon}
           </span>
           <span className="font-mono text-xs font-bold">{opt.label}</span>
-          <span className="font-mono text-[10px] opacity-70">{opt.desc}</span>
+          <span className="font-mono text-xs opacity-70">{opt.desc}</span>
         </button>
       ))}
     </div>

@@ -32,14 +32,14 @@ export async function LegalPage({
           <DotHeading tone="block" variant="inverted">
             {title}
           </DotHeading>
-          <p className="mt-4 font-mono text-sm text-tinta/60">{updated}</p>
+          <p className="mt-4 font-mono text-sm text-tinta/70">{updated}</p>
         </header>
 
         <div className="grid gap-12 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
           {/* Índice */}
           <nav aria-label="Contenido" className="hidden lg:block">
             <div className="sticky top-28">
-              <p className="dot-matrix mb-4 text-base leading-none text-tinta/60">
+              <p className="etiqueta mb-4 leading-none text-tinta/70">
                 {t("legal_index")}
               </p>
               <ol className="m-0 flex list-none flex-col gap-2 p-0">
@@ -47,9 +47,9 @@ export async function LegalPage({
                   <li key={s.id}>
                     <a
                       href={`#${s.id}`}
-                      className="group flex gap-2.5 font-mono text-[13px] leading-snug text-tinta/65 transition-colors hover:text-tinta"
+                      className="group flex gap-2.5 font-mono text-[13px] leading-snug text-tinta/70 transition-colors hover:text-tinta"
                     >
-                      <span className="tabular-nums text-tinta/40 group-hover:text-tinta">
+                      <span className="tabular-nums text-tinta/70 group-hover:text-tinta">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <span className="underline-offset-4 group-hover:underline">
@@ -102,7 +102,7 @@ export async function LegalPage({
             <span
               key={i}
               className={cn(
-                "dot-matrix whitespace-nowrap px-6 py-2.5 text-base leading-none sm:text-lg",
+                "dot-matrix whitespace-nowrap px-6 py-2.5 text-lg leading-none",
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >
@@ -140,7 +140,7 @@ export function NumberedList({ items }: { items: React.ReactNode[] }) {
 export function Callout({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mt-5 border-l-4 border-tinta bg-white/40 py-4 pl-5 pr-4">
-      <p className="dot-matrix m-0 mb-2 text-sm leading-none text-acento-profundo">{label}</p>
+      <p className="etiqueta m-0 mb-2 leading-none text-acento-profundo">{label}</p>
       <div className="m-0">{children}</div>
     </div>
   );

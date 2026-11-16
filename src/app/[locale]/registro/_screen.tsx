@@ -10,6 +10,7 @@ export function RegistroScreen({
   isOpen,
   volunteersOpen,
   locale,
+  title,
   lead,
   closedTitle,
   closedLead,
@@ -18,6 +19,7 @@ export function RegistroScreen({
   /** Si la convocatoria de voluntarios acepta postulaciones ahora mismo. */
   volunteersOpen: boolean;
   locale: string;
+  title: string;
   lead: string;
   closedTitle: string;
   closedLead: string;
@@ -56,13 +58,13 @@ export function RegistroScreen({
   };
 
   return (
-    <FormShell title="Registro" lead={lead} className="max-w-3xl">
+    <FormShell title={title} lead={lead} className="max-w-3xl">
       {isOpen ? (
         <RegistroForm onSubmit={handleSubmit} volunteersOpen={volunteersOpen} />
       ) : (
         <div className="py-12 text-center">
           <p className="font-mono text-sm text-tinta/70">{closedTitle}</p>
-          <p className="mt-2 font-mono text-xs text-tinta/50">{closedLead}</p>
+          <p className="mt-2 font-mono text-xs text-tinta/70">{closedLead}</p>
         </div>
       )}
     </FormShell>

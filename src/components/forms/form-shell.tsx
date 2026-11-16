@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { DotHeading } from "@/components/ui/dot-heading";
 import { cn } from "@/lib/utils";
-import { EVENTO } from "@/config";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -31,18 +31,19 @@ export function FormShell({
   aside?: React.ReactNode;
   className?: string;
 }) {
+  const tCinta = useTranslations("Strip");
   return (
     <main className="form-block flex min-h-screen flex-col bg-acento pt-28">
       <div className={cn("mx-auto w-full max-w-6xl flex-1 px-5", className)}>
         {/* Cabecera */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease }}
           className="mb-8 flex flex-wrap items-end justify-between gap-6"
         >
           <div>
-            <DotHeading tone="block" variant="inverted" flicker>
+            <DotHeading tone="block" variant="inverted" flicker reveal={false}>
               {title}
             </DotHeading>
             {lead && (
@@ -62,10 +63,10 @@ export function FormShell({
         >
           {/* Hoja del formulario */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12, ease }}
-            className="border-2 border-tinta bg-acento/40 p-5 shadow-[8px_8px_0_0_rgba(10,10,15,0.28)] sm:p-8"
+            className="border-2 border-tinta p-5 shadow-[8px_8px_0_0_var(--color-tinta)] sm:p-8"
           >
             {children}
           </motion.div>
@@ -89,11 +90,11 @@ export function FormShell({
             <span
               key={i}
               className={cn(
-                "dot-matrix whitespace-nowrap px-6 py-2.5 text-base leading-none sm:text-lg",
+                "dot-matrix whitespace-nowrap px-6 py-2.5 text-lg leading-none",
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >
-              {EVENTO.ciudad} · {EVENTO.anio} · {title}
+              {i % 2 === 1 ? title : tCinta("date")}
             </span>
           ))}
         </div>

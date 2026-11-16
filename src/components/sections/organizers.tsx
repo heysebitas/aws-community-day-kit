@@ -78,7 +78,7 @@ export function OrganizerCard({ org }: { org: Organizador }) {
           </div>
         )}
         {org.pais && (
-          <span className="absolute right-2 top-2 bg-acento px-1.5 py-0.5 font-mono text-[10px] font-bold leading-none text-tinta">
+          <span className="absolute right-2 top-2 bg-acento px-1.5 py-0.5 font-mono text-xs font-bold leading-none text-tinta">
             {org.pais}
           </span>
         )}
@@ -129,7 +129,7 @@ export function Organizers() {
   // Se respeta el orden de `src/data/organizers.ts` tal cual: la lista es
   // curada, no aleatoria.
   return (
-    <section id="organizers" className="py-24 px-6">
+    <section id="organizers" className="seccion-m px-6">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <SectionHeading title={t("heading")} subtitle={t("subheading")} />

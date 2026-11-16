@@ -225,7 +225,7 @@ export default function PlantillasPage() {
                   </span>
                   <input className={CAMPO} value={borrador.preview} readOnly={actual.bloqueada}
                     onChange={(e) => editar({ preview: e.target.value })} />
-                  <span className="font-mono text-[10px] text-surface-500">
+                  <span className="font-mono text-[10px] text-surface-300">
                     La línea gris que sale junto al asunto en la bandeja de entrada.
                   </span>
                 </label>
@@ -277,7 +277,7 @@ export default function PlantillasPage() {
                 ))}
               </div>
 
-              <p className="m-0 mt-3 border-t-2 border-surface-600 pt-2 font-mono text-[10px] leading-relaxed text-surface-500">
+              <p className="m-0 mt-3 border-t-2 border-surface-600 pt-2 font-mono text-[10px] leading-relaxed text-surface-300">
                 Los de «enlaces del panel» se configuran en Configuración del evento. Si uno está
                 vacío, el botón que lo use desaparece del correo.
               </p>

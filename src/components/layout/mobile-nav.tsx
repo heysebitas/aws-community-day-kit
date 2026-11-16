@@ -90,7 +90,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                 transition={{ duration: 0.4, delay: 0.04 + i * 0.035, ease }}
                 className="group flex items-baseline gap-4 border-b border-acento/20 py-3.5 transition-colors hover:bg-acento/10"
               >
-                <span className="dot-matrix w-7 shrink-0 text-xs text-acento/60">
+                <span className="etiqueta w-7 shrink-0 text-acento">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="font-display text-2xl font-medium lowercase tracking-tight text-surface-50 transition-colors group-hover:text-acento">

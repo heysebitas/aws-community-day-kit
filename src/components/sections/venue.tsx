@@ -33,7 +33,7 @@ export function Venue() {
       <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
         <div>
           <ScrollReveal>
-            <p className="dot-matrix text-sm text-surface-400">{coordenadas(locale)}</p>
+            <p className="etiqueta text-surface-400">{coordenadas(locale)}</p>
             <h3 className="mt-2 font-display text-5xl font-medium lowercase leading-[0.95] tracking-tighter text-surface-50 md:text-6xl">
               {EVENTO.ciudad}
             </h3>
@@ -70,12 +70,8 @@ export function Venue() {
         {silueta !== "ninguna" && (
           <ScrollReveal delay={0.2} from="scale">
             <div className="relative mx-auto w-full max-w-[520px]">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-full bg-acento/10 blur-3xl"
-              />
               <WireCiudad silueta={silueta} ciudad={EVENTO.ciudad} className="relative h-[420px] w-full md:h-[520px]" />
-              <p className="dot-matrix mt-1 text-center text-[11px] text-surface-500 sm:text-xs">
+              <p className="etiqueta mt-1 text-center text-surface-300">
                 {EVENTO.sede.siluetaPie ?? EVENTO.ciudad}
               </p>
             </div>

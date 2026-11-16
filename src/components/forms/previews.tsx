@@ -19,7 +19,7 @@ function Frame({
 }) {
   return (
     <div className="w-full">
-      <p className="dot-matrix mb-3 text-xs text-tinta/60">{kicker}</p>
+      <p className="etiqueta mb-3 text-tinta/70">{kicker}</p>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ export function PassportPreview({
       <div className="flex items-center justify-between border-b-2 border-acento/25 px-4 py-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/logos/aws-logo.svg" alt="AWS" className="h-5 w-auto" />
-        <span className="dot-matrix text-[11px] text-white/45">{fechaCorta(EVENTO.inicio)}</span>
+        <span className="etiqueta text-white/45">{fechaCorta(EVENTO.inicio)}</span>
       </div>
 
       {/* Avatar */}
@@ -94,11 +94,11 @@ export function PassportPreview({
         </p>
 
         {extra && (
-          <p className="mt-3 font-mono text-[11px] text-white/55">{toUpper(extra)}</p>
+          <p className="mt-3 font-mono text-xs text-white/55">{toUpper(extra)}</p>
         )}
 
         <div className="mt-4 flex justify-center">
-          <span className="dot-matrix border border-acento/40 bg-acento/10 px-3 py-1 text-[10px] text-acento">
+          <span className="etiqueta border border-acento/40 bg-acento/10 px-3 py-1 text-acento">
             asistente
           </span>
         </div>
@@ -106,7 +106,7 @@ export function PassportPreview({
 
       {/* Sellos: lo que se va llenando durante el evento */}
       <div className="border-t-2 border-acento/25 px-5 py-4">
-        <p className="dot-matrix mb-2.5 text-[10px] text-white/45">{t("preview_stamps")}</p>
+        <p className="etiqueta mb-2.5 text-white/45">{t("preview_stamps")}</p>
         <div className="flex gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
@@ -164,7 +164,7 @@ export function SpeakerPreview({
             </span>
           </div>
         )}
-        <span className="dot-matrix absolute left-3 top-3 bg-acento px-2 py-1 text-[10px] leading-none text-tinta">
+        <span className="etiqueta absolute left-3 top-3 bg-acento px-2 py-1 leading-none text-tinta">
           speaker
         </span>
       </div>
@@ -178,7 +178,7 @@ export function SpeakerPreview({
         </p>
 
         <div className="mt-4 border-t border-surface-700 pt-4">
-          <p className="dot-matrix mb-1.5 text-[10px] text-white/45">{t("preview_talk_label")}</p>
+          <p className="etiqueta mb-1.5 text-white/45">{t("preview_talk_label")}</p>
           <p className="m-0 font-mono text-sm leading-snug text-white/90">
             {cleanWhitespace(talkTitle) || t("preview_talk_ph")}
           </p>
@@ -189,7 +189,7 @@ export function SpeakerPreview({
             {badges.map((b) => (
               <span
                 key={b}
-                className="border border-acento/40 px-2.5 py-1 font-mono text-[10px] text-acento"
+                className="border border-acento/40 px-2.5 py-1 font-mono text-xs text-acento"
               >
                 {b}
               </span>
@@ -225,7 +225,7 @@ export function VolunteerPreview({
     <Frame kicker={t("preview_volunteer")}>
       {/* Cinta del cordón */}
       <div className="flex items-center justify-center border-b-2 border-acento bg-acento py-1.5">
-        <span className="dot-matrix text-[11px] leading-none text-tinta">
+        <span className="etiqueta leading-none text-tinta">
           staff · {EVENTO.ciudad.toLowerCase()} {EVENTO.anio}
         </span>
       </div>
@@ -241,12 +241,12 @@ export function VolunteerPreview({
         </div>
 
         <div className="min-w-0">
-          <p className="dot-matrix text-[10px] text-white/45">voluntario/a</p>
+          <p className="etiqueta text-white/45">voluntario/a</p>
           <p className="m-0 mt-1 break-words font-display text-2xl font-medium uppercase leading-[0.95] tracking-tight text-white">
             {name}
           </p>
           {area && (
-            <p className="mt-2 inline-block border border-acento/40 px-2 py-0.5 font-mono text-[10px] text-acento">
+            <p className="mt-2 inline-block border border-acento/40 px-2 py-0.5 font-mono text-xs text-acento">
               {toUpper(area)}
             </p>
           )}
@@ -261,8 +261,8 @@ export function VolunteerPreview({
           ["sede", "duoc maipú"],
         ].map(([k, v]) => (
           <div key={k} className="border-r border-surface-700 px-2 py-3 last:border-r-0">
-            <p className="dot-matrix m-0 text-[9px] text-white/45">{k}</p>
-            <p className="m-0 mt-1 font-mono text-[11px] text-white/80">{v}</p>
+            <p className="etiqueta m-0 text-white/45">{k}</p>
+            <p className="m-0 mt-1 font-mono text-xs text-white/80">{v}</p>
           </div>
         ))}
       </div>

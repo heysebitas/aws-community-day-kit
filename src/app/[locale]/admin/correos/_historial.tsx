@@ -159,13 +159,13 @@ export function Historial({ plantilla, recargar }: { plantilla: string; recargar
                             </span>
                             <span className="text-surface-200">{e.nombre || "(sin nombre)"}</span>
                             <span className="text-surface-400">{e.email}</span>
-                            <span className="text-surface-500">{e.publico}</span>
+                            <span className="text-surface-300">{e.publico}</span>
                             {e.motivo && <span className="text-red-300">{e.motivo}</span>}
                           </li>
                         ))}
                       </ul>
                     )}
-                    <p className="m-0 mt-2 flex items-start gap-1.5 font-mono text-[10px] leading-relaxed text-surface-500">
+                    <p className="m-0 mt-2 flex items-start gap-1.5 font-mono text-[10px] leading-relaxed text-surface-300">
                       <MailCheck className="mt-0.5 h-3 w-3 shrink-0" />
                       «Enviado» es que Resend lo aceptó; «entregado», que llegó al servidor de
                       destino. El estado lo va actualizando Resend por su cuenta, así que esto

@@ -57,8 +57,8 @@ export function FilterSection({
                 }`}
               >
                 <span className="font-mono text-xs">{label}</span>
-                <span className={`rounded-none px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
-                  isActive ? "bg-surface-900/60 text-current" : "bg-surface-800 text-surface-500"
+                <span className={`rounded-none px-1.5 py-0.5 font-mono text-xs font-semibold ${
+                  isActive ? "bg-surface-900/60 text-current" : "bg-surface-800 text-surface-300"
                 }`}>
                   {count}
                 </span>
@@ -102,7 +102,7 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
           </>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-700 to-surface-900">
-            <span className="font-mono font-bold text-surface-600 select-none text-5xl">{initials}</span>
+            <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none text-5xl">{initials}</span>
           </div>
         )}
 
@@ -115,7 +115,7 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
       </div>
 
       <div className="relative z-[2] flex flex-col justify-center gap-4 p-6">
-        <span className="self-start font-mono font-bold tracking-[0.28em] uppercase text-acento bg-acento/10 border border-acento/30 rounded-none text-[10px] px-3 py-1">
+        <span className="self-start font-mono font-bold tracking-[0.28em] uppercase text-acento bg-acento/10 border border-acento/30 rounded-none text-xs px-3 py-1">
           Keynote
         </span>
 
@@ -137,7 +137,7 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
 
         {kn.tipoCharla && (
           <div className="border-t border-surface-700/60 pt-3 flex flex-col gap-1">
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-surface-500">{kn.tipoCharla}</span>
+            <span className="font-mono text-xs tracking-[0.2em] uppercase text-surface-300">{kn.tipoCharla}</span>
             {kn.tituloCharla && (
               <span className="font-mono italic text-surface-200 text-sm line-clamp-2">{kn.tituloCharla}</span>
             )}
@@ -174,7 +174,7 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
 // Badge "en vivo"
 export function LiveBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-none border border-yellow-400/50 bg-yellow-400/15 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-yellow-300">
+    <span className="inline-flex items-center gap-1 rounded-none border border-yellow-400/50 bg-yellow-400/15 px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-yellow-300">
       <span className="relative flex h-1.5 w-1.5">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-75" />
         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-yellow-400" />
@@ -219,7 +219,7 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-800 to-surface-700">
-                <span className="font-mono text-3xl font-bold text-acento/50">{initials}</span>
+                <span className="font-mono text-3xl font-bold text-acento/70">{initials}</span>
               </div>
             )}
             <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface-900/80 to-transparent" />
@@ -256,18 +256,18 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
             <div className="flex flex-wrap gap-1.5 shrink-0">
               {isLive && <LiveBadge />}
               {esTrack(profile.track) && (
-                <span className={`rounded-none border px-2 py-0.5 font-mono text-[10px] font-bold ${trackColor}`}>
+                <span className={`rounded-none border px-2 py-0.5 font-mono text-xs font-bold ${trackColor}`}>
                   {trackCorto(profile.track)}
                 </span>
               )}
               {profile.sessionType && SESSION_LABEL[profile.sessionType] && (
-                <span className="flex items-center gap-1 rounded-full border border-glass-border bg-surface-800/60 px-2 py-0.5 font-mono text-[10px] text-surface-300">
+                <span className="flex items-center gap-1 rounded-full border border-glass-border bg-surface-800/60 px-2 py-0.5 font-mono text-xs text-surface-300">
                   {profile.sessionType === "online" ? <Monitor className="h-2.5 w-2.5" /> : <Mic2 className="h-2.5 w-2.5" />}
                   {SESSION_LABEL[profile.sessionType]}
                 </span>
               )}
               {profile.audienceLevel && (
-                <span className={`rounded-none border px-2 py-0.5 font-mono text-[10px] font-semibold ${LEVEL_COLORS[profile.audienceLevel] ?? "border-glass-border text-surface-400"}`}>
+                <span className={`rounded-none border px-2 py-0.5 font-mono text-xs font-semibold ${LEVEL_COLORS[profile.audienceLevel] ?? "border-glass-border text-surface-400"}`}>
                   {profile.audienceLevel}
                 </span>
               )}
@@ -280,7 +280,7 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] text-surface-500">
+          <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-surface-300">
             {profile.countryCity && (
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3 shrink-0" /> {profile.countryCity}
@@ -339,11 +339,11 @@ export function AgendaSessionCard({ event, startLabel, endLabel, isLive }: { eve
       <div className="flex flex-col gap-3 p-5">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-none border border-glass-border bg-surface-800/60 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-surface-300">
+            <span className="inline-flex items-center gap-1.5 rounded-none border border-glass-border bg-surface-800/60 px-2.5 py-0.5 font-mono text-xs font-semibold text-surface-300">
               <CalendarClock className="h-3 w-3 text-acento" /> Actividad
             </span>
             {esTrack(event.track) && (
-              <span className={`rounded-none border px-2 py-0.5 font-mono text-[10px] font-bold ${trackColor}`}>
+              <span className={`rounded-none border px-2 py-0.5 font-mono text-xs font-bold ${trackColor}`}>
                 {trackCorto(event.track)}
               </span>
             )}
@@ -351,7 +351,7 @@ export function AgendaSessionCard({ event, startLabel, endLabel, isLive }: { eve
           <div className="flex flex-wrap items-center gap-1.5">
             {isLive && <LiveBadge />}
             {sessionLabel && (
-              <span className="flex items-center gap-1 rounded-none border border-glass-border bg-surface-800/60 px-2 py-0.5 font-mono text-[10px] text-surface-300">
+              <span className="flex items-center gap-1 rounded-none border border-glass-border bg-surface-800/60 px-2 py-0.5 font-mono text-xs text-surface-300">
                 {event.sessionType === "online" ? <Monitor className="h-2.5 w-2.5" /> : <Mic2 className="h-2.5 w-2.5" />}
                 {sessionLabel}
               </span>

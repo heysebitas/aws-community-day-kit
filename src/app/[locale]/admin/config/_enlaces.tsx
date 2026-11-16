@@ -80,7 +80,7 @@ export function EditorEnlaces() {
                   value={v}
                   placeholder={e.ejemplo ?? "https://…"}
                   onChange={(ev) => editar(e.clave, ev.target.value)}
-                  className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-500 outline-none transition-colors focus:border-acento"
+                  className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-300 outline-none transition-colors focus:border-acento"
                 />
                 <span className="font-mono text-[10px] leading-relaxed text-surface-400">{e.explica}</span>
                 {raro && (
@@ -104,7 +104,7 @@ export function EditorEnlaces() {
         {guardando ? "Guardando…" : sucio ? "Guardar enlaces" : "Sin cambios"}
       </button>
 
-      <p className="m-0 flex items-start gap-1.5 font-mono text-[10px] leading-relaxed text-surface-500">
+      <p className="m-0 flex items-start gap-1.5 font-mono text-[10px] leading-relaxed text-surface-300">
         <Link2 className="mt-0.5 h-3 w-3 shrink-0" />
         La transmisión, las fotos y las grabaciones se editan arriba, con el resto del sitio:
         son los mismos enlaces que enseña la portada, y tener dos copias llevaría a que la web

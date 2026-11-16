@@ -33,7 +33,7 @@ export function FAQView({ faqs }: { faqs: FaqDTO[] }) {
         }));
 
   return (
-    <section id="faq" className="relative overflow-hidden border-y-2 border-acento/25 bg-surface-800 px-6 py-20 md:py-28">
+    <section id="faq" className="relative overflow-hidden border-y-2 border-acento/25 bg-surface-800 px-6 seccion-s">
       <div className="mx-auto grid max-w-[1180px] gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <ScrollReveal from="left" distance={60}>

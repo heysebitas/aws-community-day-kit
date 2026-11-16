@@ -193,7 +193,7 @@ export function EditorAudiencia({
                   <div key={f.clave} className="flex flex-col gap-1">
                     <span className="font-mono text-[10px] uppercase tracking-wider text-surface-400">
                       {f.etiqueta}
-                      {!puestos.length && <span className="ml-1.5 normal-case text-surface-500">· sin filtrar</span>}
+                      {!puestos.length && <span className="ml-1.5 normal-case text-surface-300">· sin filtrar</span>}
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {f.opciones.map((o) => {
@@ -217,7 +217,7 @@ export function EditorAudiencia({
                       })}
                     </div>
                     {f.explica && (
-                      <span className="font-mono text-[10px] text-surface-500">{f.explica}</span>
+                      <span className="font-mono text-[10px] text-surface-300">{f.explica}</span>
                     )}
                   </div>
                 );
@@ -272,7 +272,7 @@ export function EditorAudiencia({
             onChange={(e) => setEvitarRepetidos(e.target.checked)} />
           <span className="font-mono text-[11px] leading-relaxed text-surface-300">
             No escribirle a quien ya recibió esta plantilla.
-            <span className="block text-surface-500">
+            <span className="block text-surface-300">
               Quítalo sólo para reenviar a propósito, como un «último llamado» que va dos días seguidos.
             </span>
           </span>
@@ -284,7 +284,7 @@ export function EditorAudiencia({
               onChange={(e) => setAdjuntarPase(e.target.checked)} />
             <span className="font-mono text-[11px] leading-relaxed text-surface-300">
               Adjuntar el pase con el QR como imagen.
-              <span className="block text-surface-500">
+              <span className="block text-surface-300">
                 Para el recordatorio del día antes, por si llegan sin señal. Sólo lo lleva
                 quien va presencial.
               </span>
@@ -298,7 +298,7 @@ export function EditorAudiencia({
               onChange={(e) => setExcluirRespondidos(e.target.checked)} />
             <span className="font-mono text-[11px] leading-relaxed text-surface-300">
               No escribirle a quien ya respondió la encuesta.
-              <span className="block text-surface-500">
+              <span className="block text-surface-300">
                 Cada persona recibe su enlace propio, y el suyo se conserva entre reenvíos.
               </span>
             </span>

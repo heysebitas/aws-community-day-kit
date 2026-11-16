@@ -29,34 +29,34 @@ const ESTILOS: Record<Tono, {
   grupo: string; opcion: string; opcionActiva: string; vacio: string;
 }> = {
   block: {
-    boton: "bg-white/55 hover:border-tinta focus:border-tinta",
-    bordeNormal: "border-tinta/35",
-    bordeError: "border-[#7f1d1d]",
+    boton: "bg-papel/80 hover:border-tinta focus:border-tinta",
+    bordeNormal: "border-tinta/75",
+    bordeError: "border-error",
     conValor: "text-tinta",
-    sinValor: "text-tinta/45",
+    sinValor: "text-tinta/70",
     menu: "border-tinta bg-acento shadow-[6px_6px_0_0_rgba(0,0,0,0.35)]",
     separador: "border-tinta/25",
-    lupa: "text-tinta/50",
-    buscador: "bg-white/55 text-tinta placeholder:text-tinta/40",
+    lupa: "text-tinta/70",
+    buscador: "bg-papel/80 text-tinta placeholder:text-tinta/70",
     grupo: "border-tinta/15 bg-tinta/5 text-acento-profundo",
     opcion: "text-tinta",
     opcionActiva: "bg-tinta text-acento",
-    vacio: "text-tinta/50",
+    vacio: "text-tinta/70",
   },
   ink: {
     boton: "bg-surface-800 hover:border-acento focus:border-acento",
     bordeNormal: "border-surface-600",
-    bordeError: "border-[#f87171]",
+    bordeError: "border-red-400",
     conValor: "text-surface-50",
-    sinValor: "text-surface-500",
+    sinValor: "text-surface-300",
     menu: "border-acento bg-surface-800 shadow-[6px_6px_0_0_rgba(0,0,0,0.6)]",
     separador: "border-surface-600",
-    lupa: "text-surface-500",
-    buscador: "bg-surface-900 text-surface-50 placeholder:text-surface-500",
+    lupa: "text-surface-300",
+    buscador: "bg-surface-900 text-surface-50 placeholder:text-surface-300",
     grupo: "border-surface-700 bg-surface-900 text-acento",
     opcion: "text-surface-200",
     opcionActiva: "bg-acento text-tinta",
-    vacio: "text-surface-500",
+    vacio: "text-surface-300",
   },
 };
 
@@ -229,7 +229,7 @@ export function SearchSelect({
               {rows.map(({ option: o, header }, i) => (
                   <li key={o.value}>
                     {header && (
-                      <p className={cn("dot-matrix m-0 border-b px-3 py-1.5 text-sm leading-none", s.grupo)}>
+                      <p className={cn("etiqueta m-0 border-b px-3 py-1.5 leading-none", s.grupo)}>
                         {header}
                       </p>
                     )}

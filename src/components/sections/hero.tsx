@@ -18,12 +18,12 @@ import { localePath } from "@/lib/utils";
 function Digit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="border-2 border-acento/40 bg-surface-800 px-3 py-2 sm:px-4 sm:py-2.5">
+      <div className="border-2 border-surface-500 bg-surface-800 px-3 py-2 sm:px-4 sm:py-2.5">
         <span className="dot-matrix block text-4xl leading-none text-acento sm:text-5xl md:text-6xl">
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span className="dot-matrix mt-2 text-[10px] text-surface-400 sm:text-xs">{label}</span>
+      <span className="etiqueta mt-2 text-surface-400">{label}</span>
     </div>
   );
 }
@@ -63,6 +63,7 @@ function renglones(nombre: string): [string, string] {
 
 export function Hero() {
   const t = useTranslations("Hero");
+  const tCinta = useTranslations("Strip");
   const locale = useLocale();
   const { isExpired, isPostEvent } = useCountdown(EVENTO.inicio);
   const {
@@ -113,7 +114,7 @@ export function Hero() {
             ) : (
               <>{t("coming_soon").toLowerCase()} · {EVENTO.ciudad.toLowerCase()} · </>
             )}
-            <span className="text-acento">{t("tagline_short")}</span>
+            <span className="text-surface-100">{t("tagline_short")}</span>
           </motion.p>
 
           {confirmada && (
@@ -210,17 +211,13 @@ export function Hero() {
           transition={{ duration: 1.1, delay: 0.15, ease }}
           className="order-1 lg:order-2"
         >
-          <div className="relative mx-auto w-full max-w-[560px]">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-8 bottom-10 top-16 rounded-full bg-acento/10 blur-3xl"
-            />
+          <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[360px] lg:max-w-[560px]">
             <WireGlobe
               marker={EVENTO.coordenadas}
               label={EVENTO.ciudad}
-              className="relative aspect-square w-full min-h-[320px]"
+              className="relative aspect-square w-full"
             />
-            <p className="dot-matrix mt-1 text-center text-[11px] text-surface-500 sm:text-xs">
+            <p className="etiqueta mt-1 text-center text-surface-300">
               {coordenadas(locale)} · {t("globe_hint")}
             </p>
           </div>
@@ -228,7 +225,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-20">
-        <MarqueeStrip text={`${EVENTO.nombre} · ${EVENTO.edicion} ${EVENTO.anio}`} tone="block" duration={40} />
+        <MarqueeStrip text={tCinta("date")} tone="block" duration={40} />
       </div>
     </section>
   );

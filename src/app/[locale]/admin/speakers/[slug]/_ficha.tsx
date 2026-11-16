@@ -76,7 +76,7 @@ function Recorrido({ actual }: { actual: SpeakerStatus }) {
                 <span className="truncate font-mono text-xs font-bold">{e.label}</span>
               </div>
               {k < CAMINO.length - 1 && (
-                <span className="hidden shrink-0 px-1 font-mono text-surface-500 sm:inline" aria-hidden="true">
+                <span className="hidden shrink-0 px-1 font-mono text-surface-300 sm:inline" aria-hidden="true">
                   ›
                 </span>
               )}

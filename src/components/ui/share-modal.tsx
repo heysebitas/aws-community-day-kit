@@ -155,7 +155,7 @@ function CopyButton({ text, label = "Copiar" }: { text: string; label?: string }
     setTimeout(() => setCopied(false), 2000);
   }, [text]);
   return (
-    <button onClick={copy} className={cn("flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs font-semibold transition-all", copied ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" : "border-glass-border bg-surface-800 text-surface-300 hover:border-acento/40 hover:text-acento")}>
+    <button onClick={copy} className={cn("flex items-center gap-1.5 border-2 px-3 py-1.5 font-mono text-xs font-semibold transition-all", copied ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" : "border-glass-border bg-surface-800 text-surface-300 hover:border-acento/40 hover:text-acento")}>
       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
       {copied ? "Copiado ✓" : label}
     </button>
@@ -207,12 +207,12 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 16 }}
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        className="relative w-full max-w-md overflow-hidden rounded-3xl border border-glass-border bg-surface-900 shadow-2xl"
+        className="relative w-full max-w-md overflow-hidden border-2 border-surface-600 bg-surface-900 shadow-[8px_8px_0_0_var(--color-acento)]"
       >
         {/* Sticky header */}
-        <div className="flex items-center justify-between border-b border-glass-border px-4 py-3">
+        <div className="flex items-center justify-between border-b-2 border-surface-600 px-4 py-3">
           <p className="font-mono text-xs font-semibold uppercase tracking-widest text-surface-400">Compartir tarjeta</p>
-          <button onClick={onClose} className="rounded-full border border-glass-border bg-surface-800 p-1.5 text-surface-400 transition-colors hover:text-surface-100">
+          <button onClick={onClose} className="border-2 border-surface-600 bg-surface-800 p-1.5 text-surface-300 transition-colors hover:text-surface-100">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -221,7 +221,7 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
         <div className="max-h-[75dvh] overflow-y-auto">
           {/* Card preview */}
           <div className="p-4 pb-3">
-            <div className="overflow-hidden rounded-xl border border-glass-border shadow-lg">
+            <div className="overflow-hidden border-2 border-surface-600">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cardUrl} alt={`Tarjeta de ${name}`} className="w-full" />
             </div>
@@ -229,7 +229,7 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
               <a
                 href={cardUrl}
                 download={`${slug}-card.png`}
-                className="flex items-center gap-1.5 rounded-lg border border-glass-border bg-surface-800 px-3 py-1.5 font-mono text-xs font-semibold text-surface-300 transition-colors hover:border-acento/40 hover:text-acento"
+                className="flex items-center gap-1.5 border-2 border-surface-600 bg-surface-800 px-3 py-1.5 font-mono text-xs font-semibold text-surface-300 transition-colors hover:border-acento/40 hover:text-acento"
               >
                 <Download className="h-3 w-3" /> Descargar
               </a>
@@ -238,63 +238,63 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
           </div>
 
           {/* Role selector */}
-          <div className="border-t border-glass-border px-4 py-3">
-            <p className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-widest text-surface-500">¿Cómo estás compartiendo?</p>
+          <div className="border-t-2 border-surface-600 px-4 py-3">
+            <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-widest text-surface-300">¿Cómo estás compartiendo?</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setRole("speaker")}
-                className={`rounded-xl border px-3 py-2 text-left transition-all ${
+                className={`border-2 px-3 py-2 text-left transition-all ${
                   role === "speaker"
                     ? "border-acento/40 bg-acento/10 text-acento"
-                    : "border-glass-border bg-surface-800/40 text-surface-400 hover:border-surface-600 hover:text-surface-200"
+                    : "border-surface-600 bg-surface-800/40 text-surface-400 hover:border-acento hover:text-surface-200"
                 }`}
               >
                 <p className="font-mono text-xs font-bold">🎤 Soy el speaker</p>
-                <p className="font-mono text-[10px] text-current opacity-70">Primera persona</p>
+                <p className="font-mono text-xs text-current opacity-70">Primera persona</p>
               </button>
               <button
                 onClick={() => setRole("attendee")}
-                className={`rounded-xl border px-3 py-2 text-left transition-all ${
+                className={`border-2 px-3 py-2 text-left transition-all ${
                   role === "attendee"
                     ? "border-sky-400/40 bg-sky-400/10 text-sky-400"
-                    : "border-glass-border bg-surface-800/40 text-surface-400 hover:border-surface-600 hover:text-surface-200"
+                    : "border-surface-600 bg-surface-800/40 text-surface-400 hover:border-acento hover:text-surface-200"
                 }`}
               >
                 <p className="font-mono text-xs font-bold">👥 Soy asistente</p>
-                <p className="font-mono text-[10px] text-current opacity-70">Tercera persona</p>
+                <p className="font-mono text-xs text-current opacity-70">Tercera persona</p>
               </button>
             </div>
           </div>
 
           {/* Platform selector */}
-          <div className="border-t border-glass-border px-4 py-3">
-            <p className="mb-2.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-surface-500">Compartir en</p>
+          <div className="border-t-2 border-surface-600 px-4 py-3">
+            <p className="mb-2.5 font-mono text-xs font-semibold uppercase tracking-widest text-surface-300">Compartir en</p>
             <div className="mb-3 grid grid-cols-4 gap-2">
               {PLATFORMS.map((p) => (
                 <button
                   key={p.key}
                   onClick={() => setActivePlatform(p.key)}
                   className={cn(
-                    "flex flex-col items-center gap-1 rounded-xl border py-2 transition-all",
-                    activePlatform === p.key ? p.color : "border-glass-border bg-surface-800/40 text-surface-500 hover:border-surface-600 hover:text-surface-300"
+                    "flex flex-col items-center gap-1 border-2 py-2 transition-all",
+                    activePlatform === p.key ? p.color : "border-surface-600 bg-surface-800/40 text-surface-300 hover:border-acento hover:text-surface-300"
                   )}
                 >
                   {p.icon}
-                  <span className="font-mono text-[9px] font-semibold">{p.label}</span>
+                  <span className="font-mono text-xs font-semibold">{p.label}</span>
                 </button>
               ))}
             </div>
 
             {/* Text area */}
-            <div className="rounded-xl border border-glass-border bg-surface-800/40">
+            <div className="border-2 border-surface-600 bg-surface-800/40">
               <textarea
                 readOnly
                 value={texts[activePlatform]}
                 rows={4}
-                className="w-full resize-none rounded-t-xl bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-surface-300 focus:outline-none"
+                className="w-full resize-none bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-surface-300 focus:outline-none"
               />
-              <div className="flex items-center justify-between border-t border-glass-border px-3 py-2">
-                <span className="font-mono text-[10px] text-surface-600 hidden sm:block">
+              <div className="flex items-center justify-between border-t-2 border-surface-600 px-3 py-2">
+                <span className="font-mono text-xs text-surface-400 hidden sm:block">
                   {active.action === "copy" ? "Instagram: copia y pega" : "Edita antes de publicar"}
                 </span>
                 <div className="flex items-center gap-2 ml-auto">
@@ -304,7 +304,7 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={cn("flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs font-semibold transition-all", active.color)}
+                      className={cn("flex items-center gap-1.5 border-2 px-3 py-1.5 font-mono text-xs font-semibold transition-all", active.color)}
                     >
                       <ExternalLink className="h-3 w-3" />
                       Abrir {active.label}
@@ -332,7 +332,7 @@ export function ShareButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-xl border border-glass-border bg-surface-800/60 px-4 py-2.5 font-mono text-sm font-semibold text-surface-300 transition-colors hover:border-acento/40 hover:text-acento"
+        className="flex items-center gap-2 border-2 border-surface-600 bg-surface-800/60 px-4 py-2.5 font-mono text-sm font-semibold text-surface-300 transition-colors hover:border-acento/40 hover:text-acento"
       >
         <Share2 className="h-4 w-4" />
         Compartir tarjeta

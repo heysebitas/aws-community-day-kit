@@ -8,7 +8,7 @@ export const COPY = {
     lastName_ph: "Tu apellido",
     email: "Correo electrónico",
     email_hint: "Ahí te contamos si quedaste en el equipo.",
-    email_ph: "tu@correo.cl",
+    email_ph: "tu@correo.com",
     phone: "Teléfono",
     phone_hint: "Para el grupo del equipo y coordinar el día del evento.",
 
