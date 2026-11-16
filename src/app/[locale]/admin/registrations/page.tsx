@@ -57,19 +57,29 @@ function RegistrationsAdminPageInner() {
   const [showManual, setShowManual] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Se pide por páginas (cursor) para no mover una respuesta enorme; el panel
+  // sigue filtrando y contando sobre todas, igual que antes.
   useEffect(() => {
-    fetch("/api/registrations")
-      .then((r) => r.json())
-      .then((data) =>
-        setRegistrations(
-          (data.registrations || []).map((r: Record<string, unknown>) => ({
+    let vivo = true;
+    (async () => {
+      let cursor: string | null = null;
+      try {
+        do {
+          const res: Response = await fetch(`/api/registrations${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ""}`);
+          const data = await res.json();
+          if (!vivo) return;
+          const filas = ((data.registrations || []) as Record<string, unknown>[]).map((r) => ({
             ...r,
             id: (r._id as string) || "",
-          })) as RegistrationRow[],
-        ),
-      )
-      .catch(() => {})
-      .finally(() => setLoading(false));
+          })) as unknown as RegistrationRow[];
+          setRegistrations((prev) => [...prev, ...filas]);
+          setLoading(false);
+          cursor = data.nextCursor ?? null;
+        } while (cursor);
+      } catch { /* se queda con lo cargado */ }
+      if (vivo) setLoading(false);
+    })();
+    return () => { vivo = false; };
   }, []);
 
   // La entidad sale del formulario estático.

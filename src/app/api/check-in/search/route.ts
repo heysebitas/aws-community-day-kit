@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAnyAccess } from "@/lib/auth";
-import { Registration } from "@/models/registration";
+import { Registration, filtroDeBusqueda } from "@/models/registration";
 
 export const dynamic = "force-dynamic";
 
-// Quita tildes y baja a minúsculas para una búsqueda tolerante
-const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-
-// Búsqueda de respaldo para el check-in manual: busca por nombre, apellido,
-// email o cualquier valor de respuesta (p. ej. número de documento).
+// Búsqueda de respaldo para el check-in manual: busca por el inicio de una
+// palabra del nombre, apellido, correo, documento o QR, con el índice `busqueda`.
 export async function GET(req: NextRequest) {
   try {
     await requireAnyAccess(["checkin", "escaner_checkin"], "ver", ["admin", "organizer", "volunteer"]);
@@ -19,25 +16,18 @@ export async function GET(req: NextRequest) {
 
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) return NextResponse.json({ results: [] });
-  const nq = norm(q);
+  const filtro = filtroDeBusqueda(q);
+  if (!filtro) return NextResponse.json({ results: [] });
 
   await connectDB();
-  const regs = await Registration.find({})
-    .select("firstName lastName email documentNumber qrCode checkedIn checkedInAt confirmation")
+  const regs = await Registration.find(filtro)
+    .select("firstName lastName email qrCode checkedIn checkedInAt confirmation")
+    .limit(25)
     .lean();
 
-  const results: Array<Record<string, unknown>> = [];
-  for (const reg of regs) {
-    // Los cuatro campos por los que de verdad se busca a alguien en la puerta.
-    const haystack = norm(
-      [reg.firstName, reg.lastName, reg.email, reg.documentNumber, reg.qrCode]
-        .filter(Boolean)
-        .join(" "),
-    );
-    if (!haystack.includes(nq)) continue;
-
+  const results = regs.map((reg) => {
     const confirmed = !!reg.confirmation?.confirmed;
-    results.push({
+    return {
       id: String(reg._id),
       qrCode: reg.qrCode,
       name: `${reg.firstName} ${reg.lastName}`.trim() || reg.email || "Asistente",
@@ -48,9 +38,8 @@ export async function GET(req: NextRequest) {
       badgeName: confirmed
         ? [reg.confirmation?.badgeFirstName, reg.confirmation?.badgeLastName].filter(Boolean).join(" ").trim()
         : "",
-    });
-    if (results.length >= 25) break;
-  }
+    };
+  });
 
   // Primero los que aún no han hecho check-in (los que falta atender)
   results.sort((a, b) => Number(a.checkedIn) - Number(b.checkedIn));

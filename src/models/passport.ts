@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { mantenerBusqueda, palabrasDeBusqueda } from "./registration";
 
 interface Stamp {
   sponsorId: string;
@@ -41,6 +42,8 @@ export interface IPassport extends Document {
   stats: PassportStats;
   viewPin?: string;
   linkedRegistrationId?: string;
+  /** Palabras normalizadas para la búsqueda de los escáneres; no se escribe a mano. */
+  busqueda?: string[];
   isManual: boolean;
   confirmed: boolean;
   confirmedAt: Date | null;
@@ -81,6 +84,7 @@ const PassportSchema = new Schema<IPassport>(
     },
     viewPin: { type: String, default: null },
     linkedRegistrationId: { type: String, index: true, sparse: true },
+    busqueda: { type: [String], default: undefined },
     isManual: { type: Boolean, default: false },
     confirmed: { type: Boolean, default: false },
     confirmedAt: { type: Date, default: null },
@@ -117,6 +121,18 @@ const PassportSchema = new Schema<IPassport>(
   },
   { timestamps: { createdAt: "createdAt", updatedAt: false } },
 );
+
+const CAMPOS_BUSQUEDA = ["firstName", "lastName", "company", "shortId"] as const;
+
+PassportSchema.index({ busqueda: 1 });
+
+PassportSchema.pre("validate", function () {
+  if (this.isNew || CAMPOS_BUSQUEDA.some((c) => this.isModified(c)) || !this.busqueda?.length) {
+    this.busqueda = palabrasDeBusqueda(this.toObject(), CAMPOS_BUSQUEDA);
+  }
+});
+
+mantenerBusqueda(PassportSchema, CAMPOS_BUSQUEDA);
 
 export const Passport =
   mongoose.models.Passport || mongoose.model<IPassport>("Passport", PassportSchema);
