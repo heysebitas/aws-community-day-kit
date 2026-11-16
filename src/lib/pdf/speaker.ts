@@ -1,3 +1,4 @@
+import "server-only";
 import { EVENTO } from "@/config";
 import {
   COLORS, MARGIN, PAGE_W,

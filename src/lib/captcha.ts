@@ -1,3 +1,4 @@
+import "server-only";
 import { DEMO, PRODUCCION } from "@/lib/env";
 
 /** Un token de Turnstile vale una sola vez; duran unos cinco minutos. */

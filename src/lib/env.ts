@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Las variables de entorno, leídas y comprobadas en un solo sitio.
  *

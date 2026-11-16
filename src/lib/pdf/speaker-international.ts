@@ -1,3 +1,4 @@
+import "server-only";
 import { EVENTO, PAIS } from "@/config";
 import { COLORS, MARGIN, PAGE_W, createDoc, drawEventDetails, drawFooter, hardBox, mono, pdfToBuffer } from "./common";
 import { encabezadoDeCarta, sello } from "./speaker";

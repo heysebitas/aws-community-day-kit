@@ -1,3 +1,4 @@
+import "server-only";
 import { DOMINIO, EVENTO } from "@/config";
 import { armarMime } from "@/lib/correo-mime";
 
