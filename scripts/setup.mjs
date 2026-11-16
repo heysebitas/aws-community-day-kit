@@ -34,6 +34,7 @@ const PAISES = {
 const TEMAS = ["naranja", "lavanda", "platano", "menta", "cielo", "coral", "rosa", "lima"];
 
 const PLANTILLA = {
+  tipo: "scd",
   nombre: "AWS Student Community Day",
   siglas: "SCD",
   pais: "CO",
@@ -77,6 +78,7 @@ const FECHA = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 function validar(r) {
   const errores = [];
   const pedir = (cond, texto) => { if (!cond) errores.push(texto); };
+  pedir(r.tipo === "scd" || r.tipo === "cd", "tipo: \"scd\" si es un AWS Student Community Day, \"cd\" si es otro Community Day");
   pedir(typeof r.nombre === "string" && r.nombre.trim(), "nombre: falta");
   pedir(typeof r.siglas === "string" && r.siglas.trim(), "siglas: falta");
   pedir(PAISES[r.pais], `pais: «${r.pais}» no es un código válido (${Object.keys(PAISES).join(", ")})`);
@@ -114,15 +116,20 @@ async function preguntar() {
 
   console.log("\nVamos a configurar tu edición. Enter acepta el valor entre corchetes.\n");
   const r = {};
-  r.nombre = await p("Nombre del evento, sin país ni año", PLANTILLA.nombre);
-  r.siglas = await p("Siglas", PLANTILLA.siglas);
+  console.log("¿Qué vas a organizar?");
+  console.log("  scd  un AWS Student Community Day (certificado oficial del programa)");
+  console.log("  cd   otro Community Day (certificado genérico con tu tema)");
+  r.tipo = (await p("Tipo", "scd")).toLowerCase() === "cd" ? "cd" : "scd";
+  const esScd = r.tipo === "scd";
+  r.nombre = await p("\nNombre del evento, sin país ni año", esScd ? "AWS Student Community Day" : "AWS Community Day");
+  r.siglas = await p("Siglas", esScd ? "SCD" : "CD");
   console.log("\nPaíses: " + Object.entries(PAISES).map(([c, v]) => `${c} ${v[0]}`).join(" · "));
   r.pais = (await p("Código del país", "CO")).toUpperCase();
   const [nombrePais, capital, lat, lon] = PAISES[r.pais] ?? PAISES.CO;
   r.edicion = await p("Qué va después del nombre (el país o la ciudad)", nombrePais);
   r.anio = Number(await p("Año", new Date().getFullYear() + 1));
   r.ciudad = await p("Ciudad", capital);
-  r.organiza = await p("Quién organiza", `AWS Student Builder Groups ${nombrePais}`);
+  r.organiza = await p("Quién organiza", esScd ? `AWS Student Builder Groups ${nombrePais}` : `AWS User Group ${nombrePais}`);
   r.sitio = await p("Dominio del sitio, con https://", "https://tu-dominio.com");
 
   console.log("\nFechas en hora local del evento, formato AAAA-MM-DDTHH:MM");
@@ -197,6 +204,7 @@ function configTs(r) {
  * Los campos están explicados en \`src/config/tipos.ts\` y en \`docs/configuracion.md\`.
  */
 export default definirEvento({
+  tipo: ${q(r.tipo)},
   nombre: ${q(r.nombre)},
   siglas: ${q(r.siglas)},
   edicion: ${q(r.edicion)},
@@ -207,7 +215,7 @@ export default definirEvento({
     logo: "/images/logos/aws-logo.svg",
     logoPng: "/images/logos/aws-logo.png",
     alt: "AWS",
-    lineas: ["Student", "Community Day"],
+    lineas: ${r.tipo === "scd" ? '["Student", "Community Day"]' : '["Community Day"]'},
   },
   organiza: ${q(r.organiza)},
   sitio: ${q(r.sitio)},

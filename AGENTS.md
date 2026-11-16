@@ -14,7 +14,7 @@ Todo lo de **una edición** vive en dos carpetas:
 
 | Carpeta | Qué hay |
 |---|---|
-| `evento/` | `config.ts` (nombre, país, fecha, sede, tema), `equipo.ts`, `keynotes.ts`, `patrocinadores.ts`, `comunidades.ts`, `grupos.ts`, `tracks.ts`, `contacto.ts` |
+| `evento/` | `config.ts` (tipo de evento, nombre, país, fecha, sede, tema), `equipo.ts`, `keynotes.ts`, `patrocinadores.ts`, `comunidades.ts`, `grupos.ts`, `tracks.ts`, `contacto.ts` |
 | `public/evento/` | Fotos y logos que esos archivos referencian |
 
 Lo demás (`src/`) es el kit. Para montar un evento **no se edita `src/`**. Si un
@@ -47,6 +47,7 @@ src/models/             esquemas de Mongoose
 src/emails/             bloques y plantillas de correo (el contenido es dato, no TSX)
 src/messages/           textos del sitio (es.json, en.json)
 tests/                  pruebas con el runner de Node
+recursos/               donde cada SCD pone la plantilla de su certificado oficial (no se sube)
 docs/                   la documentación; cada tema en un archivo corto
 ```
 
@@ -80,7 +81,8 @@ docs/                   la documentación; cada tema en un archivo corto
 ## Lo que no se hace
 
 - No subas `.env.local` ni pongas secretos, correos reales o enlaces de grupos
-  privados en el repo.
+  privados en el repo. Tampoco material de terceros que no se pueda redistribuir,
+  como la plantilla del certificado oficial.
 - No escribas direcciones de correo en claro en una página: usa `ObfuscatedEmail`.
 - No envíes correos ni ejecutes acciones contra una base real para «probar»:
   para eso está `npm run demo`.
@@ -90,3 +92,13 @@ docs/                   la documentación; cada tema en un archivo corto
 
 `npm run check` y `npm run build` en verde. Si cambiaste algo visible, míralo:
 `npm run demo` y `node scripts/captura.mjs http://localhost:3000/ captura.png`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

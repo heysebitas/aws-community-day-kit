@@ -18,7 +18,8 @@ your event in one folder and everything else adapts.
 - **Admin panel** with roles and permissions: proposal review, agenda with
   clash detection, QR check-in, badges, certificates, exports.
 - **Emails** edited from the panel, with audiences and campaigns (Resend or Amazon SES).
-- **Volunteers**: call, selection and certificate.
+- **Volunteers**: call, selection and certificate: the official programme one
+  for an AWS Student Community Day, a themed one for any other Community Day.
 - **Digital passport**: attendees collect stamps from booths and talks with their QR.
 - **Eight colour themes**, or your own derived from a single colour.
 - **Machine-readable**: `/llms.txt`, `/llms-full.txt`, `/api/evento` and JSON-LD.

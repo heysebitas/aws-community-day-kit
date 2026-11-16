@@ -32,31 +32,35 @@ valor por omisión cuando lo haya. No inventes datos: lo que no sepa todavía se
 deja como «Por confirmar» y se anota para el final.
 
 **Lo básico**
-1. ¿Cómo se llama el evento, sin país ni año? (por omisión: «AWS Student Community Day»)
-2. ¿En qué país y ciudad? → código de país: `AR BO BR CL CO CR CU DO EC SV GT HN MX NI PA PY PE PR UY VE`
-3. ¿Qué va después del nombre: el país («Colombia») o la ciudad («Bogotá»)?
-4. ¿Fecha, hora de apertura de puertas y hora de cierre? (hora local)
-5. ¿Quién organiza? (el nombre que firma: un grupo, una comunidad)
+1. ¿Vas a organizar un **AWS Student Community Day** (`scd`) u otro **Community Day** (`cd`)?
+   De esto depende el certificado de voluntariado: un SCD usa el oficial del
+   programa; un CD, uno genérico con su tema. También cambia los valores por omisión.
+2. ¿Cómo se llama el evento, sin país ni año? (por omisión: «AWS Student
+   Community Day» si es `scd`, «AWS Community Day» si es `cd`)
+3. ¿En qué país y ciudad? → código de país: `AR BO BR CL CO CR CU DO EC SV GT HN MX NI PA PY PE PR UY VE`
+4. ¿Qué va después del nombre: el país («Colombia») o la ciudad («Bogotá»)?
+5. ¿Fecha, hora de apertura de puertas y hora de cierre? (hora local)
+6. ¿Quién organiza? (el nombre que firma: un grupo, una comunidad)
 
 **La sede**
-6. Nombre, dirección y barrio o comuna.
-7. Coordenadas (para el globo de la portada) y un enlace de «cómo llegar».
+7. Nombre, dirección y barrio o comuna.
+8. Coordenadas (para el globo de la portada) y un enlace de «cómo llegar».
    Si no las tiene, búscalas tú y confírmalas con la persona.
-8. ¿Cómo se llega, en una frase? (va en las preguntas frecuentes)
+9. ¿Cómo se llega, en una frase? (va en las preguntas frecuentes)
 
 **El formato**
-9. ¿Presencial, online o los dos? ¿Cuántos cupos se anuncian?
-10. ¿Qué tema de color? Muéstrale `docs/img/temas.png`. Opciones: `naranja`,
+10. ¿Presencial, online o los dos? ¿Cuántos cupos se anuncian?
+11. ¿Qué tema de color? Muéstrale `docs/img/temas.png`. Opciones: `naranja`,
     `lavanda`, `platano`, `menta`, `cielo`, `coral`, `rosa`, `lima`, o un color propio (`#12AB34`).
-11. ¿En qué idiomas? (`es`, `en`; el primero es el principal)
+12. ¿En qué idiomas? (`es`, `en`; el primero es el principal)
 
 **Fechas de la convocatoria**
-12. ¿Cuándo cierra el Call for Speakers y cuándo se entregan las diapositivas?
+13. ¿Cuándo cierra el Call for Speakers y cuándo se entregan las diapositivas?
     (por omisión: 31 y 10 días antes del evento)
 
 **Contacto y publicación**
-13. Correos de contacto, de privacidad y de patrocinios.
-14. ¿Qué dominio va a usar? ¿Instagram o LinkedIn del evento?
+14. Correos de contacto, de privacidad y de patrocinios.
+15. ¿Qué dominio va a usar? ¿Instagram o LinkedIn del evento?
 
 ## 3. Escribe la configuración
 
@@ -108,6 +112,11 @@ Termina con una lista corta y concreta de lo que queda en sus manos:
   el texto es una plantilla (`docs/configuracion.md`).
 - Si usa el logo y el nombre de AWS, que tenga el visto bueno de su contacto
   en el programa (`NOTICE.md`).
+- Si es un SCD (`scd`): pedir la plantilla del certificado oficial a su
+  contacto del programa y guardarla como `recursos/certificado-sbg.pdf`. No
+  viene en el kit y no se sube al repo; sin ella sale el genérico.
+- Si es un Community Day (`cd`): quién firma el certificado de voluntariado
+  (`detalles.certificado` en `evento/config.ts`).
 
 No hagas commit, no despliegues y no crees cuentas en servicios externos sin
 que te lo pidan.

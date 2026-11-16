@@ -53,7 +53,8 @@ Nada de imágenes horneadas: todo sale del tema y de la configuración.
 - **Imágenes** (Open Graph, icono, encabezado de correo, tarjetas de speaker):
   `next/og` en `src/app/api/marca/`, `src/app/api/og/` y `src/lib/marca.tsx`.
 - **PDF** (pase, carta de aceptación, carta de invitación, certificado):
-  PDFKit en `src/lib/pdf/`.
+  PDFKit en `src/lib/pdf/`. El certificado oficial de un SCD es la excepción:
+  se escribe con pdf-lib sobre la plantilla del programa.
 - **Correos**: bloques → HTML con React Email (`src/emails/`).
 
 ## Textos

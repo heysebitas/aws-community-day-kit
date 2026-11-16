@@ -17,3 +17,6 @@ next-env.d.ts
 npm-debug.log*
 /coverage
 .vercel
+
+# La plantilla del certificado oficial la pone cada SCD: no se distribuye.
+recursos/*.pdf

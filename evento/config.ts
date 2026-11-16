@@ -8,6 +8,7 @@ import { definirEvento } from "@/config/definir";
  * Los campos están explicados en `src/config/tipos.ts` y en `docs/configuracion.md`.
  */
 export default definirEvento({
+  tipo: "scd",
   nombre: "AWS Student Community Day",
   siglas: "SCD",
   edicion: "Demo",

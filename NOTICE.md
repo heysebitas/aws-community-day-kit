@@ -16,6 +16,15 @@ programas, o no tienes permiso para usar la marca, cámbialo en
 `evento/config.ts` (`marca`) y quita esos archivos. El uso de las marcas de AWS
 se rige por sus [directrices de marca](https://aws.amazon.com/trademark-guidelines/).
 
+## El certificado de los Student Community Days
+
+La plantilla del certificado oficial **no viene en este repositorio**. Es
+material de Amazon que el programa AWS Student Builder Groups entrega a sus
+líderes, y no nos corresponde redistribuirla. Si tu evento es parte del
+programa, pídela a tu contacto y ponla en `recursos/` (ver
+`recursos/README.md`); esa carpeta ignora los PDF para que no la subas por
+descuido a un repositorio público.
+
 ## Material de terceros incluido
 
 | Qué | Dónde | Licencia |

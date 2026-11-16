@@ -1,13 +1,16 @@
 import { EVENTO, PAIS } from "@/config";
 import { fechaLarga } from "@/config/fechas";
+import { certificadoScd, hayPlantillaScd } from "./certificate-scd";
 import { COLORS, createDoc, drawHeader, hardBox, mono, pdfToBuffer, strip } from "./common";
 
 /**
- * El certificado de voluntariado: una hoja apaisada dibujada con el tema.
+ * El certificado de voluntariado.
  *
- * Quien firma sale de `detalles.certificado` en `evento/config.ts`. No lleva
- * una firma escaneada a propósito: una firma real incrustada en un repositorio
- * público la puede reutilizar cualquiera.
+ * Un AWS Student Community Day (`tipo: "scd"`) usa el certificado oficial del
+ * programa, si el evento puso su plantilla en `recursos/`. Sin ella, y en
+ * cualquier otro Community Day, sale el
+ * genérico: una hoja apaisada dibujada con el tema de la edición, que firma
+ * quien diga `detalles.certificado`.
  */
 
 const ANCHO = 842;
@@ -15,6 +18,18 @@ const ALTO = 595;
 const MARGEN = 64;
 
 export async function generateVolunteerCertificate(rawName: string): Promise<Buffer> {
+  if (EVENTO.tipo === "scd" && hayPlantillaScd()) {
+    try {
+      return await certificadoScd(rawName);
+    } catch (e) {
+      // Una plantilla distinta de la esperada no puede dejar a nadie sin certificado.
+      console.error("[certificado] no se pudo usar recursos/certificado-sbg.pdf; sale el genérico:", e);
+    }
+  }
+  return certificadoGenerico(rawName);
+}
+
+export async function certificadoGenerico(rawName: string): Promise<Buffer> {
   const nombre = rawName.trim().toUpperCase() || "VOLUNTARIO";
   const doc = createDoc([ANCHO, ALTO]);
   const util = ANCHO - MARGEN * 2;

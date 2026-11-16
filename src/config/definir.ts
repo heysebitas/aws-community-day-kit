@@ -18,6 +18,8 @@ export function definirEvento(config: ConfigEvento): ConfigEvento {
     throw new Error(`evento/config.ts → ${campo}: ${motivo}`);
   };
 
+  if (config.tipo !== "scd" && config.tipo !== "cd") error("tipo", "tiene que ser \"scd\" (AWS Student Community Day) o \"cd\" (otro Community Day).");
+
   const pais = PAISES[config.pais];
   if (!pais) error("pais", `«${config.pais}» no está en el catálogo. Opciones: ${Object.keys(PAISES).join(", ")}.`);
 

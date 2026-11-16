@@ -18,7 +18,8 @@ ninguna de las dos: tu evento se describe en una carpeta y el resto se adapta.
 - **Panel** con roles y permisos: revisión de propuestas, agenda con detección
   de choques, check-in con QR, escarapelas, certificados, exportes.
 - **Correos** editables desde el panel, con audiencias y campañas (Resend o Amazon SES).
-- **Voluntarios**: convocatoria, selección y certificado.
+- **Voluntarios**: convocatoria, selección y certificado: el oficial del
+  programa si es un AWS Student Community Day, uno con tu tema si es otro Community Day.
 - **Pasaporte digital**: cada asistente junta sellos de stands y charlas con su QR.
 - **Ocho temas de color**, o el tuyo a partir de un solo color.
 - **Legible para máquinas**: `/llms.txt`, `/llms-full.txt`, `/api/evento` y JSON-LD.
@@ -45,7 +46,7 @@ el repo y dile:
 
 > Lee `docs/asistente.md` y ayúdame a configurar mi evento.
 
-Te hace unas catorce preguntas, escribe la configuración y te lo enseña andando.
+Te hace unas quince preguntas, escribe la configuración y te lo enseña andando.
 En Claude Code también está el comando `/configurar-evento`.
 
 **A mano:**

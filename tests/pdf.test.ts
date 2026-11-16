@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import QRCode from "qrcode";
-import { generateVolunteerCertificate } from "@/lib/pdf/certificate";
+import { certificadoGenerico, generateVolunteerCertificate } from "@/lib/pdf/certificate";
+import { certificadoScd, hayPlantillaScd } from "@/lib/pdf/certificate-scd";
 import { generateRegistrationPDF } from "@/lib/pdf/registration";
 import { generateSpeakerPDF, generateVolunteerPDF } from "@/lib/pdf/speaker";
 import { generateInternationalSpeakerPDF } from "@/lib/pdf/speaker-international";
@@ -34,8 +35,18 @@ describe("los PDF caben en una hoja", () => {
     comprobar("carta-internacional", await generateInternationalSpeakerPDF(LARGO));
   });
 
-  test("el certificado de voluntariado", async () => {
+  // La plantilla es de Amazon y no viene en el repo: sólo se prueba donde alguien la puso.
+  test("el certificado oficial de un SCD", { skip: !hayPlantillaScd() && "sin recursos/certificado-sbg.pdf" }, async () => {
+    comprobar("certificado-scd", await certificadoScd("Ana Ejemplo"));
+    comprobar("certificado-scd-nombre-largo", await certificadoScd(LARGO));
+  });
+
+  test("el certificado genérico de un Community Day", async () => {
+    comprobar("certificado-generico", await certificadoGenerico("Ana Ejemplo"));
+    comprobar("certificado-generico-nombre-largo", await certificadoGenerico(LARGO));
+  });
+
+  test("el que se envía sale según el tipo de evento", async () => {
     comprobar("certificado", await generateVolunteerCertificate("Ana Ejemplo"));
-    comprobar("certificado-nombre-largo", await generateVolunteerCertificate(LARGO));
   });
 });

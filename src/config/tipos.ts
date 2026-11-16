@@ -71,6 +71,12 @@ export type NombreTema =
 export type FechaLocal = `${number}-${number}-${number}T${number}:${number}`;
 
 export type ConfigEvento = {
+  /**
+   * Qué evento es: `"scd"`, un AWS Student Community Day, o `"cd"`, cualquier
+   * otro Community Day. De esto depende el certificado de voluntariado: el
+   * oficial del programa o uno genérico con el tema de la edición.
+   */
+  tipo: "scd" | "cd";
   /** Nombre del programa, sin país ni año: «AWS Student Community Day». */
   nombre: string;
   /** Cómo se abrevia en cintas, correos y remitentes: «SCD». */

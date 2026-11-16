@@ -32,6 +32,10 @@ async function main() {
   const { EVENTO, PAIS, TEMA, SITIO, IDIOMAS } = config;
   const { fechaConDia, hora, zonaDe } = await import("../src/config/fechas");
   ok(`${EVENTO.nombreCompleto} — ${EVENTO.ciudad}, ${PAIS.nombre}`);
+  const plantilla = fs.existsSync(path.join(raiz, "recursos/certificado-sbg.pdf"));
+  if (EVENTO.tipo === "cd") ok("Community Day: certificado genérico con el tema");
+  else if (plantilla) ok("AWS Student Community Day: certificado oficial del programa");
+  else aviso("AWS Student Community Day sin recursos/certificado-sbg.pdf: saldrá el certificado genérico. Ver recursos/README.md.");
   ok(`${fechaConDia(EVENTO.inicio, "es")} ${EVENTO.anio}, ${hora(EVENTO.inicio)} (${zonaDe(EVENTO.inicio)}), zona ${EVENTO.zona}`);
   ok(`Sitio: ${SITIO} · idiomas: ${IDIOMAS.join(", ")} · acento ${TEMA.acento}`);
 

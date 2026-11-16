@@ -8,12 +8,30 @@ están en `src/config/tipos.ts`, y `npm run doctor` te dice si algo quedó mal.
 
 | Campo | Qué es |
 |---|---|
+| `tipo` | `"scd"` si es un AWS Student Community Day, `"cd"` si es otro Community Day |
 | `nombre`, `siglas` | «AWS Student Community Day», «SCD» |
 | `edicion` | Lo que va después del nombre: el país o la ciudad |
 | `anio`, `pais`, `ciudad` | `pais` es un código de [docs/paises.md](paises.md) |
 | `organiza` | Quién firma los correos, las cartas y los textos legales |
 | `sitio` | La URL pública, sin barra final |
 | `marca` | El logo del encabezado (`logo` en SVG, `logoPng` para los PDF) y las líneas de texto que lo acompañan |
+
+## Certificado de voluntariado
+
+Depende de `tipo`:
+
+- **`"scd"`**: el certificado oficial de los AWS Student Community Days. La
+  plantilla no viene en el kit porque es material de Amazon: pídesela a tu
+  contacto del programa y guárdala como `recursos/certificado-sbg.pdf`. El kit
+  escribe sobre ella el nombre de la persona, quién organiza, el evento, la
+  fecha y la ciudad. Va en inglés, como la plantilla.
+- **`"cd"`**: un certificado genérico, dibujado con el tema de tu edición, que
+  firma quien pongas en `detalles.certificado` (`{ nombre, cargo }`); sin eso,
+  el equipo organizador.
+
+Se envían desde **Panel → Certificados**, con una prueba a tu correo antes.
+Mientras falte la plantilla, un SCD emite el genérico; `npm run doctor` lo
+avisa. Manda una prueba antes del envío real para ver cuál sale.
 
 ## Fecha y sede
 
