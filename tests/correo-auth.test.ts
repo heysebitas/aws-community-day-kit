@@ -97,18 +97,24 @@ describe("registro: el correo no retrasa la respuesta", () => {
     }) as typeof fetch;
   };
 
-  test("con un proveedor de 2 s la ruta responde en menos de 1 s y el estado queda en «sent»", async () => {
+  test("con el proveedor retenido la ruta responde igual y el estado queda en «sent»", async () => {
     const { POST } = await import("@/app/api/registrations/route");
     const { Registration } = await import("@/models/registration");
-    proveedorLento(200);
-    const t0 = Date.now();
-    const res = await POST(post("lento-ok@ejemplo.test"));
-    const ms = Date.now() - t0;
-    console.log(`# POST con proveedor de 2 s: ${ms} ms`);
+    // El proveedor no contesta hasta que la prueba lo suelta: si la ruta esperara
+    // al correo, nunca respondería. Sin umbral de tiempo, que en CI es frágil.
+    process.env.RESEND_API_KEY = "re_prueba";
+    let soltar = () => {};
+    const puerta = new Promise<void>((r) => { soltar = r; });
+    globalThis.fetch = (async () => {
+      await puerta;
+      return new Response(JSON.stringify({ id: "id-prueba" }), { status: 200 });
+    }) as typeof fetch;
+    const limite = new Promise<never>((_, no) => setTimeout(() => no(new Error("la ruta esperó al correo")), 5000));
+    const res = await Promise.race([POST(post("lento-ok@ejemplo.test")), limite]);
     assert.equal(res.status, 201);
-    assert.ok(ms < 1000, `tardó ${ms} ms`);
     const antes = await Registration.findOne({ email: "lento-ok@ejemplo.test" }).lean();
     assert.equal(antes?.emailStatus, "pending");
+    soltar();
     assert.ok(await esperar(async () => (await Registration.findOne({ email: "lento-ok@ejemplo.test" }).lean())?.emailStatus === "sent"));
     const fila = await Registration.findOne({ email: "lento-ok@ejemplo.test" }).lean();
     assert.equal(fila?.resendId, "id-prueba");
