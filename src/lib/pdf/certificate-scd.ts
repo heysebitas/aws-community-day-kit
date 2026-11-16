@@ -34,7 +34,15 @@ const PANEL = { centro: 234, ancho: 360 };
 const MARCA_NOMBRE = ["556.17", "219.1"] as const;
 const MARCA_ENTIDAD = ["193.3", "382.4"] as const;
 
-const leer = (ruta: string) => fs.readFileSync(path.join(/*turbopackIgnore: true*/ process.cwd(), ruta));
+const cacheArchivos = new Map<string, Buffer>();
+const leer = (ruta: string) => {
+  let b = cacheArchivos.get(ruta);
+  if (!b) {
+    b = fs.readFileSync(path.join(/*turbopackIgnore: true*/ process.cwd(), ruta));
+    cacheArchivos.set(ruta, b);
+  }
+  return b;
+};
 
 export function hayPlantillaScd(): boolean {
   return fs.existsSync(path.join(/*turbopackIgnore: true*/ process.cwd(), PLANTILLA));

@@ -4,6 +4,21 @@ import { requireAnyAccess } from "@/lib/auth";
 import { Registration } from "@/models/registration";
 import { createLog } from "@/lib/log";
 
+// El total se cuenta de la base cada 30 s y entre tanto sube con cada escaneo
+// propio: un conteo completo por escaneo es lo más caro de la puerta.
+const TTL_TOTAL_MS = 30_000;
+let total: { n: number; en: number } | null = null;
+
+async function totalDentro(): Promise<number> {
+  const ahora = Date.now();
+  if (!total || ahora - total.en > TTL_TOTAL_MS) {
+    total = { n: await Registration.countDocuments({ checkedIn: true }), en: ahora };
+  } else {
+    total.n += 1;
+  }
+  return total.n;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await requireAnyAccess(["checkin", "escaner_checkin"], "editar");
@@ -56,7 +71,7 @@ export async function POST(request: NextRequest) {
       }, { status: 409 });
     }
 
-    const totalCheckedIn = await Registration.countDocuments({ checkedIn: true });
+    const totalCheckedIn = await totalDentro();
 
     await createLog({
       userId: user._id.toString(),

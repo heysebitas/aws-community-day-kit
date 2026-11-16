@@ -12,6 +12,44 @@ type GenerateRole = "attendee" | "speaker" | "volunteer" | "organizer";
 
 import { nuevoPin as generatePin } from "@/lib/pin";
 
+/** Personas por `bulkWrite`: cada una lleva dos operaciones (alta y PIN). */
+const LOTE = 500;
+
+type Item = {
+  filtro: Record<string, unknown>;
+  alta: Record<string, unknown>;
+  campos: Record<string, unknown>;
+};
+
+/** Un `bulkWrite` por lote en vez de dos `updateOne` por persona. */
+async function volcar(items: Item[]) {
+  let created = 0, skipped = 0, failed = 0;
+  for (let i = 0; i < items.length; i += LOTE) {
+    const lote = items.slice(i, i + LOTE);
+    const ops = lote.flatMap((it) => [
+      { updateOne: { filter: it.filtro, update: { $setOnInsert: { ...it.alta, viewPin: generatePin() }, $set: it.campos }, upsert: true } },
+      // A los pasaportes que ya existían sin PIN se les asigna uno.
+      { updateOne: { filter: { ...it.filtro, viewPin: { $in: [null, undefined, ""] } }, update: { $set: { viewPin: generatePin() } } } },
+    ]);
+    let nuevos = 0;
+    const malas = new Set<number>();
+    try {
+      const r = await Passport.bulkWrite(ops as never, { ordered: false });
+      nuevos = r.upsertedCount;
+    } catch (e) {
+      const err = e as { result?: { upsertedCount?: number }; writeErrors?: { index?: number; err?: { index?: number } }[] };
+      nuevos = err.result?.upsertedCount ?? 0;
+      for (const w of err.writeErrors ?? []) malas.add(Math.floor((w.index ?? w.err?.index ?? 0) / 2));
+      if (!malas.size) malas.add(-1);
+    }
+    const fallidos = malas.has(-1) ? lote.length - nuevos : malas.size;
+    failed += fallidos;
+    created += nuevos;
+    skipped += Math.max(0, lote.length - nuevos - fallidos);
+  }
+  return { created, skipped, failed };
+}
+
 export async function POST(req: NextRequest) {
   try {
     await requireAuth(["admin"]);
@@ -19,33 +57,25 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    let created = 0, skipped = 0, failed = 0;
+    const items: Item[] = [];
+    const parteNombre = (n?: string) => {
+      const parts = (n || "").trim().split(" ");
+      return { firstName: parts[0] || "Sin", lastName: parts.slice(1).join(" ") || "Nombre" };
+    };
 
     if (role === "attendee") {
       const regs = await Registration.find({}).lean();
       for (const reg of regs) {
-        try {
-          const firstName = reg.firstName || "Sin";
-          const lastName = reg.lastName || "Nombre";
-          const company = reg.entityName ?? undefined;
-          const jobTitle = roleLabelOf(reg.role, reg.roleOther) || undefined;
-
-          const result = await Passport.updateOne(
-            { shortId: reg.qrCode, isManual: { $ne: true } },
-            {
-              $setOnInsert: { shortId: reg.qrCode, role: "attendee", linkedRegistrationId: reg._id.toString(), isManual: false, viewPin: generatePin() },
-              $set: { firstName, lastName, company, jobTitle },
-            },
-            { upsert: true },
-          );
-          if (result.upsertedCount > 0) {
-            created++;
-          } else {
-            // Assign viewPin to existing passports that don't have one yet
-            await Passport.updateOne({ shortId: reg.qrCode, viewPin: { $in: [null, undefined, ""] } }, { $set: { viewPin: generatePin() } });
-            skipped++;
-          }
-        } catch { failed++; }
+        items.push({
+          filtro: { shortId: reg.qrCode, isManual: { $ne: true } },
+          alta: { shortId: reg.qrCode, role: "attendee", linkedRegistrationId: reg._id.toString(), isManual: false },
+          campos: {
+            firstName: reg.firstName || "Sin",
+            lastName: reg.lastName || "Nombre",
+            company: reg.entityName ?? undefined,
+            jobTitle: roleLabelOf(reg.role, reg.roleOther) || undefined,
+          },
+        });
       }
     }
 
@@ -53,32 +83,15 @@ export async function POST(req: NextRequest) {
       const { nanoid } = await import("nanoid");
       const volunteers = await VolunteerSubmission.find({ approved: true }).lean();
       for (const vol of volunteers) {
-        try {
-          const firstName = vol.firstName?.trim() || "Sin";
-          const lastName = vol.lastName?.trim() || "Nombre";
-          // El SBG describe mejor de dónde viene un voluntario que la entidad,
-          // que muchas veces es la misma universidad del grupo.
-          const company =
-            (vol.sbg && vol.sbg !== "none" ? vol.sbg : vol.entityName) || undefined;
-
-          const result = await Passport.updateOne(
-            { linkedRegistrationId: vol._id.toString(), role: "volunteer" },
-            {
-              $setOnInsert: { shortId: nanoid(8), role: "volunteer", linkedRegistrationId: vol._id.toString(), isManual: false, viewPin: generatePin() },
-              $set: { firstName, lastName, company },
-            },
-            { upsert: true },
-          );
-          if (result.upsertedCount > 0) {
-            created++;
-          } else {
-            await Passport.updateOne(
-              { linkedRegistrationId: vol._id.toString(), role: "volunteer", viewPin: { $in: [null, undefined, ""] } },
-              { $set: { viewPin: generatePin() } },
-            );
-            skipped++;
-          }
-        } catch { failed++; }
+        // El SBG describe mejor de dónde viene un voluntario que la entidad,
+        // que muchas veces es la misma universidad del grupo.
+        const company = (vol.sbg && vol.sbg !== "none" ? vol.sbg : vol.entityName) || undefined;
+        const id = vol._id.toString();
+        items.push({
+          filtro: { linkedRegistrationId: id, role: "volunteer" },
+          alta: { shortId: nanoid(8), role: "volunteer", linkedRegistrationId: id, isManual: false },
+          campos: { firstName: vol.firstName?.trim() || "Sin", lastName: vol.lastName?.trim() || "Nombre", company },
+        });
       }
     }
 
@@ -89,31 +102,12 @@ export async function POST(req: NextRequest) {
         sessionType: "in-person",
       }).lean();
       for (const sp of speakers) {
-        try {
-          const parts = (sp.name || "").trim().split(" ");
-          const firstName = parts[0] || "Sin";
-          const lastName = parts.slice(1).join(" ") || "Nombre";
-          const company = sp.company || undefined;
-          const jobTitle = sp.role || sp.tagline || undefined;
-
-          const result = await Passport.updateOne(
-            { linkedRegistrationId: sp._id.toString(), role: "speaker" },
-            {
-              $setOnInsert: { shortId: nanoid(8), role: "speaker", linkedRegistrationId: sp._id.toString(), isManual: false, viewPin: generatePin() },
-              $set: { firstName, lastName, company, jobTitle },
-            },
-            { upsert: true },
-          );
-          if (result.upsertedCount > 0) {
-            created++;
-          } else {
-            await Passport.updateOne(
-              { linkedRegistrationId: sp._id.toString(), role: "speaker", viewPin: { $in: [null, undefined, ""] } },
-              { $set: { viewPin: generatePin() } },
-            );
-            skipped++;
-          }
-        } catch { failed++; }
+        const id = sp._id.toString();
+        items.push({
+          filtro: { linkedRegistrationId: id, role: "speaker" },
+          alta: { shortId: nanoid(8), role: "speaker", linkedRegistrationId: id, isManual: false },
+          campos: { ...parteNombre(sp.name), company: sp.company || undefined, jobTitle: sp.role || sp.tagline || undefined },
+        });
       }
     }
 
@@ -121,31 +115,16 @@ export async function POST(req: NextRequest) {
       const { nanoid } = await import("nanoid");
       const users = await User.find({ role: { $in: ["admin", "organizer"] } }).lean();
       for (const u of users) {
-        try {
-          const parts = (u.name || "").trim().split(" ");
-          const firstName = parts[0] || "Sin";
-          const lastName = parts.slice(1).join(" ") || "Nombre";
-
-          const result = await Passport.updateOne(
-            { linkedRegistrationId: u._id.toString(), role: "organizer" },
-            {
-              $setOnInsert: { shortId: nanoid(8), role: "organizer", linkedRegistrationId: u._id.toString(), isManual: false, viewPin: generatePin() },
-              $set: { firstName, lastName },
-            },
-            { upsert: true },
-          );
-          if (result.upsertedCount > 0) {
-            created++;
-          } else {
-            await Passport.updateOne(
-              { linkedRegistrationId: u._id.toString(), role: "organizer", viewPin: { $in: [null, undefined, ""] } },
-              { $set: { viewPin: generatePin() } },
-            );
-            skipped++;
-          }
-        } catch { failed++; }
+        const id = u._id.toString();
+        items.push({
+          filtro: { linkedRegistrationId: id, role: "organizer" },
+          alta: { shortId: nanoid(8), role: "organizer", linkedRegistrationId: id, isManual: false },
+          campos: parteNombre(u.name),
+        });
       }
     }
+
+    const { created, skipped, failed } = await volcar(items);
 
     return Response.json({ ok: true, created, skipped, failed });
   } catch (e) {

@@ -12,11 +12,23 @@ type Entrada = { count: number; resetAt: number };
 const ventanas = new Map<string, Entrada>();
 const fallos = new Map<string, Entrada>();
 
-/** Sin esto los mapas crecen con cada IP que pasa y nunca devuelven la memoria. */
+/** Tope duro de claves por mapa: en un ataque no deja crecer la memoria. */
+export const MAX_ENTRADAS = 10_000;
+
+/** Quita lo vencido y, si aun así no cabe, las claves más antiguas (los Map conservan el orden de inserción). */
 function purgar(mapa: Map<string, Entrada>) {
-  if (mapa.size < 5000) return;
+  if (mapa.size < MAX_ENTRADAS / 2) return;
   const ahora = Date.now();
   for (const [k, e] of mapa) if (ahora >= e.resetAt) mapa.delete(k);
+  for (const k of mapa.keys()) {
+    if (mapa.size < MAX_ENTRADAS * 0.9) break;
+    mapa.delete(k);
+  }
+}
+
+/** Sólo para pruebas. */
+export function tamanosDeMapas() {
+  return { ventanas: ventanas.size, fallos: fallos.size };
 }
 
 export function rateLimit(key: string, limit: number, windowMs: number): { ok: boolean; retryAfterMs: number } {

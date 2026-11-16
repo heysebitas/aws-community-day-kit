@@ -27,9 +27,21 @@ const FECHA = fechaLarga(EVENTO.inicio, IDIOMA_BASE);
 const SEDE = EVENTO.sede.nombre;
 const CIUDAD = EVENTO.sede.localidad;
 
+// Los archivos no cambian mientras corre el servidor: se leen una vez.
+const cacheAssets = new Map<string, string>();
 function loadAsset(filePath: string, mime: string) {
-  const buf = fs.readFileSync(path.join(/*turbopackIgnore: true*/ process.cwd(), filePath));
-  return `data:${mime};base64,${buf.toString("base64")}`;
+  let uri = cacheAssets.get(filePath);
+  if (uri === undefined) {
+    const buf = fs.readFileSync(path.join(/*turbopackIgnore: true*/ process.cwd(), filePath));
+    uri = `data:${mime};base64,${buf.toString("base64")}`;
+    cacheAssets.set(filePath, uri);
+  }
+  return uri;
+}
+
+let fuenteBuf: ArrayBuffer | undefined;
+function cargarFuente(): ArrayBuffer {
+  return (fuenteBuf ??= bufferToArrayBuffer(fs.readFileSync(path.join(/*turbopackIgnore: true*/ process.cwd(), "public/fonts/JetBrainsMono-Bold.ttf"))));
 }
 
 function bufferToArrayBuffer(buf: Buffer): ArrayBuffer {
@@ -148,8 +160,7 @@ export async function GET(
     })),
   ];
 
-  const fontBuf = fs.readFileSync(path.join(/*turbopackIgnore: true*/ process.cwd(), "public/fonts/JetBrainsMono-Bold.ttf"));
-  const fontData = bufferToArrayBuffer(fontBuf);
+  const fontData = cargarFuente();
   const awsLogo   = loadAsset("public/images/logos/aws-logo.svg", "image/svg+xml");
   const mascota = EVENTO.marca.mascota;
   const eventLogo = mascota ? loadAsset(`public${mascota}`, mascota.endsWith(".svg") ? "image/svg+xml" : "image/png") : "";
