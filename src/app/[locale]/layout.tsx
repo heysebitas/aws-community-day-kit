@@ -1,8 +1,9 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale, getTranslations, getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { routing } from "@/i18n/routing";
+import { MENSAJES_COMUN, pick } from "@/i18n/mensajes-cliente";
 import { EVENTO, IDIOMAS, IDIOMA_BASE, PAIS, SITIO, TEMA } from "@/config";
 import { localeDe } from "@/config/fechas";
 import { TEMAS, variablesDeTema } from "@/config/temas";
@@ -98,6 +99,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   // Si la base falla, el sitio sigue en pie con los formularios cerrados.
+  const mensajes = await getMessages();
   const desdeLaBase = await getPublicEventConfig().catch(() => EMPTY_PUBLIC_CONFIG);
   const config = {
     ...desdeLaBase,
@@ -117,7 +119,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="min-h-full bg-surface-900 font-sans text-surface-100">
         {DEMO && <script dangerouslySetInnerHTML={{ __html: VISTA_PREVIA_TEMA }} />}
         <BfcacheReset />
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={pick(mensajes, MENSAJES_COMUN)}>
           <EventConfigProvider value={config}>
             <SiteChrome
               navbar={<Navbar />}

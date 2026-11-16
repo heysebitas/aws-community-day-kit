@@ -1,3 +1,4 @@
+import { MensajesDeRuta } from "@/components/providers/mensajes-de-ruta";
 import type { Metadata } from "next";
 import { metadatosDe } from "@/lib/metadatos";
 
@@ -6,6 +7,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return metadatosDe(locale, "/voluntarios", "voluntarios");
 }
 
-export default function VoluntariosLayout({ children }: { children: React.ReactNode }) {
-  return children;
+export default function VoluntariosLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  return <MensajesDeRuta ruta="voluntarios" params={params}>{children}</MensajesDeRuta>;
 }
