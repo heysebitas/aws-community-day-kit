@@ -66,6 +66,8 @@ export function Navbar() {
 
   const home = localePath(locale);
   const isHome = pathname === home || pathname === home + "/";
+  // En el propio formulario el botón no lleva a ningún sitio nuevo.
+  const enRegistro = pathname.endsWith("/registro");
   // Un ancla (`#about`) sólo sirve tal cual en la portada; desde otra página lleva antes a ella.
   const resolveHref = (href: string) => {
     if (href.startsWith("/")) return localePath(locale, href);
@@ -101,7 +103,7 @@ export function Navbar() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageToggle />
             {/* Con el registro cerrado deja de ser un enlace. */}
-            {attendeeOpen ? (
+            {enRegistro ? null : attendeeOpen ? (
               <a
                 href={localePath(locale, "/registro")}
                 className={cn(

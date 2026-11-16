@@ -77,7 +77,7 @@ export function WhyAttend() {
   const t = useTranslations("About");
 
   return (
-    <section id="why-attend" className="mx-auto max-w-[1180px] px-6 py-20 md:py-28">
+    <section id="why-attend" className="mx-auto max-w-[1180px] px-6 seccion-m">
       <div className="flex flex-wrap items-end justify-between gap-8 mb-10 md:mb-14">
         <ScrollReveal>
           <DotHeading as="div" variant="inverted" className="mb-5 text-xl sm:text-2xl md:text-3xl">

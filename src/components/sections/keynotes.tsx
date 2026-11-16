@@ -195,7 +195,7 @@ export function Keynotes() {
 
   return (
     /* Mismo espaciado y misma cabecera que «Por qué asistir»: van seguidas en la portada. */
-    <section id="keynotes" className="mx-auto max-w-[1180px] px-6 py-20 md:py-28">
+    <section id="keynotes" className="mx-auto max-w-[1180px] px-6 seccion-m">
       {/* Section head */}
       <div className="flex flex-wrap items-end justify-between gap-8 mb-10 md:mb-14">
         <ScrollReveal>

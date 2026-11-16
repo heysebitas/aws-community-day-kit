@@ -617,11 +617,12 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                         {([["es", t.lang_es], ["en", t.lang_en]] as const).map(([val, lbl]) => (
                           <button key={val} type="button" onClick={() => set("language", val)}
                             // Mismo tratamiento que CardSelector: elegido en tinta sólida.
+                            aria-pressed={form.language === val}
                             className={cn(
                               "flex-1 border-2 py-3 font-mono text-xs font-bold transition-all",
                               form.language === val
                                 ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                                : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                                : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                             )}
                           >{lbl}</button>
                         ))}
@@ -743,11 +744,12 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                       <div className="flex gap-3">
                         {([true, false] as const).map((val) => (
                           <button key={String(val)} type="button" onClick={() => { set("firstTimeSpeaker", val); clearErr("firstTimeSpeaker"); }}
+                            aria-pressed={form.firstTimeSpeaker === val}
                             className={cn(
                               "flex-1 border-2 py-3 font-mono text-sm font-bold transition-all",
                               form.firstTimeSpeaker === val
                                 ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                                : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                                : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                             )}
                           >
                             {val ? t.yes_opt : t.no_opt}
@@ -940,11 +942,11 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                     {/* Legal agreements */}
                     <div className="flex flex-col gap-2">
                       {/* Code of conduct */}
-                      <label className={cn("flex cursor-pointer items-start gap-3 border p-3.5 transition-all", form.codeOfConduct ? "border-tinta/30 bg-tinta/5" : "border-tinta/20 bg-white/20 hover:border-tinta/25")}>
+                      <label className={cn("flex cursor-pointer items-start gap-3 border-2 p-3.5 transition-all", form.codeOfConduct ? "border-tinta bg-tinta/5" : "border-tinta/75 bg-papel/80 hover:border-tinta")}>
                         <div className="relative mt-0.5 shrink-0">
                           <input type="checkbox" checked={form.codeOfConduct} onChange={(e) => { set("codeOfConduct", e.target.checked); clearErr("codeOfConduct"); }} className="sr-only" />
-                          <div className={cn("flex h-4.5 w-4.5 h-5 w-5 items-center justify-center rounded border-2 transition-all", form.codeOfConduct ? "border-tinta bg-tinta" : "border-tinta/20 bg-white/40")}>
-                            {form.codeOfConduct && <CheckCircle2 className="h-3 w-3 text-white" />}
+                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all", form.codeOfConduct ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
+                            {form.codeOfConduct && <CheckCircle2 className="h-3 w-3 text-acento" />}
                           </div>
                         </div>
                         <span className="font-mono text-xs text-surface-200 leading-relaxed">
@@ -955,11 +957,11 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                       {errors.codeOfConduct && <p className="font-mono text-xs text-error px-1">{errors.codeOfConduct}</p>}
 
                       {/* Privacy */}
-                      <label className={cn("flex cursor-pointer items-start gap-3 border p-3.5 transition-all", form.consent ? "border-tinta/30 bg-tinta/5" : "border-tinta/20 bg-white/20 hover:border-tinta/25")}>
+                      <label className={cn("flex cursor-pointer items-start gap-3 border-2 p-3.5 transition-all", form.consent ? "border-tinta bg-tinta/5" : "border-tinta/75 bg-papel/80 hover:border-tinta")}>
                         <div className="relative mt-0.5 shrink-0">
                           <input type="checkbox" checked={form.consent} onChange={(e) => { set("consent", e.target.checked); clearErr("consent"); }} className="sr-only" />
-                          <div className={cn("flex h-5 w-5 items-center justify-center rounded border-2 transition-all", form.consent ? "border-tinta bg-tinta" : "border-tinta/20 bg-white/40")}>
-                            {form.consent && <CheckCircle2 className="h-3 w-3 text-white" />}
+                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all", form.consent ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
+                            {form.consent && <CheckCircle2 className="h-3 w-3 text-acento" />}
                           </div>
                         </div>
                         <span className="font-mono text-xs text-surface-200 leading-relaxed">

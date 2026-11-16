@@ -28,7 +28,7 @@ colors:
   on-primary-muted: "oklch(0.332 0.072 70)" # tinta al 70 % sobre el acento (≈ #4D2E00): el único secundario
   paper: "oklch(1.000 0.000 0)"           # --color-papel #FFFFFF
   # --- Semánticos
-  danger: "oklch(0.396 0.133 26)"         # --color-error #7F1D1D, sobre el bloque claro
+  danger: "oklch(0.312 0.108 26)"         # --color-error #5C1010: 4,5:1 sobre cualquier acento del tema
 
 typography:
   # Tres voces: Oxanium para títulos, Handjet (.dot-matrix) para la voz de marca en
@@ -90,9 +90,9 @@ spacing:
   "8": 32px
   "12": 48px
   control: 44px  # min-h-11
-  section-s: 96px
-  section-m: 128px
-  section-l: 192px
+  section-s: 96px   # .seccion-s (64px en móvil): secciones de lista
+  section-m: 128px  # .seccion-m (80px en móvil): por defecto
+  section-l: 192px  # .seccion-l (96px en móvil): CTA final
   gutter: 16px
 
 components:
@@ -207,6 +207,7 @@ estilo de cartel, no de capas.
 - Do: acento en texto pequeño al 100 % (`text-acento`) sobre negro o `text-acento-profundo` sobre claro.
 - Do: números de marca de agua (`text-white/10`) con `aria-hidden="true"`.
 - Do: controles con `min-h-11`.
+- Do: controles sin elegir sobre el bloque claro con borde `tinta` al 75 % (≥ 3:1 en todos los temas) y fondo `papel` al 80 %; elegidos en `tinta` sólida con el texto en acento y `aria-pressed`.
 - Don't: `text-surface-500`, `text-surface-600` ni `text-surface-700` como color de texto.
 - Don't: `text-tinta/40…60`, `text-acento/50…70`.
 - Don't: `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `backdrop-blur-*` o `shadow-[…_Npx_…]` con difuminado en el sitio público.

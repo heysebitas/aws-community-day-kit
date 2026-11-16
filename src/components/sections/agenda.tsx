@@ -404,7 +404,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
   const tableMinWidth = 148 + rooms.length * 210;
 
   return (
-    <section id="agenda" className="py-24 px-4 sm:px-6 bg-surface-800/50">
+    <section id="agenda" className="seccion-s px-4 sm:px-6 bg-surface-800/50">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <div className="flex flex-wrap items-center justify-between gap-8">

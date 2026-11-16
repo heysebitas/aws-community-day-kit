@@ -97,7 +97,7 @@
     "lead_em": "sesión",
     "lead_post": ".",
     "lead_desc": "Charlas y talleres presenciales en [[ciudad]]. Cuéntanos qué quieres enseñar y a quién le sirve.",
-    "cta_apply": "Postular como speaker",
+    "cta_apply": "Ser speaker",
     "cta_closed": "El Call for Speakers está cerrado",
     "countdown_label": "El CFP cierra en",
     "closed_note": "Las postulaciones cerraron el [[cfp_cierre_largo]].",
@@ -139,7 +139,7 @@
     "subheading": "Aprende de expertos en cloud computing, IA, DevOps y más",
     "coming_soon": "Speakers próximamente",
     "coming_soon_desc": "Estamos confirmando a los mejores expertos de la industria. ¡Mantente atento!",
-    "apply_speaker": "Postúlate como speaker",
+    "apply_speaker": "Ser speaker",
     "modal_sessions": "Sesiones",
     "modal_bio": "Biografía"
   },
@@ -175,7 +175,7 @@
     "contact_us": "Contáctanos",
     "visit_website": "Visitar sitio web",
     "view_all": "Ver todos los sponsors",
-    "cta": "Sé sponsor",
+    "cta": "Ser patrocinador",
     "mail_subject": "Quiero patrocinar el [[evento]]"
   },
   "Organizers": {
@@ -209,7 +209,7 @@
   "Registration": {
     "heading": "Reserva Tu Lugar",
     "description": "Cupos limitados. El registro es gratuito pero obligatorio.",
-    "cta": "Regístrate Ahora",
+    "cta": "Regístrate",
     "free": "Registro gratuito",
     "coming_soon": "Registro próximamente",
     "coming_soon_desc": "El registro se abrirá pronto. Síguenos en redes sociales para ser el primero en enterarte.",

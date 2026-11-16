@@ -30,7 +30,7 @@ export function RegistrationCTA() {
     <section
       ref={ref}
       id="register"
-      className="relative overflow-hidden bg-surface-900 px-6 py-24 md:py-32"
+      className="relative overflow-hidden bg-surface-900 px-6 seccion-l"
     >
       {/* Rejilla de fondo */}
       <div

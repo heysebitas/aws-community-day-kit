@@ -47,7 +47,7 @@ export function Tracks() {
   if (!tracks.length) return null;
 
   return (
-    <section id="tracks" className="mx-auto max-w-[1180px] px-6 py-20 md:py-28">
+    <section id="tracks" className="mx-auto max-w-[1180px] px-6 seccion-s">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-8 md:mb-14">
         <ScrollReveal>
           <DotHeading as="div" variant="inverted" className="mb-5 text-xl sm:text-2xl md:text-3xl">

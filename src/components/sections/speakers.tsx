@@ -210,7 +210,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
   const { showSpeakerCta } = useEventConfig();
 
   return (
-    <section id="speakers" className="py-24 px-6">
+    <section id="speakers" className="seccion-m px-6">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <SectionHeading title={t("heading")} subtitle={t("subheading")} />

@@ -129,7 +129,7 @@ export function Organizers() {
   // Se respeta el orden de `src/data/organizers.ts` tal cual: la lista es
   // curada, no aleatoria.
   return (
-    <section id="organizers" className="py-24 px-6">
+    <section id="organizers" className="seccion-m px-6">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <SectionHeading title={t("heading")} subtitle={t("subheading")} />

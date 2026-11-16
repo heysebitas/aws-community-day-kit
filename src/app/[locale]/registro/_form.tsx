@@ -80,7 +80,7 @@ function Field({
 }
 
 const inputCls =
-  "w-full border-2 border-tinta/35 bg-white/55 px-4 py-3 font-mono text-sm text-tinta " +
+  "w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta " +
   "placeholder:text-tinta/70 outline-none transition-all " +
   "focus:-translate-y-px focus:border-tinta focus:bg-white " +
   "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
@@ -303,11 +303,12 @@ export function RegistroForm({
                 key={code}
                 type="button"
                 onClick={() => set("attendance", code)}
+                aria-pressed={v.attendance === code}
                 className={cn(
                   "border-2 py-3.5 font-mono text-sm font-bold transition-all",
                   v.attendance === code
                     ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                    : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                    : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                 )}
               >
                 {texto}
@@ -475,7 +476,7 @@ export function RegistroForm({
                   }}
                   className={cn(
                     "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-all",
-                    checked ? "border-tinta bg-tinta" : "border-tinta/40 bg-white/55",
+                    checked ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel/80",
                     errors[key] && "border-error",
                   )}
                 >

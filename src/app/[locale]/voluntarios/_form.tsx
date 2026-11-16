@@ -120,7 +120,7 @@ function Field({
 }
 
 const inputCls =
-  "w-full border-2 border-tinta/35 bg-white/55 px-4 py-3 font-mono text-sm text-tinta " +
+  "w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta " +
   "placeholder:text-tinta/70 outline-none transition-all " +
   "focus:-translate-y-px focus:border-tinta focus:bg-white " +
   "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
@@ -142,11 +142,12 @@ function Choice({
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
+          aria-pressed={value === o.value}
           className={cn(
             "border-2 px-3 py-3.5 font-mono text-sm font-bold transition-all",
             value === o.value
               ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-              : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+              : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
           )}
         >
           {labelOf(o, locale)}
@@ -623,17 +624,18 @@ export function VoluntariosForm({
                   key={a.value}
                   type="button"
                   onClick={() => toggleArea(a.value)}
+                  aria-pressed={on}
                   className={cn(
                     "flex items-center gap-3 border-2 px-4 py-3 text-left font-mono text-sm font-bold transition-all",
                     on
                       ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                      : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                      : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                   )}
                 >
                   <span
                     className={cn(
                       "flex h-4 w-4 shrink-0 items-center justify-center border-2",
-                      on ? "border-acento" : "border-tinta/40",
+                      on ? "border-acento" : "border-tinta/75",
                     )}
                   >
                     {on && (
@@ -705,11 +707,12 @@ export function VoluntariosForm({
                 key={d.value}
                 type="button"
                 onClick={() => set("dietary", d.value)}
+                aria-pressed={v.dietary === d.value}
                 className={cn(
                   "border-2 px-3 py-3 font-mono text-sm font-bold transition-all",
                   v.dietary === d.value
                     ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                    : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                    : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
                 )}
               >
                 {labelOf(d, locale)}
@@ -788,7 +791,7 @@ placeholder={t.emergency_ph}
                   }}
                   className={cn(
                     "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-all",
-                    checked ? "border-tinta bg-tinta" : "border-tinta/40 bg-white/55",
+                    checked ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel/80",
                     errors[key] && "border-error",
                   )}
                 >

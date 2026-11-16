@@ -97,7 +97,7 @@
     "lead_em": "session",
     "lead_post": ".",
     "lead_desc": "In-person talks and workshops in [[ciudad]]. Tell us what you want to teach and who it is for.",
-    "cta_apply": "Apply as a speaker",
+    "cta_apply": "Be a speaker",
     "cta_closed": "The Call for Speakers is closed",
     "countdown_label": "CFP closes in",
     "closed_note": "Applications closed on [[cfp_cierre_largo]].",
@@ -139,7 +139,7 @@
     "subheading": "Learn from experts in cloud computing, AI, DevOps, and more",
     "coming_soon": "Speakers coming soon",
     "coming_soon_desc": "We're confirming the best industry experts. Stay tuned!",
-    "apply_speaker": "Apply as a speaker",
+    "apply_speaker": "Be a speaker",
     "modal_sessions": "Sessions",
     "modal_bio": "Bio"
   },
@@ -209,7 +209,7 @@
   "Registration": {
     "heading": "Reserve Your Spot",
     "description": "Limited seats. Registration is free but required.",
-    "cta": "Register Now",
+    "cta": "Register",
     "free": "Free registration",
     "coming_soon": "Registration coming soon",
     "coming_soon_desc": "Registration will open soon. Follow us on social media to be the first to know.",

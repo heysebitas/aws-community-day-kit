@@ -27,7 +27,7 @@ export function BlockSection({
         className,
       )}
     >
-      <div className={cn("mx-auto max-w-[1180px] px-6 py-20 md:py-28", innerClassName)}>
+      <div className={cn("mx-auto max-w-[1180px] px-6 seccion-m", innerClassName)}>
         {children}
       </div>
     </section>

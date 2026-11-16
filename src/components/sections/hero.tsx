@@ -210,15 +210,11 @@ export function Hero() {
           transition={{ duration: 1.1, delay: 0.15, ease }}
           className="order-1 lg:order-2"
         >
-          <div className="relative mx-auto w-full max-w-[560px]">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-8 bottom-10 top-16 rounded-full bg-acento/10 blur-3xl"
-            />
+          <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[360px] lg:max-w-[560px]">
             <WireGlobe
               marker={EVENTO.coordenadas}
               label={EVENTO.ciudad}
-              className="relative aspect-square w-full min-h-[320px]"
+              className="relative aspect-square w-full"
             />
             <p className="etiqueta mt-1 text-center text-surface-300">
               {coordenadas(locale)} · {t("globe_hint")}

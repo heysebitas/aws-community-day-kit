@@ -29,15 +29,15 @@ const ESTILOS: Record<Tono, {
   grupo: string; opcion: string; opcionActiva: string; vacio: string;
 }> = {
   block: {
-    boton: "bg-white/55 hover:border-tinta focus:border-tinta",
-    bordeNormal: "border-tinta/35",
+    boton: "bg-papel/80 hover:border-tinta focus:border-tinta",
+    bordeNormal: "border-tinta/75",
     bordeError: "border-error",
     conValor: "text-tinta",
     sinValor: "text-tinta/70",
     menu: "border-tinta bg-acento shadow-[6px_6px_0_0_rgba(0,0,0,0.35)]",
     separador: "border-tinta/25",
     lupa: "text-tinta/70",
-    buscador: "bg-white/55 text-tinta placeholder:text-tinta/70",
+    buscador: "bg-papel/80 text-tinta placeholder:text-tinta/70",
     grupo: "border-tinta/15 bg-tinta/5 text-acento-profundo",
     opcion: "text-tinta",
     opcionActiva: "bg-tinta text-acento",

@@ -59,7 +59,7 @@ export function TextInput({ value, onChange, onBlur, placeholder, maxLength, cla
         inputMode={inputMode}
         autoComplete={autoComplete ?? "off"}
         spellCheck={false}
-        className={cn("w-full border border-tinta/25 bg-white/40 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all", className)}
+        className={cn("w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all", className)}
       />
       {maxLength && value.length > maxLength * 0.8 && (
         <span className="absolute right-3 top-3 font-mono text-xs text-tinta/70">{value.length}/{maxLength}</span>
@@ -78,7 +78,7 @@ export function Textarea({ value, onChange, placeholder, maxLength, rows = 4 }: 
         placeholder={placeholder}
         maxLength={maxLength}
         rows={rows}
-        className="w-full resize-none border border-tinta/25 bg-white/40 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all"
+        className="w-full resize-none border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all"
       />
       {maxLength && (
         <span className={cn("absolute right-3 bottom-3 font-mono text-xs", value.length > maxLength * 0.9 ? "text-acento-profundo" : "text-tinta/70")}>
@@ -191,6 +191,7 @@ export function CardSelector<T extends string>({
           type="button"
           disabled={opt.disabled}
           aria-disabled={opt.disabled}
+          aria-pressed={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
             // Elegida = tinta negra sólida: el acento sobre el bloque del tema es el mismo color del fondo.
@@ -201,7 +202,7 @@ export function CardSelector<T extends string>({
               ? "cursor-not-allowed border-dashed border-tinta/30 bg-transparent text-tinta/70 [&>span:nth-child(2)]:line-through"
               : value === opt.value
                 ? "border-tinta bg-tinta text-acento shadow-[4px_4px_0_0_rgba(0,0,0,0.3)]"
-                : "border-tinta/25 bg-white/30 text-tinta/70 hover:border-tinta hover:text-tinta",
+                : "border-tinta/75 bg-papel/80 text-tinta hover:-translate-y-px hover:border-tinta hover:shadow-[3px_3px_0_0_var(--color-tinta)]",
           )}
         >
           <span className="flex h-8 w-8 items-center justify-center">

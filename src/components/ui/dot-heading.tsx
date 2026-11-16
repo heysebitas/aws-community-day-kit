@@ -92,7 +92,7 @@ export function DotHeading({
         initial={{ clipPath: "inset(0 100% 0 0)" }}
         animate={inView ? { clipPath: "inset(0 0% 0 0)" } : undefined}
         transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-        className="inline-block"
+        className="scroll-reveal inline-block"
       >
         {caja}
       </motion.div>

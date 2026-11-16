@@ -70,10 +70,6 @@ export function Venue() {
         {silueta !== "ninguna" && (
           <ScrollReveal delay={0.2} from="scale">
             <div className="relative mx-auto w-full max-w-[520px]">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-full bg-acento/10 blur-3xl"
-              />
               <WireCiudad silueta={silueta} ciudad={EVENTO.ciudad} className="relative h-[420px] w-full md:h-[520px]" />
               <p className="etiqueta mt-1 text-center text-surface-300">
                 {EVENTO.sede.siluetaPie ?? EVENTO.ciudad}
