@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { EVENTO, TEMA } from "@/config";
+import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -26,6 +27,14 @@ function clamp(raw: string | null, fallback: number, min: number, max: number) {
 }
 
 export async function GET(request: Request) {
+  const limite = rateLimit(`email-map:${getIp(request)}`, 30, 60_000);
+  if (!limite.ok) {
+    return new NextResponse(null, {
+      status: 429,
+      headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) },
+    });
+  }
+
   const key = process.env.GOOGLE_MAPS_KEY;
   // Sin llave el correo se ve bien igual, sólo sin mapa.
   if (!key) return new NextResponse(null, { status: 503 });
@@ -37,19 +46,14 @@ export async function GET(request: Request) {
   const w = clamp(params.get("w"), 520, 200, 640);
   const h = clamp(params.get("h"), 220, 100, 400);
 
-  // `q` permite otra sede (p. ej. la del montaje) sin tocar el código. Va
-  // limitado en largo; el resto de la petición no es negociable.
-  const q = params.get("q")?.slice(0, 160);
-  const center = q ? encodeURIComponent(q) : DEFAULT_CENTER;
-
   const url =
     `https://maps.googleapis.com/maps/api/staticmap` +
-    `?center=${center}` +
+    `?center=${DEFAULT_CENTER}` +
     `&zoom=15` +
     `&size=${w}x${h}` +
     `&scale=2` +
     `&maptype=roadmap` +
-    `&markers=${encodeURIComponent(`color:0x${TEMA.acento.slice(1)}|${q || DEFAULT_CENTER}`)}` +
+    `&markers=${encodeURIComponent(`color:0x${TEMA.acento.slice(1)}|${DEFAULT_CENTER}`)}` +
     STYLE.map((s) => `&style=${encodeURIComponent(s)}`).join("") +
     `&key=${key}`;
 
