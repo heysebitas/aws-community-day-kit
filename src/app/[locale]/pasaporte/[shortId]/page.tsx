@@ -475,7 +475,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
       <style>{ANIM_CSS}</style>
 
       {/* ═══ PAGE SHELL ═══ */}
-      <div style={{ minHeight: "100svh", background: "#080a0f", overflowX: "hidden", paddingBottom: 64 }}>
+      <main style={{ minHeight: "100svh", background: "#080a0f", overflowX: "hidden", paddingBottom: 64 }}>
 
         {/* Ambient glow — orange top */}
         <div style={{ position: "fixed", top: "12%", left: "50%", width: 520, height: 420, pointerEvents: "none", background: "radial-gradient(ellipse at center, rgb(var(--tema-acento-rgb) / .065) 0%, transparent 68%)", animation: "breathe 5s ease-in-out infinite" }} />
@@ -845,7 +845,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
           </Link>
 
         </div>{/* /card area */}
-      </div>{/* /page */}
+      </main>{/* /page */}
 
       {/* ═══ STAMP MODAL ═══ */}
       {showStampModal && (

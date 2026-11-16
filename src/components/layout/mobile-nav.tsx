@@ -9,17 +9,26 @@ import { Marca } from "./marca";
 import { localePath } from "@/lib/utils";
 import { useEventConfig } from "@/components/providers/event-config-provider";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
+import { CLASE_DIALOGO, useDialogo } from "@/hooks/use-dialogo";
 import { EVENTO } from "@/config";
 import { fechaCorta } from "@/config/fechas";
 
 interface MobileNavProps {
   isOpen: boolean;
+  /** Id del panel, para el `aria-controls` del botón. */
+  id?: string;
   onClose: () => void;
 }
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function MobileNav({ isOpen, onClose }: MobileNavProps) {
+export function MobileNav({ isOpen, onClose, id }: MobileNavProps) {
+  useScrollLock(isOpen);
+
+  return <AnimatePresence>{isOpen && <Panel id={id} onClose={onClose} />}</AnimatePresence>;
+}
+
+function Panel({ id, onClose }: { id?: string; onClose: () => void }) {
   const t = useTranslations("Nav");
   const { attendeeOpen } = useEventConfig();
   const locale = useLocale();
@@ -31,13 +40,12 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
     return isHome ? href : `${home === "/" ? "" : home}/${href}`;
   };
 
-  useScrollLock(isOpen);
-
   const links = navItems.map((i) => ({ href: resolveHref(i.href), label: t(i.labelKey) }));
 
+  const ref = useDialogo(onClose);
+
   return (
-    <AnimatePresence>
-      {isOpen && (
+    <dialog ref={ref} id={id} aria-label={t("menu")} className={CLASE_DIALOGO}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -122,7 +130,6 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
             )}
           </div>
         </motion.div>
-      )}
-    </AnimatePresence>
+    </dialog>
   );
 }

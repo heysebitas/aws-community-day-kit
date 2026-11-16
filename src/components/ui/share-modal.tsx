@@ -1,13 +1,14 @@
 "use client";
 
 
-import { useState, useCallback } from "react";
+import { useId, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Copy, Check, Download, Share2, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
+import { CLASE_DIALOGO, useDialogo } from "@/hooks/use-dialogo";
 import { PAIS, EVENTO, SITIO } from "@/config";
 
 // ── Brand SVG icons ───────────────────────────────────────────────────────────
@@ -195,8 +196,11 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
   const url = shareUrl(activePlatform);
 
   useScrollLock(true);
+  const idTitulo = useId();
+  const ref = useDialogo(onClose);
 
   return (
+    <dialog ref={ref} aria-labelledby={idTitulo} className={CLASE_DIALOGO}>
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
@@ -211,8 +215,8 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
       >
         {/* Sticky header */}
         <div className="flex items-center justify-between border-b-2 border-surface-600 px-4 py-3">
-          <p className="font-mono text-xs font-semibold uppercase tracking-widest text-surface-400">Compartir tarjeta</p>
-          <button onClick={onClose} className="border-2 border-surface-600 bg-surface-800 p-1.5 text-surface-300 transition-colors hover:text-surface-100">
+          <p id={idTitulo} className="font-mono text-xs font-semibold uppercase tracking-widest text-surface-400">Compartir tarjeta</p>
+          <button onClick={onClose} aria-label="Cerrar" className="border-2 border-surface-600 bg-surface-800 p-1.5 text-surface-300 transition-colors hover:text-surface-100">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -317,6 +321,7 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
         </div>
       </motion.div>
     </motion.div>
+    </dialog>
   );
 }
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
+import { CLASE_DIALOGO, useDialogo } from "@/hooks/use-dialogo";
 import { AlertTriangle } from "lucide-react";
 import { HardButton } from "@/components/admin/ui";
 
@@ -48,41 +49,28 @@ function ConfirmDialog({
   opts: ConfirmOptions | null;
   onAnswer: (value: boolean) => void;
 }) {
-  const okRef = useRef<HTMLDivElement>(null);
-
-  // Esc cancela y el foco entra en el diálogo, como en el nativo.
   // Suele abrirse encima de un modal, que ya tiene el fondo congelado: el
   // candado lleva cuenta de cuántos hay para no soltarlo antes de tiempo.
   useScrollLock(!!opts);
 
-  useEffect(() => {
-    if (!opts) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onAnswer(false);
-    };
-    document.addEventListener("keydown", onKey);
-    okRef.current?.focus();
-    return () => document.removeEventListener("keydown", onKey);
-  }, [opts, onAnswer]);
+  // Va por portal a `body`, encima del Modal.
+  if (!opts || typeof window === "undefined") return null;
+  return createPortal(<Caja opts={opts} onAnswer={onAnswer} />, document.body);
+}
 
-  if (!opts) return null;
-
+function Caja({ opts, onAnswer }: { opts: ConfirmOptions; onAnswer: (value: boolean) => void }) {
+  const idTitulo = useId();
+  // Escape cancela y el foco vuelve a lo que abrió la pregunta.
+  const ref = useDialogo(() => onAnswer(false));
   const danger = opts.tone !== "accent";
 
-  // Va por portal a `body` y por encima del Modal.
-  if (typeof window === "undefined") return null;
-
-  return createPortal(
+  return (
+    <dialog ref={ref} aria-labelledby={idTitulo} className={CLASE_DIALOGO}>
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={opts.title}
       className="fixed inset-0 z-[150] flex items-center justify-center bg-black/85 p-4"
       onClick={() => onAnswer(false)}
     >
       <div
-        ref={okRef}
-        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={`w-full max-w-md border-2 bg-surface-800 outline-none ${
           danger ? "border-red-500 shadow-[8px_8px_0_0_rgba(239,68,68,0.35)]" : "border-acento shadow-[8px_8px_0_0_var(--color-acento-fuerte)]"
@@ -90,7 +78,7 @@ function ConfirmDialog({
       >
         <div className={`flex items-center gap-2 border-b-2 px-4 py-3 ${danger ? "border-red-500/60" : "border-acento/60"}`}>
           <AlertTriangle className={`h-4 w-4 shrink-0 ${danger ? "text-red-400" : "text-acento"}`} />
-          <p className="dot-matrix m-0 text-lg leading-none text-surface-50">{opts.title}</p>
+          <p id={idTitulo} className="dot-matrix m-0 text-lg leading-none text-surface-50">{opts.title}</p>
         </div>
 
         <p className="m-0 px-4 py-5 font-mono text-sm leading-relaxed text-surface-100">
@@ -106,7 +94,7 @@ function ConfirmDialog({
           </HardButton>
         </div>
       </div>
-    </div>,
-    document.body,
+    </div>
+    </dialog>
   );
 }

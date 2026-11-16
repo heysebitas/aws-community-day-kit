@@ -215,9 +215,15 @@ body {
   }
 }
 
-/* `ScrollReveal` sale del servidor oculto para animar la entrada. Sin JS o con
-   movimiento reducido se queda en su sitio y visible desde el principio. */
-@media (scripting: none), (prefers-reduced-motion: reduce) {
+/* `ScrollReveal` sale del servidor oculto para animar la entrada, pero sólo
+   cuando hay JS (`.js` en el `<html>`, ver el layout). Sin JS, o con movimiento
+   reducido, se queda en su sitio y visible desde el principio. */
+html:not(.js) .scroll-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  clip-path: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
   .scroll-reveal {
     opacity: 1 !important;
     transform: none !important;

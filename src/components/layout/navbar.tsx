@@ -128,6 +128,8 @@ export function Navbar() {
               style={{ touchAction: "manipulation" }}
               className="flex h-10 w-10 items-center justify-center border-2 border-acento text-acento transition-colors hover:bg-acento hover:text-tinta lg:hidden"
               aria-label={t("open_menu")}
+              aria-expanded={mobileOpen}
+              aria-controls="menu-movil"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                 <path d="M4 7h16 M4 12h16 M4 17h16" stroke="currentColor" strokeWidth="2.4" />
@@ -137,7 +139,7 @@ export function Navbar() {
         </nav>
       </header>
 
-      <MobileNav isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <MobileNav id="menu-movil" isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
     </>
   );
 }
