@@ -38,6 +38,21 @@ export async function buscarDuplicados(uri: string) {
   }
 }
 
+/** Cuántos registros y pasaportes no tienen el campo `busqueda`; sólo lee. */
+export async function contarSinBusqueda(uri: string) {
+  const mongoose = (await import("mongoose")).default;
+  const conn = await mongoose.createConnection(uri, { serverSelectionTimeoutMS: 5000 }).asPromise();
+  try {
+    const falta = { busqueda: { $exists: false } };
+    return {
+      registrations: await conn.collection("registrations").countDocuments(falta),
+      passports: await conn.collection("passports").countDocuments(falta),
+    };
+  } finally {
+    await conn.close();
+  }
+}
+
 async function main() {
   let fallos = 0;
 
@@ -111,6 +126,9 @@ async function main() {
         fallos++;
         error(`${d.coleccion}: ${d.email} está ${d.veces} veces; sin quitar los repetidos no se crea el índice único`);
       }
+      const sin = await contarSinBusqueda(process.env.MONGODB_URI);
+      if (!sin.registrations && !sin.passports) ok("Todos los registros y pasaportes tienen el campo de búsqueda");
+      else aviso(`Sin campo de búsqueda: ${sin.registrations} registros y ${sin.passports} pasaportes; no salen en el check-in. Corre \`node scripts/rellenar-busqueda.mjs --aplicar\` (sin --aplicar sólo cuenta).`);
     } catch (e) {
       aviso(`No se pudo revisar la base: ${(e as Error).message}`);
     }

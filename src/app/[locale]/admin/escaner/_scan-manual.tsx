@@ -33,18 +33,20 @@ export function ScanManual({ actionLabel, confirm, disabled, disabledHint }: {
     const q = query.trim();
     if (q.length < 2) { setResults([]); setSearching(false); return; }
     setSearching(true);
+    // Una respuesta lenta de una tecla anterior no pisa a la más reciente.
+    let vigente = true;
     const t = setTimeout(async () => {
       try {
         const res = await fetch(`/api/scanner/search?q=${encodeURIComponent(q)}`);
         const data = await res.json();
-        setResults(data.results || []);
+        if (vigente) setResults(data.results || []);
       } catch {
-        setResults([]);
+        if (vigente) setResults([]);
       } finally {
-        setSearching(false);
+        if (vigente) setSearching(false);
       }
     }, 300);
-    return () => clearTimeout(t);
+    return () => { vigente = false; clearTimeout(t); };
   }, [query]);
 
   const doConfirm = async (hit: Hit) => {

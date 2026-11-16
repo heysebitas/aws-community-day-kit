@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import mongoose from "mongoose";
 import { nanoid } from "nanoid";
 import { connectDB } from "@/lib/db";
 import { nuevoPin } from "@/lib/pin";
@@ -15,13 +16,42 @@ import { rateLimit, getIp } from "@/lib/rate-limit";
 import { Passport } from "@/models/passport";
 import { verifyCaptcha } from "@/lib/captcha";
 
-export async function GET() {
+// Lo que pinta el panel; el resto (campañas, `busqueda`, `__v`) no viaja.
+const CAMPOS_PANEL =
+  "firstName lastName email attendance documentType documentNumber role roleOther entityType entityName " +
+  "consent qrCode checkedIn checkedInAt checkedInBy isManual emailStatus emailError emailSentAt resendId " +
+  "confirmation createdAt updatedAt";
+
+export async function GET(request: NextRequest) {
   try {
     await requireAccess("registrations", "ver", ["admin", "organizer", "volunteer"]);
 
     await connectDB();
-    const registrations = await Registration.find({}).sort({ createdAt: -1 });
-    return Response.json({ registrations });
+
+    // Cursor = «createdAt_id» del último registro de la página anterior.
+    const params = request.nextUrl.searchParams;
+    const limite = Math.min(Math.max(parseInt(params.get("limit") ?? "", 10) || 200, 1), 500);
+    const filtro: Record<string, unknown> = {};
+    const cursor = params.get("cursor");
+    if (cursor) {
+      const [ms, id] = cursor.split("_");
+      const fecha = new Date(Number(ms));
+      if (!id || !mongoose.isValidObjectId(id) || Number.isNaN(fecha.getTime())) {
+        return Response.json({ error: "Cursor inválido" }, { status: 400 });
+      }
+      filtro.$or = [{ createdAt: { $lt: fecha } }, { createdAt: fecha, _id: { $lt: id } }];
+    }
+
+    const filas = await Registration.find(filtro)
+      .select(CAMPOS_PANEL)
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(limite + 1)
+      .lean();
+    const hayMas = filas.length > limite;
+    const registrations = hayMas ? filas.slice(0, limite) : filas;
+    const ultimo = registrations[registrations.length - 1];
+    const nextCursor = hayMas && ultimo ? `${ultimo.createdAt.getTime()}_${ultimo._id}` : null;
+    return Response.json({ registrations, nextCursor });
   } catch (e) {
     const msg = (e as Error).message;
     if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
