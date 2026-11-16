@@ -7,8 +7,9 @@ export const runtime = "nodejs";
 /** El reloj animado que va dentro de los correos. */
 
 export async function GET(request: Request) {
-  // Holgado: los clientes de correo piden desde pocas IP y el GIF va cacheado.
-  const limite = rateLimit(`countdown:${getIp(request)}`, 120, 60_000);
+  // Muy holgado: Gmail y otros piden las imágenes desde pocas IP de su proxy, y la
+  // CPU ya la acota la caché (un GIF por ventana), no este límite.
+  const limite = rateLimit(`countdown:${getIp(request)}`, 1200, 60_000);
   if (!limite.ok) {
     return new NextResponse(null, {
       status: 429,

@@ -76,7 +76,7 @@ describe("countdown", () => {
 
   test("devuelve 429 al pasar el límite", async () => {
     let ultimo = 200;
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 1300; i++) {
       ultimo = (await reloj(pedir("https://x.test/api/countdown", "192.0.2.50"))).status;
       if (ultimo === 429) break;
     }
