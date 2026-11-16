@@ -43,6 +43,10 @@ function LogoRow({
             <img
               src={`${basePath}${s.logo}`}
               alt={s.nombre}
+              width={400}
+              height={200}
+              loading="lazy"
+              decoding="async"
               className={`${h} w-auto object-contain brightness-0 transition-opacity duration-300 group-hover:opacity-70`}
             />
           </a>
