@@ -31,7 +31,7 @@ export const MENSAJES_COMUN = [
 export const MENSAJES_RUTA = {
   registro: ["Forms", "Strip"],
   voluntarios: ["Forms", "Strip"],
-  speakers: ["Forms", "Strip", "CFP"],
+  speakers: ["Forms", "Strip", "CFP", "Speakers"],
   pasaporte: [],
   confirmar: [],
   "confirmar-cambios": [],
