@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
+import { CLASE_DIALOGO, useDialogo } from "@/hooks/use-dialogo";
 import { Pencil } from "lucide-react";
 import { HardButton } from "@/components/admin/ui";
 
@@ -70,6 +71,9 @@ function Caja({
   onAnswer: (value: string | null) => void;
 }) {
   const [valor, setValor] = useState(opts.initial ?? "");
+  const idTitulo = useId();
+  // Declarado antes que el foco del campo: abre el diálogo y luego se enfoca.
+  const ref = useDialogo(() => onAnswer(null));
   const campo = useRef<HTMLInputElement>(null);
 
   // El foco dentro y el texto seleccionado, para escribir encima sin borrar.
@@ -77,14 +81,6 @@ function Caja({
     campo.current?.focus();
     campo.current?.select();
   }, []);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onAnswer(null);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onAnswer]);
 
   const limpio = valor.trim();
   const error = limpio ? (opts.validar?.(limpio) ?? null) : null;
@@ -96,10 +92,8 @@ function Caja({
   // con `transform` o `filter`, que crean contexto de apilamiento propio y
   // dejarían el z-index sin efecto si se abre desde dentro de un modal.
   return createPortal(
+    <dialog ref={ref} aria-labelledby={idTitulo} className={CLASE_DIALOGO}>
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={opts.title}
       className="fixed inset-0 z-[150] flex items-center justify-center bg-black/85 p-4"
       onClick={() => onAnswer(null)}
     >
@@ -109,7 +103,7 @@ function Caja({
       >
         <div className="flex items-center gap-2 border-b-2 border-acento/60 px-4 py-3">
           <Pencil className="h-4 w-4 shrink-0 text-acento" />
-          <p className="dot-matrix m-0 text-lg leading-none text-surface-50">{opts.title}</p>
+          <p id={idTitulo} className="dot-matrix m-0 text-lg leading-none text-surface-50">{opts.title}</p>
         </div>
 
         <div className="flex flex-col gap-2 px-4 py-5">
@@ -150,7 +144,8 @@ function Caja({
           </HardButton>
         </div>
       </div>
-    </div>,
+    </div>
+    </dialog>,
     document.body,
   );
 }

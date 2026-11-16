@@ -4,6 +4,9 @@ import { Session } from "@/models/session";
 import { User } from "@/models/user";
 import { createLog } from "@/lib/log";
 
+// Borra también lo que el navegador guarde del panel (cookies y almacenamiento local).
+const CABECERAS = { "Clear-Site-Data": '"cookies", "storage"' };
+
 export async function POST() {
   try {
     const user = await getAuthUser();
@@ -20,9 +23,9 @@ export async function POST() {
       await User.findByIdAndUpdate(user._id, { currentSessionId: null });
     }
     await clearAuthCookie();
-    return Response.json({ ok: true });
+    return Response.json({ ok: true }, { headers: CABECERAS });
   } catch {
     await clearAuthCookie();
-    return Response.json({ ok: true });
+    return Response.json({ ok: true }, { headers: CABECERAS });
   }
 }

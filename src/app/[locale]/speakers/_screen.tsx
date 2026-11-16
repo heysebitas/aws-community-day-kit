@@ -688,10 +688,10 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
 
                     <div className="grid grid-cols-2 gap-4">
                       <Field label={t.firstName} error={errors.firstName}>
-                        <TextInput value={form.firstName} onChange={(v) => { set("firstName", v); clearErr("firstName"); }} placeholder={t.firstName_ph} maxLength={80} />
+                        <TextInput value={form.firstName} onChange={(v) => { set("firstName", v); clearErr("firstName"); }} placeholder={t.firstName_ph} maxLength={80} name="firstName" autoComplete="given-name" />
                       </Field>
                       <Field label={t.lastName} error={errors.lastName}>
-                        <TextInput value={form.lastName} onChange={(v) => { set("lastName", v); clearErr("lastName"); }} placeholder={t.lastName_ph} maxLength={80} />
+                        <TextInput value={form.lastName} onChange={(v) => { set("lastName", v); clearErr("lastName"); }} placeholder={t.lastName_ph} maxLength={80} name="lastName" autoComplete="family-name" />
                       </Field>
                     </div>
 
@@ -709,6 +709,9 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                         }}
                         onBlur={() => set("email", cleanWhitespace(form.email))}
                         placeholder="tu@email.com"
+                        name="email"
+                        autoComplete="email"
+                        inputMode="email"
                       />
                       {emailHint && !errors.email && (
                         <button type="button"

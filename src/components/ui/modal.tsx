@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useId } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
+import { CLASE_DIALOGO, useDialogo } from "@/hooks/use-dialogo";
 
 /** Ventana modal. */
 
@@ -13,6 +14,8 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   title?: string;
+  /** Id del encabezado propio, cuando el título no va en la barra. */
+  labelledBy?: string;
   children: React.ReactNode;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
@@ -25,29 +28,29 @@ const sizeStyles = {
   xl: "sm:max-w-4xl",
 };
 
-export function Modal({ open, onClose, title, children, className, size = "md" }: ModalProps) {
-  const handleEsc = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose],
-  );
+export function Modal(props: ModalProps) {
+  const { open } = props;
 
   // El fondo no se mueve mientras esto esté abierto. Ver `useScrollLock`: el
   // candado va en el `<html>`, que es quien desplaza la página.
   useScrollLock(open);
 
-  useEffect(() => {
-    if (!open) return;
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, [open, handleEsc]);
-
   if (typeof window === "undefined") return null;
 
   return createPortal(
     <AnimatePresence>
-      {open && (
+      {open && <Caja {...props} />}
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
+function Caja({ onClose, title, labelledBy, children, className, size = "md" }: ModalProps) {
+  const idTitulo = useId();
+  const ref = useDialogo(onClose);
+
+  return (
+    <dialog ref={ref} aria-labelledby={title ? idTitulo : labelledBy} className={CLASE_DIALOGO}>
         <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4">
           <motion.div
             initial={{ opacity: 0 }}
@@ -57,8 +60,6 @@ export function Modal({ open, onClose, title, children, className, size = "md" }
             onClick={onClose}
           />
           <motion.div
-            role="dialog"
-            aria-modal="true"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
@@ -72,7 +73,7 @@ export function Modal({ open, onClose, title, children, className, size = "md" }
           >
             {title && (
               <div className="flex shrink-0 items-center justify-between gap-3 border-b-2 border-surface-600 bg-surface-800 px-4 py-3 sm:px-5">
-                <h2 className="dot-matrix m-0 min-w-0 truncate text-lg leading-none text-surface-50 sm:text-xl">
+                <h2 id={idTitulo} className="dot-matrix m-0 min-w-0 truncate text-lg leading-none text-surface-50 sm:text-xl">
                   {title}
                 </h2>
                 <button
@@ -93,8 +94,6 @@ export function Modal({ open, onClose, title, children, className, size = "md" }
             </div>
           </motion.div>
         </div>
-      )}
-    </AnimatePresence>,
-    document.body,
+    </dialog>
   );
 }

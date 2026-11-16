@@ -13,7 +13,9 @@
     "cfp": "CFP",
     "register_closed": "Registration closed",
     "open_menu": "Open menu",
-    "close_menu": "Close menu"
+    "close_menu": "Close menu",
+    "menu": "Navigation menu",
+    "skip_to_content": "Skip to content"
   },
   "Strip": {
     "event": "[[evento]]",

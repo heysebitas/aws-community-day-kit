@@ -46,6 +46,8 @@ const seguridad = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // La cámara hace falta para los escáneres del panel; lo demás no se usa.
   { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(), payment=(), usb=()" },
+  // Los popups (Turnstile, enlaces externos) siguen funcionando; el resto queda aislado.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
   ...(produccion ? [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" }] : []),
 ];
 
@@ -72,6 +74,11 @@ const nextConfig: NextConfig = {
     const inmutable = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
     return [
       { source: "/:ruta*", headers: seguridad },
+      // `marca` y `og` los piden los correos y las redes desde otros orígenes.
+      {
+        source: "/api/:ruta((?!marca(?:/|$)|og(?:/|$)).*)",
+        headers: [{ key: "Cross-Origin-Resource-Policy", value: "same-origin" }],
+      },
       { source: "/images/:ruta*", headers: revalidable },
       { source: "/evento/:ruta*", headers: revalidable },
       { source: "/fonts/:ruta*", headers: inmutable },

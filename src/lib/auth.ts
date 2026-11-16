@@ -4,7 +4,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { connectDB } from "./db";
 import { PRODUCCION } from "./env";
-import { COOKIE_SESION, DURACION_SESION } from "./sesion";
+import { COOKIE_SESION, COOKIE_SESION_VIEJA, DURACION_SESION, leerTokenSesion } from "./sesion";
 import { User, type IUser } from "@/models/user";
 import { Session } from "@/models/session";
 import { alcanza, puedeEliminar, type Nivel, type SeccionId } from "@/lib/permisos";
@@ -56,6 +56,8 @@ export async function setAuthCookie(userId: string, sessionId: string) {
 export async function clearAuthCookie() {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_SESION);
+  // La cookie vieja no debe sobrevivir al cierre de sesión.
+  if (COOKIE_SESION_VIEJA !== COOKIE_SESION) cookieStore.delete(COOKIE_SESION_VIEJA);
 }
 
 /**
@@ -83,7 +85,7 @@ const usuarioDeSesion = cache(async (token: string): Promise<IUser | null> => {
 
 export async function getAuthUser(): Promise<IUser | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_SESION)?.value;
+  const token = leerTokenSesion((n) => cookieStore.get(n));
   if (!token) return null;
   return usuarioDeSesion(token);
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { CLASE_DIALOGO, useDialogo } from "@/hooks/use-dialogo";
 import { useTranslations } from "next-intl";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { WireSolid } from "@/components/effects/wire-solid";
@@ -117,18 +119,9 @@ function EventModal({ event, onClose }: { event: AgendaEvent; onClose: () => voi
   const [cardOpen, setCardOpen] = useState(false);
   const cardUrl = event.speakerSlug ? `/api/og/speaker/${event.speakerSlug}` : (event.cardImageUrl || null);
 
-  useEffect(() => {
-    if (!cardOpen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.stopImmediatePropagation(); setCardOpen(false); }
-    };
-    document.addEventListener("keydown", handler, { capture: true });
-    return () => document.removeEventListener("keydown", handler, { capture: true });
-  }, [cardOpen]);
-
   return (
     <>
-      <Modal open onClose={onClose} title="" size="md">
+      <Modal open onClose={onClose} labelledBy="agenda-titulo" size="md">
         <div className="flex flex-col gap-5">
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-2">
@@ -159,7 +152,7 @@ function EventModal({ event, onClose }: { event: AgendaEvent; onClose: () => voi
 
           {/* Title + speaker */}
           <div>
-            <h2 className="font-mono text-xl font-bold text-surface-50 leading-snug">{event.title}</h2>
+            <h2 id="agenda-titulo" className="font-mono text-xl font-bold text-surface-50 leading-snug">{event.title}</h2>
             {event.speaker && (
               <p className="mt-1 font-mono text-sm text-surface-400">{event.speaker}</p>
             )}
@@ -236,6 +229,7 @@ function EventModal({ event, onClose }: { event: AgendaEvent; onClose: () => voi
 
       {/* Lightbox */}
       {cardOpen && cardUrl && (
+        <Lightbox onClose={() => setCardOpen(false)}>
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4 cursor-zoom-out"
           onClick={() => setCardOpen(false)}
@@ -257,8 +251,20 @@ function EventModal({ event, onClose }: { event: AgendaEvent; onClose: () => voi
             <X className="h-7 w-7" />
           </button>
         </div>
+        </Lightbox>
       )}
     </>
+  );
+}
+
+/** La tarjeta ampliada: otro diálogo encima del modal, con su propio Escape. */
+function Lightbox({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+  const ref = useDialogo(onClose);
+  return createPortal(
+    <dialog ref={ref} aria-label="Tarjeta ampliada" className={CLASE_DIALOGO}>
+      {children}
+    </dialog>,
+    document.body,
   );
 }
 

@@ -46,7 +46,7 @@ export function Field({ label, error, children, hint }: { label?: string; error?
   );
 }
 
-export function TextInput({ value, onChange, onBlur, placeholder, maxLength, className, inputMode, autoComplete }: { value: string; onChange: (v: string) => void; onBlur?: () => void; placeholder?: string; maxLength?: number; className?: string; inputMode?: "text" | "email" | "numeric" | "url"; autoComplete?: string }) {
+export function TextInput({ value, onChange, onBlur, placeholder, maxLength, className, inputMode, autoComplete, name }: { value: string; onChange: (v: string) => void; onBlur?: () => void; placeholder?: string; maxLength?: number; className?: string; inputMode?: "text" | "email" | "numeric" | "url"; autoComplete?: string; name?: string }) {
   return (
     <div className="relative">
       <input
@@ -57,7 +57,8 @@ export function TextInput({ value, onChange, onBlur, placeholder, maxLength, cla
         placeholder={placeholder}
         maxLength={maxLength}
         inputMode={inputMode}
-        autoComplete={autoComplete ?? "off"}
+        name={name}
+        autoComplete={autoComplete}
         spellCheck={false}
         className={cn("w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all", className)}
       />

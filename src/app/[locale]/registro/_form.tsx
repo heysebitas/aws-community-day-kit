@@ -259,6 +259,8 @@ export function RegistroForm({
           <Field label={t.firstName} required htmlFor="f-name" error={errors.firstName}>
             <input
               id="f-name"
+              name="given-name"
+              autoComplete="given-name"
               value={v.firstName}
               onChange={(e) => set("firstName", e.target.value)}
               placeholder={t.firstName_ph}
@@ -269,6 +271,8 @@ export function RegistroForm({
           <Field label={t.lastName} required htmlFor="f-last" error={errors.lastName}>
             <input
               id="f-last"
+              name="family-name"
+              autoComplete="family-name"
               value={v.lastName}
               onChange={(e) => set("lastName", e.target.value)}
               placeholder={t.lastName_ph}
@@ -281,6 +285,8 @@ export function RegistroForm({
         <Field label={t.email} required htmlFor="f-mail" error={errors.email} hint={t.email_hint}>
           <input
             id="f-mail"
+            name="email"
+            autoComplete="email"
             type="email"
             inputMode="email"
             value={v.email}
@@ -349,6 +355,8 @@ export function RegistroForm({
                 >
                   <input
                     id="f-docn"
+                    name="documento"
+                    autoComplete="off"
                     value={v.documentNumber}
                     onChange={(e) => set("documentNumber", e.target.value)}
                     onBlur={() => {
@@ -397,6 +405,8 @@ export function RegistroForm({
               <Field label={t.which} required htmlFor="f-roleo" error={errors.roleOther}>
                 <input
                   id="f-roleo"
+                  name="rol-otro"
+                  autoComplete="off"
                   value={v.roleOther}
                   onChange={(e) => set("roleOther", e.target.value)}
                   placeholder={t.which_ph}
@@ -442,6 +452,8 @@ export function RegistroForm({
               >
                 <input
                   id="f-entn"
+                  name="organization"
+                  autoComplete="organization"
                   value={v.entityName}
                   onChange={(e) => set("entityName", e.target.value)}
                   placeholder={t.entityName_ph}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { IDIOMAS, IDIOMA_BASE } from "@/config";
-import { COOKIE_SESION } from "@/lib/sesion";
+import { leerTokenSesion } from "@/lib/sesion";
 import { routing } from "./i18n/routing";
 
 const intl = createMiddleware(routing);
@@ -22,7 +22,7 @@ export default function proxy(request: NextRequest) {
   const ruta = pathname.replace(PREFIJO_IDIOMA, "") || "/";
 
   const esPanel = ruta.startsWith("/admin") && !ADMIN_PUBLICO.some((p) => ruta.startsWith(p));
-  if (esPanel && !request.cookies.get(COOKIE_SESION)?.value) {
+  if (esPanel && !leerTokenSesion((n) => request.cookies.get(n))) {
     return NextResponse.redirect(new URL(`/${idioma}/admin/login`, request.url));
   }
 

@@ -100,6 +100,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   // Si la base falla, el sitio sigue en pie con los formularios cerrados.
   const mensajes = await getMessages();
+  const tNav = await getTranslations({ locale, namespace: "Nav" });
   const desdeLaBase = await getPublicEventConfig().catch(() => EMPTY_PUBLIC_CONFIG);
   const config = {
     ...desdeLaBase,
@@ -116,7 +117,17 @@ export default async function LocaleLayout({ children, params }: Props) {
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
+      <head>
+        {/* `js` va antes de pintar: el CSS oculta lo que anima sólo si hay JS. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="min-h-full bg-surface-900 font-sans text-surface-100">
+        <a
+          href="#contenido"
+          className="fixed left-2 top-2 z-[300] -translate-y-[200%] border-2 border-acento bg-surface-900 px-4 py-2 font-mono text-sm text-acento focus:translate-y-0"
+        >
+          {tNav("skip_to_content")}
+        </a>
         {DEMO && <script dangerouslySetInnerHTML={{ __html: VISTA_PREVIA_TEMA }} />}
         <BfcacheReset />
         <NextIntlClientProvider messages={pick(mensajes, MENSAJES_COMUN)}>
@@ -126,7 +137,9 @@ export default async function LocaleLayout({ children, params }: Props) {
               footer={<Footer locale={locale} />}
               jsonLd={<EventJsonLd locale={locale} />}
             >
-              {children}
+              <div id="contenido" tabIndex={-1} className="outline-none">
+                {children}
+              </div>
             </SiteChrome>
           </EventConfigProvider>
         </NextIntlClientProvider>
