@@ -150,7 +150,7 @@ export function RegistrationCTA() {
         >
           <div className="border-2 border-acento bg-surface-900 p-1.5 shadow-[6px_6px_0_0_rgba(0,0,0,0.55)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${basePath}${EVENTO.marca.mascota}`} alt="" className="h-[88px] w-auto sm:h-[120px] lg:h-[138px]" />
+            <img src={`${basePath}${EVENTO.marca.mascota}`} alt="" width={400} height={400} loading="lazy" decoding="async" className="h-[88px] w-auto sm:h-[120px] lg:h-[138px]" />
           </div>
         </motion.div>}
       </motion.div>

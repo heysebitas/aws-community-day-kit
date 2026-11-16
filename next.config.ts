@@ -66,12 +66,14 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_BUCKET_HOST: bucket?.host ?? "" },
 
   async headers() {
+    // Sin hash en el nombre: un logo corregido tiene que verse en un día.
+    const revalidable = [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }];
+    // Las fuentes no cambian de nombre entre versiones, por eso pueden ser inmutables.
     const inmutable = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
     return [
       { source: "/:ruta*", headers: seguridad },
-      // Los estáticos cambian con el despliegue, no entre visitas.
-      { source: "/images/:ruta*", headers: inmutable },
-      { source: "/evento/:ruta*", headers: [{ key: "Cache-Control", value: "public, max-age=86400" }] },
+      { source: "/images/:ruta*", headers: revalidable },
+      { source: "/evento/:ruta*", headers: revalidable },
       { source: "/fonts/:ruta*", headers: inmutable },
     ];
   },
