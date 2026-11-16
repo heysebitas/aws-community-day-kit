@@ -11,13 +11,13 @@
     "dev": "next dev",
     "demo": "node scripts/demo.mjs",
     "setup": "node scripts/setup.mjs",
-    "doctor": "tsx scripts/doctor.ts",
+    "doctor": "tsx --import ./scripts/sin-server-only.mjs scripts/doctor.ts",
     "crear-admin": "node scripts/crear-admin.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src tests evento scripts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --import ./scripts/sin-server-only.mjs --test tests/*.test.ts",
     "check": "npm run typecheck && npm run lint && npm test",
     "db:memoria": "node scripts/db-memoria.mjs"
   },
@@ -63,6 +63,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "mongodb-memory-server": "^11.3.0",
+    "server-only": "^0.0.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5"

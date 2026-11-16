@@ -1,3 +1,4 @@
+import "server-only";
 import { EVENTO, PAIS } from "@/config";
 import { fechaLarga } from "@/config/fechas";
 import { certificadoScd, hayPlantillaScd } from "./certificate-scd";

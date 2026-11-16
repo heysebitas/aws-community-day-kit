@@ -1,3 +1,4 @@
+import "server-only";
 import {
   COLORS, MARGIN, PAGE_W,
   createDoc, drawEventDetails, drawFooter, drawHeader, hardBox, mono, pdfToBuffer,

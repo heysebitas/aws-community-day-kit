@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Límite de peticiones en memoria.
  *

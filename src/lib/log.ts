@@ -1,3 +1,4 @@
+import "server-only";
 import { connectDB } from "@/lib/db";
 import { Log } from "@/models/log";
 import { getAuthUser } from "@/lib/auth";

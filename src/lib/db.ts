@@ -1,3 +1,4 @@
+import "server-only";
 import mongoose from "mongoose";
 import { DEMO } from "@/lib/env";
 
