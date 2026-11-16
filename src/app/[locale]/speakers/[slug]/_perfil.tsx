@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { Code2, Globe, Clock, MapPin } from "lucide-react";
 import { ShareButton } from "@/components/ui/share-modal";
 import { cn } from "@/lib/utils";
+import { Foto } from "@/components/ui/foto";
 import { NombreTecleado } from "./_nombre";
 
 /** El perfil público de un speaker, en el lenguaje del sitio. */
@@ -106,15 +107,22 @@ function Retrato({ persona, grande }: { persona: Persona; grande?: boolean }) {
   return (
     <div
       className={cn(
-        "shrink-0 overflow-hidden border-2 border-acento bg-surface-800",
+        "relative shrink-0 overflow-hidden border-2 border-acento bg-surface-800",
         grande
           ? "h-56 w-56 shadow-[8px_8px_0_0_rgb(var(--tema-acento-rgb)_/_0.35)] sm:h-64 sm:w-64"
           : "h-20 w-20",
       )}
     >
       {persona.foto ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={persona.foto} alt={persona.nombre} className="h-full w-full object-cover object-top" />
+        <Foto
+          src={persona.foto}
+          alt={persona.nombre}
+          fill
+          sizes={grande ? "(max-width: 640px) 224px, 256px" : "80px"}
+          loading={grande ? "eager" : "lazy"}
+          fetchPriority={grande ? "high" : "auto"}
+          className="h-full w-full object-cover object-top"
+        />
       ) : (
         <span className={cn("flex h-full w-full items-center justify-center font-mono font-bold text-acento", grande ? "text-5xl" : "text-xl")}>
           {iniciales}

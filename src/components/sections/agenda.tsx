@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { WireSolid } from "@/components/effects/wire-solid";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { Modal } from "@/components/ui/modal";
+import { Foto } from "@/components/ui/foto";
 import { Clock, MapPin, Wifi, GitMerge, ExternalLink, X } from "lucide-react";
 import type { AgendaEventDTO as AgendaEvent } from "@/lib/data/agenda";
 import { EVENTO } from "@/config";
@@ -87,12 +88,13 @@ function EventCard({ event, onClick }: { event: AgendaEvent; onClick: () => void
       <div className="flex h-full min-h-[88px]">
         {photoUrl && (
           <div className="shrink-0 w-[72px] overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Foto
               src={photoUrl}
               alt={event.speaker || "Speaker"}
+              width={72}
+              height={96}
+              sizes="72px"
               className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"
             />
           </div>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { Foto } from "@/components/ui/foto";
 import { avatarUrl } from "@/lib/avatar";
 
 /** La carita de una persona en el panel. */
@@ -59,7 +59,7 @@ export function Avatar({
   if (photo) {
     return (
       <span className={box} style={{ width: size, height: size, background: "#16161F" }}>
-        <Image src={photo} alt="" width={size} height={size} className="h-full w-full object-cover" unoptimized />
+        <Foto src={photo} alt="" width={size} height={size} className="h-full w-full object-cover" />
       </span>
     );
   }
