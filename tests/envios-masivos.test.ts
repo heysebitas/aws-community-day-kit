@@ -34,7 +34,8 @@ const SLUG_CAMPANA = "recordatorio";
 
 async function crearGente(n: number): Promise<Destinatario[]> {
   const docs = Array.from({ length: n }, (_, i) => ({
-    _id: new mongoose.Types.ObjectId(), email: `persona${i}@ejemplo.test`,
+    // qrCode propio: su índice es único y, si llega antes del insert, los vacíos chocan.
+    _id: new mongoose.Types.ObjectId(), email: `persona${i}@ejemplo.test`, qrCode: `qr-prueba-${i}`,
   }));
   await Registration.collection.insertMany(docs);
   return docs.map((d, i) => ({
