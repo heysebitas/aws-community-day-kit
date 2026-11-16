@@ -5,6 +5,7 @@ import { Passport } from "@/models/passport";
 import { badgeNameOptions, maskEmail } from "@/lib/utils";
 import { createLog } from "@/lib/log";
 import { EVENTO } from "@/config";
+import { getIp, rateLimit } from "@/lib/rate-limit";
 
 function isExpired(): boolean {
   return Date.now() > new Date(EVENTO.confirmacionHasta).getTime();
@@ -15,6 +16,14 @@ export async function GET(
   { params }: { params: Promise<{ token: string }> },
 ) {
   try {
+    const limite = rateLimit(`confirmacion:${getIp(_req)}`, 100, 15 * 60 * 1000);
+    if (!limite.ok) {
+      return Response.json(
+        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
+      );
+    }
+
     const { token } = await params;
     await connectDB();
 
@@ -60,6 +69,14 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> },
 ) {
   try {
+    const limite = rateLimit(`confirmacion:${getIp(req)}`, 100, 15 * 60 * 1000);
+    if (!limite.ok) {
+      return Response.json(
+        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
+      );
+    }
+
     const { token } = await params;
     const body = await req.json().catch(() => ({})) as { badgeFirstName?: string; badgeLastName?: string };
 

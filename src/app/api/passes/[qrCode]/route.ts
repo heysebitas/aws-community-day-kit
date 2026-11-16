@@ -4,12 +4,21 @@ import { connectDB } from "@/lib/db";
 import { Registration } from "@/models/registration";
 import { generateRegistrationPDF } from "@/lib/pdf/registration";
 import { EVENTO } from "@/config";
+import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ qrCode: string }> },
 ) {
   try {
+    const limite = rateLimit(`pase-pdf:${getIp(_request)}`, 30, 10 * 60 * 1000);
+    if (!limite.ok) {
+      return Response.json(
+        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
+      );
+    }
+
     const { qrCode } = await params;
     await connectDB();
 
