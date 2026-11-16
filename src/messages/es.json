@@ -401,5 +401,12 @@
     "event": "[[ciudad]], [[fecha]]. Entrada gratuita.",
     "home": "volver al inicio",
     "register": "regístrate gratis"
+  },
+  "Panel": {
+    "config_dia_title": "Día del Evento · [[fecha_dia]]",
+    "config_post_title": "Post-Evento · después del [[fecha_dia]]",
+    "config_notify_label": "Notificación [[anio_siguiente]]",
+    "config_notify_hint": "Botón de aviso de la próxima edición — puede ser un Google Form o newsletter.",
+    "escarapelas": "Escarapelas"
   }
 }

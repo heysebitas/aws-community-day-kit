@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 import { cleanWhitespace, toUpper } from "@/lib/normalize";
-import { EVENTO, SLUG, TEMA } from "@/config";
+import { EVENTO, PAIS, SLUG, TEMA } from "@/config";
 import { aRgb } from "@/config/temas";
 
 /** Tarjeta cuadrada para redes, dibujada en canvas y descargable. */
@@ -78,7 +79,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): st
   return lines;
 }
 
-function draw(canvas: HTMLCanvasElement, name: string, labels: ShareLabels) {
+function draw(canvas: HTMLCanvasElement, name: string, labels: ShareLabels, lugar: string) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -155,7 +156,7 @@ function draw(canvas: HTMLCanvasElement, name: string, labels: ShareLabels) {
   ctx.fillStyle = "rgba(255,255,255,0.62)";
   ctx.font = `32px ${mono}`;
   ctx.fillText(EVENTO.sede.nombre.toUpperCase(), 84, 826);
-  ctx.fillText("SANTIAGO · CHILE", 84, 872);
+  ctx.fillText(lugar, 84, 872);
 
   // Cinta inferior
   ctx.fillStyle = C.block;
@@ -180,6 +181,11 @@ export function useShareCard({
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
+  const locale = useLocale();
+
+  // La ciudad y el país salen de la configuración de la edición: la tarjeta
+  // es la misma para todas, lo que cambia son estos dos datos.
+  const lugar = toUpper(`${EVENTO.ciudad} · ${locale === "en" ? PAIS.nombreEn : PAIS.nombre}`);
 
   // Se desarma el objeto en valores sueltos: `labels` se construye nuevo en
   // cada render de quien llama, asi que como dependencia del efecto haria que
@@ -197,14 +203,14 @@ export function useShareCard({
         /* si falla, se dibuja igual con lo que haya */
       }
       if (cancelled || !ref.current) return;
-      draw(ref.current, name, { kicker, headline, date, footer });
+      draw(ref.current, name, { kicker, headline, date, footer }, lugar);
       setReady(true);
     };
     void run();
     return () => {
       cancelled = true;
     };
-  }, [name, kicker, headline, date, footer]);
+  }, [name, kicker, headline, date, footer, lugar]);
 
   const download = useCallback(() => {
     const canvas = ref.current;

@@ -401,5 +401,12 @@
     "event": "[[ciudad]], [[fecha]]. Free entry.",
     "home": "back to home",
     "register": "register for free"
+  },
+  "Panel": {
+    "config_dia_title": "Event day · [[fecha_dia]]",
+    "config_post_title": "After the event · from the day after [[fecha_dia]]",
+    "config_notify_label": "Notification for [[anio_siguiente]]",
+    "config_notify_hint": "Notification button for the next edition — it can be a Google Form or a newsletter.",
+    "escarapelas": "Badges"
   }
 }
