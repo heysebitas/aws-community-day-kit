@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Passport } from "@/models/passport";
 import { PassportEditToken } from "@/models/passport-edit-token";
+import { getIp, rateLimit } from "@/lib/rate-limit";
 
 // POST (no GET) para que los prefetchers de correo no consuman el token de un solo uso.
 export async function POST(
@@ -9,6 +10,14 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> },
 ) {
   try {
+    const limite = rateLimit(`confirmacion-pasaporte:${getIp(_req)}`, 30, 15 * 60 * 1000);
+    if (!limite.ok) {
+      return Response.json(
+        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
+      );
+    }
+
     const { token } = await params;
     await connectDB();
 

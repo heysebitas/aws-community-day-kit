@@ -35,16 +35,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sho
       return Response.json({ error: "PIN incorrecto o sponsor inactivo" }, { status: 400 });
     }
 
-    const passport = await Passport.findOne({ shortId });
-    if (!passport) return Response.json({ error: "Pasaporte no encontrado" }, { status: 404 });
-
+    // El filtro exige que el sello aún no esté: solo un escaneo lo agrega.
     const sponsorId = sponsor._id.toString();
-    if (passport.stamps.some((s: { sponsorId: string }) => s.sponsorId === sponsorId)) {
+    const sellado = await Passport.findOneAndUpdate(
+      { shortId, "stamps.sponsorId": { $ne: sponsorId } },
+      { $push: { stamps: { sponsorId, sponsorName: sponsor.sponsorName, stampedAt: new Date() } } },
+      { returnDocument: "after" },
+    );
+    if (!sellado) {
+      if (!(await Passport.exists({ shortId }))) {
+        return Response.json({ error: "Pasaporte no encontrado" }, { status: 404 });
+      }
       return Response.json({ error: "Ya tienes el sello de este sponsor" }, { status: 409 });
     }
-
-    passport.stamps.push({ sponsorId, sponsorName: sponsor.sponsorName, stampedAt: new Date() });
-    await passport.save();
     await SponsorPin.findByIdAndUpdate(sponsor._id, { $inc: { totalStamps: 1 } });
 
     return Response.json({ ok: true, sponsorName: sponsor.sponsorName });

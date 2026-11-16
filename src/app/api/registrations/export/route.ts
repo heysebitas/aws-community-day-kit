@@ -7,14 +7,8 @@ import {
   entityLabelOf,
   roleLabelOf,
 } from "@/data/attendee-form";
+import { csvResponse, csvRow } from "@/lib/csv";
 import { SLUG } from "@/config";
-
-function escapeCsv(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n") || value.includes("\r")) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
 
 /** Columnas de la persona, en orden fijo. */
 const PERSON_COLUMNS: { label: string; value: (r: IRegistration) => string }[] = [
@@ -49,32 +43,26 @@ export async function GET() {
     const systemColumns = ["id", "qrCode", "checkedIn", "checkedInAt", "checkedInBy", "emailStatus", "emailError", "emailSentAt", "createdAt"];
     const allColumns = [...PERSON_COLUMNS.map((c) => c.label), ...systemColumns];
 
-    const header = allColumns.map(escapeCsv).join(",");
+    const header = csvRow(allColumns);
 
-    const rows = registrations.map((reg) => {
-      const responsePart = PERSON_COLUMNS.map((c) => escapeCsv(c.value(reg)));
-      const systemPart = [
-        escapeCsv(String(reg._id)),
-        escapeCsv(reg.qrCode),
-        escapeCsv(reg.checkedIn ? "Sí" : "No"),
-        escapeCsv(reg.checkedInAt ? reg.checkedInAt.toISOString() : ""),
-        escapeCsv(reg.checkedInBy ?? ""),
-        escapeCsv(reg.emailStatus),
-        escapeCsv(reg.emailError ?? ""),
-        escapeCsv(reg.emailSentAt ? reg.emailSentAt.toISOString() : ""),
-        escapeCsv(reg.createdAt.toISOString()),
-      ];
-      return [...responsePart, ...systemPart].join(",");
-    });
+    const rows = registrations.map((reg) =>
+      csvRow([
+        ...PERSON_COLUMNS.map((c) => c.value(reg)),
+        String(reg._id),
+        reg.qrCode,
+        reg.checkedIn ? "Sí" : "No",
+        reg.checkedInAt ? reg.checkedInAt.toISOString() : "",
+        reg.checkedInBy ?? "",
+        reg.emailStatus,
+        reg.emailError ?? "",
+        reg.emailSentAt ? reg.emailSentAt.toISOString() : "",
+        reg.createdAt.toISOString(),
+      ]),
+    );
 
     const csv = [header, ...rows].join("\r\n");
 
-    return new Response(csv, {
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="registros-${SLUG}.csv"`,
-      },
-    });
+    return csvResponse(csv, `registros-${SLUG}.csv`);
   } catch (e) {
     const msg = (e as Error).message;
     if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });

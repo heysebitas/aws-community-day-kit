@@ -63,7 +63,7 @@ const registrationSchema = new Schema<IRegistration>(
   {
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, lowercase: true, trim: true, index: true },
+    email: { type: String, required: true, lowercase: true, trim: true, unique: true },
 
     attendance: {
       type: String,
@@ -101,7 +101,12 @@ const registrationSchema = new Schema<IRegistration>(
     },
     emailError: { type: String, default: null },
     emailSentAt: { type: Date, default: null },
-    resendId: { type: String, default: null },
+    // Parcial para no indexar los nulos; Mongoose lo crea al iniciar el modelo.
+    resendId: {
+      type: String,
+      default: null,
+      index: { partialFilterExpression: { resendId: { $type: "string" } } },
+    },
     sentCampaigns: { type: [String], default: [] },
 
     confirmation: {

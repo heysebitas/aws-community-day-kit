@@ -13,6 +13,7 @@ import { fechaLarga } from "@/config/fechas";
 import { getAuthUser } from "@/lib/auth";
 import { descargarImagen } from "@/lib/fetch-seguro";
 import { firmaInterna } from "@/lib/speaker-card";
+import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,6 +77,14 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limite = rateLimit(`imagen-speaker:${getIp(_request)}`, 120, 10 * 60 * 1000);
+  if (!limite.ok) {
+    return Response.json(
+      { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
+    );
+  }
+
   const { slug } = await params;
 
   await connectDB();

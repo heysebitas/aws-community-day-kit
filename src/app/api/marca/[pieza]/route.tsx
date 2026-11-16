@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { Banner, CabeceraCorreo, Icono, PieCorreo, fuentes } from "@/lib/marca";
+import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -8,6 +9,14 @@ export const runtime = "nodejs";
  * `/correo-pie` e `/icono?t=192`. Los dibujos están en `src/lib/marca.tsx`.
  */
 export async function GET(req: Request, { params }: { params: Promise<{ pieza: string }> }) {
+  const limite = rateLimit(`imagen-marca:${getIp(req)}`, 300, 10 * 60 * 1000);
+  if (!limite.ok) {
+    return Response.json(
+      { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
+    );
+  }
+
   const { pieza } = await params;
   // Cambian sólo con un despliegue: se cachean un día y se sirven viejas mientras se regeneran.
   const headers = { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800" };

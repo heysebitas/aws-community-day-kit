@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   const emailStatus = mapeo.envio === "entregado" ? "sent" : "failed";
 
   await Promise.all([
-    Registration.updateMany({ resendId }, { emailStatus, emailError: mapeo.motivo }),
+    Registration.updateOne({ resendId }, { emailStatus, emailError: mapeo.motivo }),
     /** Un `entregado` nunca pisa un `rebotado`. */
     EmailEnvio.updateMany(
       {

@@ -15,7 +15,13 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const registration = await Registration.findOne({ qrCode });
+    // Un solo escritor gana: el filtro exige que aún no esté dentro.
+    const marcada = await Registration.findOneAndUpdate(
+      { qrCode, checkedIn: { $ne: true } },
+      { $set: { checkedIn: true, checkedInAt: new Date(), checkedInBy: user._id.toString() } },
+      { returnDocument: "after" },
+    );
+    const registration = marcada ?? await Registration.findOne({ qrCode });
     if (!registration) {
       return Response.json({ error: "Registro no encontrado", status: "not_found" }, { status: 404 });
     }
@@ -37,7 +43,7 @@ export async function POST(request: NextRequest) {
       ? [registration.confirmation?.badgeFirstName, registration.confirmation?.badgeLastName].filter(Boolean).join(" ").trim()
       : "";
 
-    if (registration.checkedIn) {
+    if (!marcada) {
       return Response.json({
         error: "Ya hizo check-in",
         status: "already_checked_in",
@@ -49,11 +55,6 @@ export async function POST(request: NextRequest) {
         checkedInAt: registration.checkedInAt,
       }, { status: 409 });
     }
-
-    registration.checkedIn = true;
-    registration.checkedInAt = new Date();
-    registration.checkedInBy = user._id.toString();
-    await registration.save();
 
     const totalCheckedIn = await Registration.countDocuments({ checkedIn: true });
 

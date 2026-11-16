@@ -14,16 +14,10 @@ import {
   sbgLabelOf,
   shirtSizeLabelOf,
 } from "@/data/volunteer-form";
+import { csvResponse, csvRow } from "@/lib/csv";
 import { SLUG } from "@/config";
 
 /** Exportación de voluntarios a CSV. */
-
-function escapeCsv(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n") || value.includes("\r")) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
 
 const COLUMNS = [
   "Nombre", "Apellido", "Correo electrónico", "Teléfono",
@@ -43,7 +37,7 @@ export async function GET() {
     const submissions = await VolunteerSubmission.find({}).sort({ submittedAt: 1 }).lean();
 
     const rows = submissions.map((v) =>
-      [
+      csvRow([
         v.firstName,
         v.lastName,
         v.email,
@@ -67,19 +61,12 @@ export async function GET() {
         v.certSentAt ? v.certSentAt.toISOString() : "",
         v.submittedAt ? v.submittedAt.toISOString() : "",
         String(v._id),
-      ]
-        .map((cell) => escapeCsv(cell ?? ""))
-        .join(","),
+      ]),
     );
 
-    const csv = [COLUMNS.map(escapeCsv).join(","), ...rows].join("\r\n");
+    const csv = [csvRow(COLUMNS), ...rows].join("\r\n");
 
-    return new Response(csv, {
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="voluntarios-${SLUG}.csv"`,
-      },
-    });
+    return csvResponse(csv, `voluntarios-${SLUG}.csv`);
   } catch (e) {
     const msg = (e as Error).message;
     if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });

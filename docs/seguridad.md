@@ -24,9 +24,40 @@ Para **reportar** una vulnerabilidad: [SECURITY.md](../SECURITY.md).
 **Formularios públicos**
 - Captcha (Cloudflare Turnstile) verificado en el servidor, que **falla
   cerrado**: si no se puede comprobar, se rechaza.
-- Límite de peticiones por IP en todo lo público, y de intentos en los PIN.
+- Límite de intentos en los PIN.
 - Validación y normalización en el servidor de cada campo; los enlaces de
   redes sólo aceptan los dominios que les corresponden.
+
+**Límite de peticiones**
+- El límite se aplica dentro del handler de cada ruta, no de forma global en
+  el proxy. La clave combina la operación (y, cuando hace falta, el recurso)
+  con la IP. Las rutas que cortan la petición responden `429` e incluyen
+  `Retry-After`.
+- Las rutas públicas con límite son:
+
+| Ruta | Método | Límite por IP |
+|---|---|---|
+| `/api/registrations` | `POST` público | 50 cada 15 minutos |
+| `/api/volunteers` | `POST` público | 30 cada 15 minutos |
+| `/api/speakers` | `POST` | 8 cada 60 minutos |
+| `/api/upload/public-presign` | `POST` | 12 cada 10 minutos |
+| `/api/auth/login` | `POST` | 10 cada 15 minutos |
+| `/api/auth/create-password` y `/api/auth/validate-token` | `POST` y `GET` | 20 cada 15 minutos, en total |
+| `/api/passport/[shortId]/stats` | `POST` | 50 visitas al día; 50 clics por red y hora (sólo evita sobrecontar, no corta la petición) |
+| `/api/confirm/[token]` | `GET` y `POST` | 100 cada 15 minutos, en total |
+| `/api/confirm-passport-edit/[token]` | `POST` | 30 cada 15 minutos |
+| `/api/passes/[qrCode]` | `GET` | 30 cada 10 minutos |
+| `/api/speaker-profiles/check-slug` | `GET` | 120 cada 15 minutos |
+| `/api/marca/[pieza]` | `GET` | 300 cada 10 minutos |
+| `/api/og/speaker/[slug]` | `GET` | 120 cada 10 minutos |
+
+Los límites van por IP y son holgados a propósito: en un campus o en la sede mucha gente sale por la misma
+IP, y las imágenes de marca se piden en cada visita y desde los proxies de los correos.
+
+- `POST /api/webhooks/resend` queda fuera de este límite: cada evento se
+  autentica con la firma de Svix y el proveedor reintenta entregas válidas;
+  un límite genérico por IP podría rechazar esos reintentos. Una firma
+  inválida se rechaza con `401` antes de tocar la base de datos.
 
 **Archivos**
 - Las subidas van directo al bucket con una URL firmada que fija tipo y

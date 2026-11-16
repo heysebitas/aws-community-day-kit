@@ -19,33 +19,37 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-    const passport = await Passport.findOne({ shortId });
-    if (!passport) return NextResponse.json({ found: false }, { status: 404 });
-
-    const already = passport.sessionAttendance?.find(
-      (e: { sessionId: string }) => e.sessionId === sessionId
+    // El filtro exige que la sesión aún no esté anotada: solo un escaneo la agrega.
+    const passport = await Passport.findOneAndUpdate(
+      { shortId, "sessionAttendance.sessionId": { $ne: sessionId } },
+      {
+        $push: {
+          sessionAttendance: {
+            sessionId,
+            sessionTitle: sessionTitle ?? "",
+            room: room ?? "",
+            scannedAt: new Date(),
+            scannedBy: user.name,
+          },
+        },
+      },
+      { returnDocument: "after" },
     );
-
-    if (already) {
+    if (!passport) {
+      const previo = await Passport.findOne({ shortId });
+      if (!previo) return NextResponse.json({ found: false }, { status: 404 });
+      const already = previo.sessionAttendance?.find(
+        (e: { sessionId: string }) => e.sessionId === sessionId
+      );
       return NextResponse.json({
         found: true,
         alreadyScanned: true,
-        scannedAt: already.scannedAt,
-        firstName: passport.firstName,
-        lastName: passport.lastName,
-        role: passport.role,
+        scannedAt: already?.scannedAt,
+        firstName: previo.firstName,
+        lastName: previo.lastName,
+        role: previo.role,
       });
     }
-
-    passport.sessionAttendance = passport.sessionAttendance ?? [];
-    passport.sessionAttendance.push({
-      sessionId,
-      sessionTitle: sessionTitle ?? "",
-      room: room ?? "",
-      scannedAt: new Date(),
-      scannedBy: user.name,
-    });
-    await passport.save();
 
     await createLog({
       userId: String(user._id),

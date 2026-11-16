@@ -2,12 +2,19 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { SpeakerProfile } from "@/models/speaker-profile";
-import { sendEmail, EMAIL_FROM } from "@/lib/correo";
+import { sendEmail, conConcurrencia, EMAIL_FROM } from "@/lib/correo";
 import { armarCorreo } from "@/lib/email-plantillas";
 import { enlacesActuales, grupoDeSpeaker } from "@/lib/enlaces";
 import { generateSpeakerPDF } from "@/lib/pdf/speaker";
 import { createLog } from "@/lib/log";
 import { SLUG } from "@/config";
+
+export const maxDuration = 300;
+
+/** Resend admite ~2 peticiones por segundo: dos hilos con pausa de 1 s. */
+const CONCURRENCIA = 2;
+const PAUSA_MS = 1000;
+const TOPE_IDS = 100;
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,23 +23,19 @@ export async function POST(request: NextRequest) {
     const ids: string[] = Array.isArray(body.ids) ? body.ids : [];
 
     if (!ids.length) return Response.json({ error: "Sin IDs" }, { status: 400 });
+    if (ids.length > TOPE_IDS) {
+      return Response.json({ error: `Máximo ${TOPE_IDS} por vez` }, { status: 400 });
+    }
 
     await connectDB();
 
     // Los enlaces se leen una vez para todo el lote, no por speaker.
     const { valores: enlaces } = await enlacesActuales();
 
-    const results = await Promise.allSettled(
-      ids.map(async (id) => {
+    const results = await conConcurrencia(ids, CONCURRENCIA, async (id) => {
         // Un solo documento por speaker: estado y datos en el mismo sitio.
         const profile = await SpeakerProfile.findById(id);
         if (!profile || profile.status === "accepted") return { id, skipped: true };
-
-        profile.status = "accepted";
-        profile.approvedAt = new Date();
-        profile.approvedBy = user._id.toString();
-        profile.isPublic = true;
-        await profile.save();
 
         const name = profile.name ?? "";
         const email = profile.email ?? "";
@@ -58,14 +61,22 @@ export async function POST(request: NextRequest) {
           if (!correo) throw new Error("plantilla speaker_aprobado no disponible");
 
           const pdfBuffer = await generateSpeakerPDF(name);
-          await sendEmail({
+          const res = await sendEmail({
             from: EMAIL_FROM,
             to: email,
             subject: correo.asunto,
             html: correo.html,
             attachments: [{ filename: `invitacion-speaker-${SLUG}.pdf`, content: pdfBuffer.toString("base64") }],
           });
+          // Sin correo no se aprueba: así sigue pendiente y el reintento lo procesa.
+          if (res.error) throw new Error(res.error);
         }
+
+        profile.status = "accepted";
+        profile.approvedAt = new Date();
+        profile.approvedBy = user._id.toString();
+        profile.isPublic = true;
+        await profile.save();
 
         await createLog({
           userId: user._id.toString(),
@@ -78,8 +89,7 @@ export async function POST(request: NextRequest) {
         });
 
         return { id, approved: true };
-      }),
-    );
+      }, PAUSA_MS);
 
     const approved = results.filter(
       (r) => r.status === "fulfilled" && !(r.value as { skipped?: boolean }).skipped,
