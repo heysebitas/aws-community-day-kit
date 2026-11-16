@@ -61,6 +61,7 @@ describe("countdown", () => {
 
   test("100 llamadas seguidas generan un solo GIF por ventana", async () => {
     const antes = estadisticas.generados;
+    const inicio = Date.now();
     let ok = 0;
     for (let i = 0; i < 100; i++) {
       const r = await reloj(pedir("https://x.test/api/countdown", `198.51.100.${i % 2 ? 7 : 8}`));
@@ -70,8 +71,10 @@ describe("countdown", () => {
       }
     }
     assert.equal(ok, 100);
-    assert.ok(estadisticas.generados - antes <= 2, "como mucho uno por ventana (puede cruzarse un borde)");
-    const t = Date.now();
+    // Uno por cada ventana que haya tocado el bucle: en una máquina lenta pueden ser varias.
+    const ventanas = Math.floor(Date.now() / VENTANA_MS) - Math.floor(inicio / VENTANA_MS) + 1;
+    assert.ok(estadisticas.generados - antes <= ventanas, `como mucho uno por ventana (${ventanas})`);
+    const t = Math.floor(Date.now() / VENTANA_MS) * VENTANA_MS;
     assert.equal(await gifDeLaVentana(t), await gifDeLaVentana(t + 1));
     assert.ok(VENTANA_MS >= 5000);
   });
