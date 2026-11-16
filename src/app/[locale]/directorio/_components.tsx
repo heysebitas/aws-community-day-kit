@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ShareButton } from "@/components/ui/share-modal";
+import { Foto } from "@/components/ui/foto";
 import { PublicProfile } from "@/components/sections/speakers";
 import { esTrack, trackCorto, trackPublico } from "@/data/session-tracks";
 import type { Keynote } from "@/config/contenido";
@@ -209,10 +210,11 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
             style={{ aspectRatio: "3/4" }}
           >
             {profile.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Foto
                 src={profile.photo}
                 alt={profile.name}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 144px, (max-width: 1024px) 176px, 192px"
                 className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
               />
             ) : (
@@ -224,10 +226,11 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
             {profile.companyLogo && (
               <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-start">
                 <div className="rounded-lg border border-glass-border bg-surface-900/80 px-2 py-1 backdrop-blur-sm">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Foto
                     src={profile.companyLogo}
                     alt="Company"
+                    width={72}
+                    height={16}
                     className="h-4 w-auto max-w-[72px] object-contain opacity-80"
                   />
                 </div>

@@ -6,9 +6,9 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const produccion = process.env.NODE_ENV === "production";
 
 // El host del bucket, para que `next/image` pueda optimizar las fotos de speakers.
-let bucket: string | undefined;
+let bucket: URL | undefined;
 try {
-  bucket = process.env.AWS_S3_PUBLIC_URL ? new URL(process.env.AWS_S3_PUBLIC_URL).hostname : undefined;
+  bucket = process.env.AWS_S3_PUBLIC_URL ? new URL(process.env.AWS_S3_PUBLIC_URL) : undefined;
 } catch {
   bucket = undefined;
 }
@@ -26,7 +26,8 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${produccion ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  // El origen del bucket va aparte por si no es https (un Garage o MinIO local).
+  `img-src 'self' data: blob: https:${bucket && bucket.protocol !== "https:" ? ` ${bucket.origin}` : ""}`,
   "font-src 'self' data:",
   "connect-src 'self' https:",
   "media-src 'self' blob:",
@@ -52,8 +53,17 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pdfkit", "mongodb-memory-server"],
   poweredByHeader: false,
   images: {
-    remotePatterns: bucket ? [{ protocol: "https", hostname: bucket }] : [],
+    remotePatterns: bucket
+      ? [{ protocol: bucket.protocol === "http:" ? "http" : "https", hostname: bucket.hostname, port: bucket.port }]
+      : [],
+    formats: ["image/avif", "image/webp"],
+    // Cada subida lleva un UUID en la key: la misma URL nunca cambia de contenido.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Un bucket local (Garage, MinIO) para probar; Next bloquea las IP locales por defecto.
+    dangerouslyAllowLocalIP: !!bucket && /(^|\.)localhost$|^127\./.test(bucket.hostname),
   },
+  // Para que `Foto` sepa en el cliente qué URLs puede optimizar.
+  env: { NEXT_PUBLIC_BUCKET_HOST: bucket?.host ?? "" },
 
   async headers() {
     const inmutable = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
