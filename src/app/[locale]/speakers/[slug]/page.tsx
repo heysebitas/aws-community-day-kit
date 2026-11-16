@@ -3,7 +3,6 @@ import { connectDB } from "@/lib/db";
 import { SpeakerProfile } from "@/models/speaker-profile";
 import { AgendaEvent } from "@/models/agenda-event";
 import { setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PerfilSpeaker } from "./_perfil";
@@ -12,10 +11,6 @@ import { EVENTO, PAIS, SITIO } from "@/config";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
-}
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale, slug: "_placeholder" }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

@@ -1,5 +1,4 @@
 import { unstable_cache } from "next/cache";
-import { connection } from "next/server";
 import { connectDB } from "@/lib/db";
 import { EventConfig } from "@/models/event-config";
 import { Form } from "@/models/form";
@@ -9,8 +8,8 @@ import { EVENTO } from "@/config";
 export const EVENT_CONFIG_TAG = "event-config";
 
 // Lo que el sitio público necesita de la base. Los datos del equipo nunca
-// salen por acá. `cfpOpen` va aparte porque depende del reloj y no se puede
-// cachear.
+// salen por acá. `cfpOpen` va aparte porque depende del reloj: lo corrige el
+// cliente con `cfpCierre`.
 export type EventConfigDB = {
   trackVirtualUrl: string;
   photosUrl: string;
@@ -24,8 +23,10 @@ export type EventConfigDB = {
 };
 
 export type PublicEventConfig = EventConfigDB & {
-  /** Si la convocatoria de speakers sigue abierta. La manda `EVENTO.cfpCierre`. */
+  /** Valor al generar la página; el provider lo recalcula en el cliente con `cfpCierre`. */
   cfpOpen: boolean;
+  /** Cierre de la convocatoria de speakers (`EVENTO.cfpCierre`). */
+  cfpCierre: string;
 };
 
 // Lo que se usa si no hay documento o si la base falla, para que el sitio no se caiga.
@@ -68,13 +69,3 @@ export const getPublicEventConfig = unstable_cache(
   ["public-event-config"],
   { tags: [EVENT_CONFIG_TAG], revalidate: 300 },
 );
-
-/**
- * Si la convocatoria de speakers sigue abierta. `connection()` obliga a
- * evaluarlo en cada petición: una comparación contra el reloj no se puede
- * prerenderizar ni cachear.
- */
-export async function isCfpOpen(): Promise<boolean> {
-  await connection();
-  return Date.now() <= new Date(EVENTO.cfpCierre).getTime();
-}

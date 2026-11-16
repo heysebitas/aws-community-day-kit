@@ -9,11 +9,12 @@ import { TEMAS, variablesDeTema } from "@/config/temas";
 import { DEMO } from "@/lib/env";
 import { handjet, jetbrainsMono, oxanium } from "@/lib/fonts";
 import { codificar } from "@/lib/buzones";
-import { getPublicEventConfig, EMPTY_PUBLIC_CONFIG, isCfpOpen } from "@/lib/data/event-config";
+import { getPublicEventConfig, EMPTY_PUBLIC_CONFIG } from "@/lib/data/event-config";
 import { localePath } from "@/lib/utils";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { SiteChrome } from "@/components/layout/site-chrome";
+import { cfpAbierto } from "@/hooks/cfp-abierto";
 import { EventConfigProvider } from "@/components/providers/event-config-provider";
 import { EventJsonLd } from "@/components/seo/json-ld";
 import { BfcacheReset } from "@/components/effects/bfcache-reset";
@@ -97,11 +98,13 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   // Si la base falla, el sitio sigue en pie con los formularios cerrados.
-  const [desdeLaBase, cfpOpen] = await Promise.all([
-    getPublicEventConfig().catch(() => EMPTY_PUBLIC_CONFIG),
-    isCfpOpen(),
-  ]);
-  const config = { ...desdeLaBase, cfpOpen, buzones: codificar(contacto) };
+  const desdeLaBase = await getPublicEventConfig().catch(() => EMPTY_PUBLIC_CONFIG);
+  const config = {
+    ...desdeLaBase,
+    cfpOpen: cfpAbierto(EVENTO.cfpCierre, Date.now()),
+    cfpCierre: EVENTO.cfpCierre,
+    buzones: codificar(contacto),
+  };
 
   return (
     <html
