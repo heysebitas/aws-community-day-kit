@@ -12,10 +12,13 @@ import { siluetaDe } from "./siluetas";
 export function WireCiudad({
   silueta,
   ciudad,
+  descripcion,
   className,
 }: {
   silueta: "auto" | "santiago";
   ciudad: string;
+  /** Texto para lectores de pantalla; viene de `messages`. */
+  descripcion?: string;
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -165,5 +168,5 @@ export function WireCiudad({
     };
   }, [silueta, ciudad, reduced]);
 
-  return <canvas ref={canvasRef} className={className} role="img" aria-label={`Silueta de ${ciudad} en alambre`} />;
+  return <canvas ref={canvasRef} className={className} role="img" aria-label={descripcion} />;
 }

@@ -210,6 +210,7 @@ export function Hero() {
         >
           <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[360px] lg:max-w-[560px]">
             <WireGlobe
+              descripcion={t("globe_label")}
               marker={EVENTO.coordenadas}
               label={EVENTO.ciudad}
               className="relative aspect-square w-full"

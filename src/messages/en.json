@@ -43,7 +43,8 @@
     "cta_register_closed_sub": "registration has closed",
     "cta_volunteer": "Volunteer",
     "tagline_short": "on site + online",
-    "globe_hint": "drag it"
+    "globe_hint": "drag it",
+    "globe_label": "Globe pointing at [[ciudad]]"
   },
   "About": {
     "heading": "What is a Student Community Day?",
@@ -156,6 +157,7 @@
     "export_calendar": "Add to calendar"
   },
   "Venue": {
+    "city_label": "Wireframe skyline of [[ciudad]]",
     "heading": "Where",
     "subheading": "[[ciudad]], [[pais]] — on site and online",
     "mode_onsite": "On site",

@@ -43,7 +43,8 @@
     "cta_register_closed_sub": "el registro ya cerró",
     "cta_volunteer": "Ser voluntario",
     "tagline_short": "presencial + online",
-    "globe_hint": "arrástralo"
+    "globe_hint": "arrástralo",
+    "globe_label": "Globo terráqueo que señala [[ciudad]]"
   },
   "About": {
     "heading": "¿Qué es un Student Community Day?",
@@ -156,6 +157,7 @@
     "export_calendar": "Agregar al calendario"
   },
   "Venue": {
+    "city_label": "Silueta de [[ciudad]] en alambre",
     "heading": "Dónde",
     "subheading": "[[ciudad]], [[pais]] — presencial y en línea",
     "mode_onsite": "Presencial",

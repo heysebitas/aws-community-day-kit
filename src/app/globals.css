@@ -132,6 +132,8 @@
 /* Onda de color letra a letra. El retardo lo pone cada <span>. */
 .wave-letter        { animation: color-wave 2.6s ease-in-out infinite; }
 .wave-letter-invert { animation: color-wave-invert 2.6s ease-in-out infinite; }
+[data-quieta] > .wave-letter,
+[data-quieta] > .wave-letter-invert { animation-play-state: paused; }
 
 .glyph-bob     { animation: glyph-bob 2.4s ease-in-out infinite; }
 .glyph-drift   { animation: glyph-drift 4.5s ease-in-out infinite; }

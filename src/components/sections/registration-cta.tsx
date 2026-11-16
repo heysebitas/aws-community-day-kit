@@ -66,7 +66,7 @@ export function RegistrationCTA() {
 
         {/* Pantalla */}
         <motion.div
-          style={{ boxShadow: useTransform(glow, (g) => `0 0 80px rgb(var(--tema-acento-rgb) / ${g})`) }}
+          style={{ boxShadow: useTransform(glow, (g) => `10px 10px 0 0 rgb(var(--tema-acento-rgb) / ${g})`) }}
           className="relative border-2 border-acento bg-black p-6 sm:p-10"
         >
           {/* Líneas de barrido del tubo */}

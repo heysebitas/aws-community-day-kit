@@ -12,10 +12,13 @@ import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
 export function WireGlobe({
   marker,
   label,
+  descripcion,
   className,
 }: {
   marker: Punto;
   label?: string;
+  /** Texto para lectores de pantalla; viene de `messages`. */
+  descripcion?: string;
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -222,7 +225,7 @@ export function WireGlobe({
       ref={canvasRef}
       className={className}
       role="img"
-      aria-label={label ? `Globo terráqueo señalando ${label}` : "Globo terráqueo"}
+      aria-label={descripcion}
     />
   );
 }
