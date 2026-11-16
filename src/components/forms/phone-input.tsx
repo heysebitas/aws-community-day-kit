@@ -54,6 +54,8 @@ export function PhoneInput({
   label,
   required,
   tone = "block",
+  autoComplete = "tel-national",
+  name = "tel-national",
 }: {
   countryCode: string;
   onCountryChange: (code: string) => void;
@@ -61,6 +63,9 @@ export function PhoneInput({
   value: string;
   onChange: (local: string) => void;
   error?: string;
+  /** Por defecto es el teléfono de la persona; el de un tercero (emergencia) va en `off`. */
+  autoComplete?: "off" | "tel-national";
+  name?: string;
   label?: string;
   required?: boolean;
   /** `block` sobre el lila de los formularios, `ink` sobre fondo oscuro. */
@@ -175,11 +180,12 @@ export function PhoneInput({
           </svg>
         </button>
 
-        {/* Número: sólo dígitos, sin autocompletado del navegador */}
+        {/* Número: sólo dígitos; autocompleta solo el teléfono propio */}
         <input
           type="text"
           inputMode="numeric"
-          autoComplete="off"
+          autoComplete={autoComplete}
+          name={autoComplete === "off" ? undefined : name}
           value={value}
           onChange={(e) => onChange(digitsOnly(e.target.value).slice(0, 15))}
           onPaste={(e) => {

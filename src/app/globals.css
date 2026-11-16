@@ -17,6 +17,8 @@
 :root {
   --tema-acento: #FF9900;
   --tema-acento-rgb: 255 153 0;
+  --tinta-rgb: 0 0 0;
+  --papel-rgb: 255 255 255;
   --tema-claro: #FFC266;
   --tema-fuerte: #E88B00;
   --tema-profundo: #6B3300;
@@ -242,14 +244,14 @@ html:not(.js) .scroll-reveal {
 .form-block label,
 .form-block .font-mono.text-sm.text-surface-200,
 .form-block span.text-surface-200 {
-  color: color-mix(in srgb, var(--color-tinta) 88%, transparent);
+  color: rgb(var(--tinta-rgb) / 0.88);
   font-weight: 600;
 }
 /* Un solo secundario sobre el bloque: tinta al 70 % (AA sobre cualquier tema). */
 .form-block .text-surface-300,
 .form-block .text-surface-400,
 .form-block .text-surface-500,
-.form-block .text-surface-600 { color: color-mix(in srgb, var(--color-tinta) 70%, transparent); }
+.form-block .text-surface-600 { color: rgb(var(--tinta-rgb) / 0.7); }
 .form-block .text-surface-50,
 .form-block .text-surface-100 { color: var(--color-tinta); }
 /* Sobre el bloque el acento no se ve: pasa al profundo. */
@@ -262,14 +264,14 @@ html:not(.js) .scroll-reveal {
 .form-block textarea,
 .form-block select {
   border-radius: 0;
-  border: 2px solid color-mix(in srgb, var(--color-tinta) 75%, transparent);
-  background: color-mix(in srgb, var(--color-papel) 80%, transparent);
+  border: 2px solid rgb(var(--tinta-rgb) / 0.75);
+  background: rgb(var(--papel-rgb) / 0.8);
   color: var(--color-tinta);
   box-shadow: none;
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 .form-block input::placeholder,
-.form-block textarea::placeholder { color: color-mix(in srgb, var(--color-tinta) 70%, transparent); }
+.form-block textarea::placeholder { color: rgb(var(--tinta-rgb) / 0.7); }
 .form-block input:not([type="checkbox"]):not([type="radio"]):hover,
 .form-block textarea:hover,
 .form-block select:hover {
@@ -281,14 +283,14 @@ html:not(.js) .scroll-reveal {
   border-color: var(--color-tinta);
   background: var(--color-papel);
   transform: translateY(-1px);
-  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--color-tinta) 30%, transparent);
+  box-shadow: 3px 3px 0 0 rgb(var(--tinta-rgb) / 0.3);
 }
 
 /* La opción elegida se marca en negro: el acento es el color del fondo y no se distinguiría. */
 .form-block [role="radio"] > span:first-child {
   border-width: 2px;
-  border-color: color-mix(in srgb, var(--color-tinta) 75%, transparent);
-  background: color-mix(in srgb, var(--color-papel) 80%, transparent);
+  border-color: rgb(var(--tinta-rgb) / 0.75);
+  background: rgb(var(--papel-rgb) / 0.8);
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 .form-block [role="radio"]:hover > span:first-child {
@@ -308,13 +310,13 @@ html:not(.js) .scroll-reveal {
   background: var(--color-tinta);
   color: var(--color-acento);
   font-weight: 700;
-  box-shadow: 5px 5px 0 0 color-mix(in srgb, var(--color-tinta) 35%, transparent);
+  box-shadow: 5px 5px 0 0 rgb(var(--tinta-rgb) / 0.35);
   transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
 }
 .form-block button[type="submit"]:hover:not(:disabled),
 .form-block .btn-hard:hover:not(:disabled) {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--color-tinta) 35%, transparent);
+  box-shadow: 7px 7px 0 0 rgb(var(--tinta-rgb) / 0.35);
 }
 .form-block button[type="submit"]:active:not(:disabled),
 .form-block .btn-hard:active:not(:disabled) {
@@ -322,6 +324,27 @@ html:not(.js) .scroll-reveal {
   box-shadow: none;
 }
 .form-block button[type="submit"]:disabled { box-shadow: none; opacity: 0.45; }
+
+/* Alto contraste: los colores de fondo se anulan, así que la opción marcada
+   se distingue por el contorno y el punto, y los botones llevan borde. */
+@media (forced-colors: active) {
+  .form-block button[type="submit"],
+  .form-block .btn-hard { border: 2px solid transparent; }
+  .form-block [role="radio"][aria-checked="true"] > span:first-child {
+    border-color: Highlight;
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+  .form-block [role="radio"][aria-checked="true"] > span:first-child > span {
+    background: HighlightText;
+  }
+  .form-block [role="checkbox"][aria-checked="true"],
+  .form-block input[type="checkbox"]:checked,
+  .form-block input[type="radio"]:checked {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+}
 
 .form-block button:not([type="submit"]).rounded-xl,
 .form-block button:not([type="submit"]).rounded-full {

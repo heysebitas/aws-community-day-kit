@@ -385,6 +385,8 @@ export function VoluntariosForm({
           <Field label={t.firstName} required htmlFor="v-name" error={errors.firstName}>
             <input
               id="v-name"
+              name="given-name"
+              autoComplete="given-name"
               value={v.firstName}
               onChange={(e) => set("firstName", e.target.value)}
               placeholder={t.firstName_ph}
@@ -395,6 +397,8 @@ export function VoluntariosForm({
           <Field label={t.lastName} required htmlFor="v-last" error={errors.lastName}>
             <input
               id="v-last"
+              name="family-name"
+              autoComplete="family-name"
               value={v.lastName}
               onChange={(e) => set("lastName", e.target.value)}
               placeholder={t.lastName_ph}
@@ -413,6 +417,8 @@ export function VoluntariosForm({
         >
           <input
             id="v-mail"
+            name="email"
+            autoComplete="email"
             type="email"
             inputMode="email"
             value={v.email}
@@ -461,6 +467,8 @@ export function VoluntariosForm({
           >
             <input
               id="v-docn"
+              name="documento"
+              autoComplete="off"
               value={v.documentNumber}
               onChange={(e) => set("documentNumber", e.target.value)}
               onBlur={() => {
@@ -506,6 +514,8 @@ export function VoluntariosForm({
               <Field label={t.which} required htmlFor="v-roleo" error={errors.roleOther}>
                 <input
                   id="v-roleo"
+                  name="rol-otro"
+                  autoComplete="off"
                   value={v.roleOther}
                   onChange={(e) => set("roleOther", e.target.value)}
                   placeholder={t.which_ph}
@@ -546,6 +556,8 @@ export function VoluntariosForm({
               >
                 <input
                   id="v-entn"
+                  name="organization"
+                  autoComplete="organization"
                   value={v.entityName}
                   onChange={(e) => set("entityName", e.target.value)}
                   placeholder={t.entityName_ph}
@@ -586,6 +598,8 @@ export function VoluntariosForm({
               <Field label={t.which} required htmlFor="v-sbgo" error={errors.sbgOther}>
                 <input
                   id="v-sbgo"
+                  name="grupo-otro"
+                  autoComplete="off"
                   value={v.sbgOther}
                   onChange={(e) => set("sbgOther", e.target.value)}
                   placeholder={t.sbgOther_ph}
@@ -733,6 +747,8 @@ export function VoluntariosForm({
               <Field label={t.which} required htmlFor="v-dieto" error={errors.dietaryOther}>
                 <input
                   id="v-dieto"
+                  name="dieta-otra"
+                  autoComplete="off"
                   value={v.dietaryOther}
                   onChange={(e) => set("dietaryOther", e.target.value)}
                   placeholder={t.dietaryOther_ph}
@@ -753,6 +769,8 @@ export function VoluntariosForm({
         >
           <input
             id="v-emn"
+            name="contacto-emergencia"
+            autoComplete="off"
             value={v.emergencyName}
             onChange={(e) => set("emergencyName", e.target.value)}
 placeholder={t.emergency_ph}
@@ -763,6 +781,7 @@ placeholder={t.emergency_ph}
 
         <PhoneInput
           label={t.emergencyPhone}
+          autoComplete="off"
           required
           countryCode={v.emergencyCountry}
           onCountryChange={(code) => set("emergencyCountry", code)}

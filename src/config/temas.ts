@@ -93,6 +93,8 @@ export function variablesDeTema(t: Tema): Record<string, string> {
   return {
     "--tema-acento": t.acento,
     "--tema-acento-rgb": aRgb(t.acento).join(" "),
+    "--tinta-rgb": "0 0 0",
+    "--papel-rgb": "255 255 255",
     "--tema-claro": t.claro,
     "--tema-fuerte": t.fuerte,
     "--tema-profundo": t.profundo,

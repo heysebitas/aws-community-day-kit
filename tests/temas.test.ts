@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { TEMAS, aRgb, contraste, derivarTema, resolverTema } from "@/config/temas";
+import { TEMAS, aRgb, variablesDeTema, contraste, derivarTema, resolverTema } from "@/config/temas";
 
 const HEX = /^#[0-9A-F]{6}$/i;
 
@@ -61,8 +61,8 @@ describe("el bloque claro se lee con cualquier tema", () => {
 
   it("globals.css usa los valores que aquí se comprueban", () => {
     assert.match(error, HEX);
-    assert.match(css, /\.form-block \.text-surface-600 \{ color: color-mix\(in srgb, var\(--color-tinta\) 70%/);
-    assert.match(css, /border: 2px solid color-mix\(in srgb, var\(--color-tinta\) 75%/);
+    assert.match(css, /\.form-block \.text-surface-600 \{ color: rgb\(var\(--tinta-rgb\) \/ 0\.7\)/);
+    assert.match(css, /border: 2px solid rgb\(var\(--tinta-rgb\) \/ 0\.75\)/);
   });
 
   for (const [nombre, tema] of temas) {
@@ -72,4 +72,15 @@ describe("el bloque claro se lee con cualquier tema", () => {
       assert.ok(contraste(error, tema.acento) >= 4.5, `error ${contraste(error, tema.acento).toFixed(2)}:1`);
     });
   }
+});
+
+describe("variables -rgb del tema", () => {
+  it("todos los temas definen tinta y papel para rgb(var(--x-rgb) / a)", () => {
+    for (const t of [...Object.values(TEMAS), derivarTema("#12AB34")]) {
+      const v = variablesDeTema(t);
+      assert.match(v["--tema-acento-rgb"], /^\d+ \d+ \d+$/);
+      assert.equal(v["--tinta-rgb"], "0 0 0");
+      assert.equal(v["--papel-rgb"], "255 255 255");
+    }
+  });
 });
