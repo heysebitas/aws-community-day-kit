@@ -145,13 +145,20 @@ export function LowPoly({
       for (const f of orden) {
         const a = tri[f * 3], b = tri[f * 3 + 1], c = tri[f * 3 + 2];
         const k = 0.26 + 0.9 * luzDe[f];
-        ctx.fillStyle = `rgb(${Math.min(255, color.r * k) | 0},${Math.min(255, color.g * k) | 0},${Math.min(255, color.b * k) | 0})`;
+        const tono = `rgb(${Math.min(255, color.r * k) | 0},${Math.min(255, color.g * k) | 0},${Math.min(255, color.b * k) | 0})`;
+        ctx.fillStyle = tono;
+        // Un trazo fino del mismo color tapa la raya de fondo que deja el
+        // suavizado entre dos caras vecinas.
+        ctx.strokeStyle = tono;
+        ctx.lineWidth = 0.6;
+        ctx.lineJoin = "round";
         ctx.beginPath();
         ctx.moveTo(px[a], py[a]);
         ctx.lineTo(px[b], py[b]);
         ctx.lineTo(px[c], py[c]);
         ctx.closePath();
         ctx.fill();
+        ctx.stroke();
       }
     };
 
@@ -191,7 +198,9 @@ export function LowPoly({
       ref={ref}
       aria-hidden="true"
       className={cn("select-none", className)}
-      style={{ width: size, height: Math.round(size * ratio) }}
+      // Alto automático con la proporción del dibujo: si el contenedor es más
+      // estrecho que `size`, el canvas se encoge entero y no se deforma.
+      style={{ width: size, maxWidth: "100%", height: "auto", aspectRatio: `${size} / ${Math.round(size * ratio)}` }}
     />
   );
 }

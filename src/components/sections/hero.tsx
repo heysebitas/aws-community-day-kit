@@ -81,9 +81,11 @@ export function Hero() {
             initial={{ y: 14 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.6, ease }}
-            className="dot-matrix text-3xl leading-none text-acento md:text-4xl"
+            className="dot-matrix flex flex-wrap gap-x-6 gap-y-1 text-3xl leading-none text-acento md:text-4xl"
           >
-            {EVENTO.edicion} [{String(EVENTO.anio).slice(-2)}]
+            {/* El letrero dice cuándo y dónde, como un panel de salidas. */}
+            <span>{confirmada ? fechaCorta(EVENTO.inicio) : t("coming_soon")}</span>
+            <span>{EVENTO.ciudad}</span>
           </motion.p>
 
           <motion.h1
@@ -105,16 +107,11 @@ export function Hero() {
             initial={{ y: 16 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="mt-5 font-mono text-base text-surface-300 md:text-lg"
+            className="mt-5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-base text-surface-300 md:text-lg"
           >
-            {confirmada ? (
-              <>
-                {fechaCorta(EVENTO.inicio)} · {EVENTO.ciudad.toLowerCase()} · {hora(EVENTO.inicio, locale)} ·{" "}
-              </>
-            ) : (
-              <>{t("coming_soon").toLowerCase()} · {EVENTO.ciudad.toLowerCase()} · </>
-            )}
+            {confirmada && <span>{hora(EVENTO.inicio, locale)}</span>}
             <span className="text-surface-100">{t("tagline_short")}</span>
+            <span>{EVENTO.edicion.toLowerCase()} {EVENTO.anio}</span>
           </motion.p>
 
           {confirmada && (
@@ -213,6 +210,7 @@ export function Hero() {
         >
           <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[360px] lg:max-w-[560px]">
             <WireGlobe
+              descripcion={t("globe_label")}
               marker={EVENTO.coordenadas}
               label={EVENTO.ciudad}
               className="relative aspect-square w-full"

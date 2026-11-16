@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { acentoCanvas } from "@/lib/tema-canvas";
+import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { bucleVisible } from "./bucle-visible";
 
 /**
  * Poliedro de alambre girando, para acompañar secciones sin imagen propia.
@@ -85,8 +86,12 @@ export function WireSolid({
     if (!ctx) return;
 
     const { verts, edges } = shape === "cube" ? cube() : icosahedron();
-    let raf = 0;
     let ay = 0.4;
+    // Perspectiva f = F / (D + z). Una esfera de radio R se proyecta hasta
+    // F·R / √(D² − R²): con eso la figura cabe entera en el canvas.
+    const F = 4, D = 4.2;
+    const R = Math.max(...verts.map(([x, y, z]) => Math.hypot(x, y, z)));
+    const alcance = (F * R) / Math.sqrt(D * D - R * R);
     let ax = 0.3;
 
     const resize = () => {
@@ -102,20 +107,18 @@ export function WireSolid({
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
 
-    const ACCENT = acentoCanvas();
+    let ACCENT = acentoCanvas();
+    const dejarDeObservar = observarAcento((v) => { ACCENT = v; });
 
     const draw = () => {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
-      if (!w || !h) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
+      if (!w || !h) return;
       ctx.clearRect(0, 0, w, h);
 
       const cx = w / 2;
       const cy = h / 2;
-      const scale = Math.min(w, h) * 0.33;
+      const scale = Math.min(Math.min(w, h) * 0.33, (Math.min(w, h) / 2 - 4) / alcance);
       const cosY = Math.cos(ay), sinY = Math.sin(ay);
       const cosX = Math.cos(ax), sinX = Math.sin(ax);
 
@@ -124,7 +127,7 @@ export function WireSolid({
         const z1 = x * sinY + z * cosY;
         const y2 = y * cosX - z1 * sinX;
         const z2 = y * sinX + z1 * cosX;
-        const f = 4 / (4.2 + z2);
+        const f = F / (D + z2);
         return { x: cx + x1 * f * scale, y: cy - y2 * f * scale, z: z2 };
       });
 
@@ -152,13 +155,14 @@ export function WireSolid({
         ay += 0.0034;
         ax += 0.0013;
       }
-      raf = requestAnimationFrame(draw);
     };
 
-    draw();
+    const parar = bucleVisible(canvas, draw);
 
     return () => {
-      cancelAnimationFrame(raf);
+      parar();
+
+      dejarDeObservar();
       observer.disconnect();
     };
   }, [shape, reduced]);

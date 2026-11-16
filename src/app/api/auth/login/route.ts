@@ -8,8 +8,9 @@ import { rateLimit, getIp } from "@/lib/rate-limit";
 import { verifyCaptcha } from "@/lib/captcha";
 import { normalizeEmail } from "@/lib/normalize";
 
-/** Un hash cualquiera, para gastar el mismo tiempo cuando la cuenta no existe. */
-const HASH_DE_RELLENO = bcrypt.hashSync("relleno", 12);
+/** Un hash cualquiera, para gastar el mismo tiempo cuando la cuenta no existe. Se calcula la primera vez que hace falta. */
+let hashDeRelleno: Promise<string> | undefined;
+const HASH_DE_RELLENO = () => (hashDeRelleno ??= bcrypt.hash("relleno", 12));
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     const user = await User.findOne({ email: checked.value });
     // Se compara siempre, haya cuenta o no: si no, el tiempo de respuesta delata qué correos existen.
-    const valid = await bcrypt.compare(password, user?.passwordHash || HASH_DE_RELLENO);
+    const valid = await bcrypt.compare(password, user?.passwordHash || await HASH_DE_RELLENO());
     if (!user || !user.passwordHash || !valid) {
       return Response.json({ error: "Credenciales inválidas" }, { status: 401 });
     }

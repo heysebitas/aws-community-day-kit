@@ -1,17 +1,21 @@
 version: 2
 updates:
+  # Un solo PR al mes por ecosistema: cada PR gasta una ejecución de la CI.
+  # Los saltos de versión mayor vienen en el mismo PR y no se mergean sin probarlos.
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 1
     groups:
-      # Un solo PR con todos los minor y patch.
       dependencias:
         patterns: ["*"]
-        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      acciones:
+        patterns: ["*"]

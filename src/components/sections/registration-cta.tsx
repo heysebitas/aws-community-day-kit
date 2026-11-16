@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { basePath, localePath } from "@/lib/utils";
 import { useEventConfig } from "@/components/providers/event-config-provider";
 import { EVENTO } from "@/config";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /** CTA de registro montado dentro de una máquina arcade. */
 export function RegistrationCTA() {
@@ -22,7 +23,9 @@ export function RegistrationCTA() {
 
   // El zoom va ligado al scroll: la escena se acerca y el mueble se desvanece
   // para que al final sólo quede la pantalla.
-  const scale = useTransform(scrollYProgress, [0, 0.75], [0.72, 1.18]);
+  // Con movimiento reducido no hay zoom: la escena queda a su tamaño.
+  const reducido = useReducedMotion();
+  const scale = useTransform(scrollYProgress, [0, 0.75], reducido ? [1, 1] : [0.72, 1.18]);
   const cabinetOpacity = useTransform(scrollYProgress, [0.35, 0.8], [1, 0]);
   const glow = useTransform(scrollYProgress, [0, 0.8], [0.15, 0.6]);
 
@@ -63,7 +66,7 @@ export function RegistrationCTA() {
 
         {/* Pantalla */}
         <motion.div
-          style={{ boxShadow: useTransform(glow, (g) => `0 0 80px rgb(var(--tema-acento-rgb) / ${g})`) }}
+          style={{ boxShadow: useTransform(glow, (g) => `10px 10px 0 0 rgb(var(--tema-acento-rgb) / ${g})`) }}
           className="relative border-2 border-acento bg-black p-6 sm:p-10"
         >
           {/* Líneas de barrido del tubo */}

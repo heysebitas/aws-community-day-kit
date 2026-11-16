@@ -2,24 +2,24 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { FAQ } from "@/models/faq";
+import { getActiveFaqs } from "@/lib/data/faq";
 import { revalidatePublic, FAQ_TAG } from "@/lib/data/revalidate";
 import { createLog } from "@/lib/log";
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
-
     const { searchParams } = new URL(request.url);
     const all = searchParams.get("all");
 
     if (all === "true") {
       await requireAccess("faq", "ver", ["admin", "organizer"]);
+      await connectDB();
       const faqs = await FAQ.find({}).sort({ order: 1 });
       return Response.json({ faqs });
     }
 
-    const faqs = await FAQ.find({ isActive: true }).sort({ order: 1 });
-    return Response.json({ faqs });
+    const faqs = await getActiveFaqs();
+    return Response.json({ faqs }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } });
   } catch (e) {
     const msg = (e as Error).message;
     if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });

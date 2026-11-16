@@ -9,12 +9,19 @@ import { localePath } from "@/lib/utils";
  *
  * Los textos salen de `Metadata` en los mensajes, con la clave de la página
  * (`registro_title`, `registro_desc`), así que no hay un título escrito en el
- * código de ninguna página.
+ * código de ninguna página. Una página que ya tiene su propio título (las
+ * legales) lo pasa en `titulo` y de aquí sólo toma la descripción y las
+ * direcciones.
  */
-export async function metadatosDe(locale: string, ruta: string, clave: string): Promise<Metadata> {
+export async function metadatosDe(
+  locale: string,
+  ruta: string,
+  clave: string,
+  opciones: { titulo?: string } = {},
+): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "Metadata" });
   const url = (idioma: string) => `${SITIO}${localePath(idioma, ruta)}`;
-  const titulo = t(`${clave}_title`);
+  const titulo = opciones.titulo ?? t(`${clave}_title`);
   const descripcion = t(`${clave}_desc`);
 
   return {

@@ -12,8 +12,11 @@ import type { Tone } from "./block-section";
  */
 function Wave({ text, invert }: { text: string; invert: boolean }) {
   const letters = [...text];
+  // Fuera de pantalla la onda se pausa: hay más de cien letras animándose.
+  const ref = useRef<HTMLSpanElement>(null);
+  const enVista = useInView(ref, { margin: "100px" });
   return (
-    <>
+    <span ref={ref} data-quieta={enVista ? undefined : ""}>
       {letters.map((ch, i) => (
         <span
           key={i}
@@ -23,7 +26,7 @@ function Wave({ text, invert }: { text: string; invert: boolean }) {
           {ch === " " ? " " : ch}
         </span>
       ))}
-    </>
+    </span>
   );
 }
 

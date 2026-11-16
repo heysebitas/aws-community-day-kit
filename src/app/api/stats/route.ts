@@ -13,77 +13,73 @@ export async function GET() {
     await requireAuth(["admin", "organizer"]);
     await connectDB();
 
-    const [
-      totalRegistrations,
-      totalSpeakers,
-      totalVolunteers,
-      volunteersApproved,
-      registrationsConfirmed,
-      totalCheckedIn,
-      emailsSent,
-      emailsFailed,
-      emailsPending,
-      registrationsByDay,
-      speakersByDay,
-      volunteersByDay,
-      checkInsByDay,
-      cloudClubBreakdown,
-      speakerStatusAgg,
-      speakerModalityAgg,
-      teamAgg,
-    ] = await Promise.all([
-      Registration.countDocuments({}),
-      SpeakerProfile.countDocuments({}),
-      VolunteerSubmission.countDocuments({}),
-      VolunteerSubmission.countDocuments({ approved: true }),
-      Registration.countDocuments({ "confirmation.confirmed": true }),
-      Registration.countDocuments({ checkedIn: true }),
-      Registration.countDocuments({ emailStatus: "sent" }),
-      Registration.countDocuments({ emailStatus: "failed" }),
-      Registration.countDocuments({ emailStatus: "pending" }),
-      Registration.aggregate([
-        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
-        { $sort: { _id: 1 } },
-      ]),
-      SpeakerProfile.aggregate([
-        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$submittedAt" } }, count: { $sum: 1 } } },
-        { $sort: { _id: 1 } },
-      ]),
-      VolunteerSubmission.aggregate([
-        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$submittedAt" } }, count: { $sum: 1 } } },
-        { $sort: { _id: 1 } },
-      ]),
-      Registration.aggregate([
-        { $match: { checkedIn: true, checkedInAt: { $ne: null } } },
-        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$checkedInAt" } }, count: { $sum: 1 } } },
-        { $sort: { _id: 1 } },
-      ]),
-      VolunteerSubmission.aggregate([
-        // `none` es "no pertenezco a ninguno": cuenta como sin grupo.
-        { $match: { sbg: { $nin: [null, "", "none"] } } },
-        { $group: { _id: "$sbg", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-      ]),
-      // Embudo de estados de las postulaciones
-      SpeakerProfile.aggregate([
-        { $group: { _id: "$status", count: { $sum: 1 } } },
-      ]),
-      // Speakers confirmados por modalidad, contando personas (principal + co-speakers)
-      SpeakerProfile.aggregate([
-        { $match: { status: { $in: CONFIRMED_PROFILE_STATUSES } } },
-        {
-          $group: {
-            _id: { $cond: [{ $in: ["$sessionType", ONLINE_MODES] }, "online", "presencial"] },
-            profiles: { $sum: 1 },
-            people: { $sum: { $add: [1, { $size: { $ifNull: ["$coSpeakers", []] } }] } },
+    const porDia = (campo: string) => [
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: campo } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 as const } },
+    ];
+    const contar = (filtro: Record<string, unknown>) => [{ $match: filtro }, { $count: "n" }];
+
+    // Una agregación con $facet por colección: los totales y las series salen de un solo recorrido.
+    const [[reg], [spk], [vol], teamAgg] = await Promise.all([
+      Registration.aggregate([{ $facet: {
+        total: [{ $count: "n" }],
+        confirmadas: contar({ "confirmation.confirmed": true }),
+        dentro: contar({ checkedIn: true }),
+        enviados: contar({ emailStatus: "sent" }),
+        fallidos: contar({ emailStatus: "failed" }),
+        pendientes: contar({ emailStatus: "pending" }),
+        porDia: porDia("$createdAt"),
+        checkInsPorDia: [{ $match: { checkedIn: true, checkedInAt: { $ne: null } } }, ...porDia("$checkedInAt")],
+      } }]),
+      SpeakerProfile.aggregate([{ $facet: {
+        total: [{ $count: "n" }],
+        porDia: porDia("$submittedAt"),
+        estados: [{ $group: { _id: "$status", count: { $sum: 1 } } }],
+        // Speakers confirmados por modalidad, contando personas (principal + co-speakers)
+        modalidad: [
+          { $match: { status: { $in: CONFIRMED_PROFILE_STATUSES } } },
+          {
+            $group: {
+              _id: { $cond: [{ $in: ["$sessionType", ONLINE_MODES] }, "online", "presencial"] },
+              profiles: { $sum: 1 },
+              people: { $sum: { $add: [1, { $size: { $ifNull: ["$coSpeakers", []] } }] } },
+            },
           },
-        },
-      ]),
+        ],
+      } }]),
+      VolunteerSubmission.aggregate([{ $facet: {
+        total: [{ $count: "n" }],
+        aprobados: contar({ approved: true }),
+        porDia: porDia("$submittedAt"),
+        // `none` es "no pertenezco a ninguno": cuenta como sin grupo.
+        grupos: [
+          { $match: { sbg: { $nin: [null, "", "none"] } } },
+          { $group: { _id: "$sbg", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ],
+      } }]),
       // Team members in the users collection by role
-      User.aggregate([
-        { $group: { _id: "$role", count: { $sum: 1 } } },
-      ]),
+      User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
     ]);
+
+    type Fila = { _id: string; count: number; profiles?: number; people?: number };
+    const n = (f?: { n: number }[]) => f?.[0]?.n ?? 0;
+    const totalRegistrations = n(reg.total);
+    const registrationsConfirmed = n(reg.confirmadas);
+    const totalCheckedIn = n(reg.dentro);
+    const emailsSent = n(reg.enviados);
+    const emailsFailed = n(reg.fallidos);
+    const emailsPending = n(reg.pendientes);
+    const registrationsByDay: Fila[] = reg.porDia;
+    const checkInsByDay: Fila[] = reg.checkInsPorDia;
+    const totalSpeakers = n(spk.total);
+    const speakersByDay: Fila[] = spk.porDia;
+    const speakerStatusAgg: Fila[] = spk.estados;
+    const speakerModalityAgg: Fila[] = spk.modalidad;
+    const totalVolunteers = n(vol.total);
+    const volunteersApproved = n(vol.aprobados);
+    const volunteersByDay: Fila[] = vol.porDia;
+    const cloudClubBreakdown: Fila[] = vol.grupos;
 
     // ── Speaker status funnel ──
     const statusMap: Record<string, number> = {};

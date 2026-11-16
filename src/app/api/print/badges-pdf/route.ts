@@ -134,6 +134,9 @@ async function drawBadgeStacked(pdf: InstanceType<typeof PDFDocument>, p: Person
   }
 }
 
+/** Tope por petición: el PDF se arma entero en memoria. */
+const MAX_SHORT_IDS = 200;
+
 // Genera un PDF con las escarapelas al tamaño EXACTO de la etiqueta (sin encabezados del navegador).
 export async function POST(req: NextRequest) {
   try {
@@ -141,6 +144,10 @@ export async function POST(req: NextRequest) {
     const { shortIds, configId } = await req.json() as { shortIds?: string[]; configId?: string };
     if (!Array.isArray(shortIds) || shortIds.length === 0) {
       return Response.json({ error: "shortIds requerido" }, { status: 400 });
+    }
+
+    if (shortIds.length > MAX_SHORT_IDS) {
+      return Response.json({ error: `Máximo ${MAX_SHORT_IDS} escarapelas por petición; envíalas por tandas.` }, { status: 400 });
     }
 
     await connectDB();

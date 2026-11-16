@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { LAND, encuadre, proyectar, type Punto } from "@/lib/globo";
-import { acentoCanvas } from "@/lib/tema-canvas";
+import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
 
 /**
  * El globo del hero: gira para dejar de frente el punto marcado, se puede
@@ -12,10 +12,13 @@ import { acentoCanvas } from "@/lib/tema-canvas";
 export function WireGlobe({
   marker,
   label,
+  descripcion,
   className,
 }: {
   marker: Punto;
   label?: string;
+  /** Texto para lectores de pantalla; viene de `messages`. */
+  descripcion?: string;
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,7 +31,8 @@ export function WireGlobe({
     if (!ctx) return;
 
     const { giro: home, inclinacion } = encuadre(marker);
-    const ACENTO = acentoCanvas();
+    let ACENTO = acentoCanvas();
+    const dejarDeObservar = observarAcento((v) => { ACENTO = v; });
 
     let raf = 0;
     let spin = home;
@@ -63,7 +67,8 @@ export function WireGlobe({
       tiltTarget = 0;
     };
     canvas.style.cursor = "grab";
-    canvas.style.touchAction = "none";
+    // El gesto vertical sigue siendo scroll de la página; el horizontal gira el globo.
+    canvas.style.touchAction = "pan-y";
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerup", onUp);
@@ -86,11 +91,18 @@ export function WireGlobe({
 
     // Fuera de pantalla no se dibuja.
     let visible = true;
-    const centinela = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { rootMargin: "100px" });
+    const centinela = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(draw);
+    }, { rootMargin: "100px" });
     centinela.observe(canvas);
 
     const draw = () => {
-      if (!size || !visible) {
+      if (!visible) {
+        raf = 0;
+        return;
+      }
+      if (!size) {
         raf = requestAnimationFrame(draw);
         return;
       }
@@ -197,6 +209,8 @@ export function WireGlobe({
 
     return () => {
       cancelAnimationFrame(raf);
+
+      dejarDeObservar();
       observer.disconnect();
       centinela.disconnect();
       canvas.removeEventListener("pointerdown", onDown);
@@ -211,7 +225,7 @@ export function WireGlobe({
       ref={canvasRef}
       className={className}
       role="img"
-      aria-label={label ? `Globo terráqueo señalando ${label}` : "Globo terráqueo"}
+      aria-label={descripcion}
     />
   );
 }

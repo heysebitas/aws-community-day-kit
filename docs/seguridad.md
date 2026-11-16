@@ -98,7 +98,9 @@ IP, y las imágenes de marca se piden en cada visita y desde los proxies de los 
 ## Límites conocidos
 
 - El límite de peticiones vive en la memoria del proceso: se reinicia con el
-  servidor y no se comparte entre instancias.
+  servidor y no se comparte entre instancias: despliega una sola instancia.
+  Los dos mapas tienen un tope de 10 000 claves; al llenarse se descartan las
+  más antiguas.
 - La CSP permite scripts en línea (`'unsafe-inline'`): es lo que deja
   prerenderizar las páginas sin un nonce por petición.
 - El código del pasaporte es el mismo que el del QR del pase: quien ve el QR

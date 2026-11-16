@@ -88,7 +88,7 @@ const PassportSchema = new Schema<IPassport>(
     isManual: { type: Boolean, default: false },
     confirmed: { type: Boolean, default: false },
     confirmedAt: { type: Date, default: null },
-    badgePrinted: { type: Boolean, default: false, index: true },
+    badgePrinted: { type: Boolean, default: false },
     badgePrintedAt: { type: Date, default: null },
     badgeFirstName: { type: String, default: "" },
     badgeLastName: { type: String, default: "" },

@@ -87,7 +87,7 @@ function Row({
   dot?: boolean;
 }) {
   return (
-    <li className="group relative grid grid-cols-1 items-start gap-2 border-b-2 border-tinta/20 px-1 py-6 transition-colors duration-300 hover:bg-tinta/5 sm:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] sm:gap-10">
+    <div className="group relative grid grid-cols-1 items-start gap-2 border-b-2 border-tinta/20 px-1 py-6 transition-colors duration-300 hover:bg-tinta/5 sm:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] sm:gap-10">
       <div
         className="absolute bottom-[-2px] left-0 h-0.5 w-0 bg-tinta transition-[width] duration-500 group-hover:w-full"
         aria-hidden="true"
@@ -106,7 +106,7 @@ function Row({
           {desc}
         </p>
       </div>
-    </li>
+    </div>
   );
 }
 
@@ -165,20 +165,24 @@ export function CallForSpeakers() {
         </DotHeading>
       </ScrollReveal>
 
-      <ol className="mb-16 border-t-2 border-tinta/20">
+      {/* El `li` es el hijo directo del `ol`: si el revelador va por fuera, la
+          lista deja de ser válida y el lector de pantalla la anuncia mal. */}
+      <ol className="mb-16 list-none border-t-2 border-tinta/20">
         {cfpMilestones.map((m, i) => (
-          <ScrollReveal key={m.id} delay={i * 0.07} from={i % 2 ? "right" : "left"} distance={60}>
-            <Row
-              dot
-              left={
-                <time className="dot-matrix text-lg text-tinta">
-                  {t(m.dateKey)}
-                </time>
-              }
-              title={t(m.titleKey)}
-              desc={t(m.descKey)}
-            />
-          </ScrollReveal>
+          <li key={m.id}>
+            <ScrollReveal delay={i * 0.07} from={i % 2 ? "right" : "left"} distance={60}>
+              <Row
+                dot
+                left={
+                  <time className="dot-matrix text-lg text-tinta">
+                    {t(m.dateKey)}
+                  </time>
+                }
+                title={t(m.titleKey)}
+                desc={t(m.descKey)}
+              />
+            </ScrollReveal>
+          </li>
         ))}
       </ol>
 

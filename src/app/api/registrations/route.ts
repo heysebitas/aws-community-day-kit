@@ -6,8 +6,7 @@ import { nuevoPin } from "@/lib/pin";
 import { requireAccess } from "@/lib/auth";
 import { Form } from "@/models/form";
 import { Registration } from "@/models/registration";
-import { sendEmail, EMAIL_FROM } from "@/lib/correo";
-import { buildRegistrationEmail } from "@/lib/registration-email";
+import { enviarCorreoRegistro, despuesDeResponder } from "@/lib/registro-correo";
 import { parseRegistrationInput } from "@/lib/registration-input";
 import { roleLabelOf } from "@/data/attendee-form";
 import { createLog } from "@/lib/log";
@@ -192,34 +191,9 @@ export async function POST(request: NextRequest) {
     const shouldSkipEmail = (manual && skipEmail) || !email;
 
     if (!shouldSkipEmail && email) {
-      try {
-        const built = await buildRegistrationEmail(name, registration.qrCode, data.attendance);
-        let html = built.html;
-
-        // La referencia al final es lo que permite casar el webhook de Resend
-        // con este registro, así que va en los dos casos.
-        html += `<!-- ref:${registration.qrCode} -->`;
-        const result = await sendEmail({
-          from: EMAIL_FROM,
-          to: email,
-          subject: built.subject,
-          html,
-          attachments: built.attachments,
-        });
-        if (result.error) {
-          registration.emailStatus = "failed";
-          registration.emailError = result.error;
-        } else {
-          registration.emailStatus = "sent";
-          registration.emailSentAt = new Date();
-          registration.resendId = result.id;
-        }
-        await registration.save();
-      } catch (emailErr) {
-        registration.emailStatus = "failed";
-        registration.emailError = (emailErr as Error).message;
-        await registration.save();
-      }
+      // Se responde ya: el correo sale después y deja su estado en el registro.
+      const id = registration._id.toString();
+      despuesDeResponder(() => enviarCorreoRegistro(id, name, email, data.attendance));
     } else {
       registration.emailStatus = "skipped";
       await registration.save();

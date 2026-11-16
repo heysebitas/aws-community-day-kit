@@ -70,13 +70,13 @@ const volunteerSubmissionSchema = new Schema<IVolunteerSubmission>(
     // ellos, y bloquear ese movimiento dejaría al staff sin poder corregir a
     // alguien que se equivocó de formulario.
     documentType: { type: String, default: "" },
-    documentNumber: { type: String, default: "", index: true },
+    documentNumber: { type: String, default: "" },
 
-    role: { type: String, required: true, index: true },
+    role: { type: String, required: true },
     roleOther: { type: String, default: null },
     entityType: { type: String, required: true },
-    entityName: { type: String, default: null, index: true },
-    sbg: { type: String, default: "none", index: true },
+    entityName: { type: String, default: null },
+    sbg: { type: String, default: "none" },
 
     availability: { type: String, default: "", index: true },
     interestAreas: { type: [String], default: [], index: true },
@@ -84,7 +84,7 @@ const volunteerSubmissionSchema = new Schema<IVolunteerSubmission>(
     motivation: { type: String, default: "" },
 
     shirtSize: { type: String, default: "" },
-    dietary: { type: String, default: "none", index: true },
+    dietary: { type: String, default: "none" },
     dietaryOther: { type: String, default: null },
     emergencyName: { type: String, default: "" },
     emergencyPhone: { type: String, default: "" },
