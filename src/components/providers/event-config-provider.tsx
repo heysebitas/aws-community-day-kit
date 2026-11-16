@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { cfpAbierto } from "@/hooks/cfp-abierto";
 import type { PublicEventConfig } from "@/lib/data/event-config";
 import type { BuzonesCodificados } from "@/lib/buzones";
 
@@ -15,7 +16,12 @@ export type ConfigDelSitio = PublicEventConfig & { buzones: BuzonesCodificados }
 const Contexto = createContext<ConfigDelSitio | null>(null);
 
 export function EventConfigProvider({ value, children }: { value: ConfigDelSitio; children: React.ReactNode }) {
-  return <Contexto.Provider value={value}>{children}</Contexto.Provider>;
+  // El HTML trae el valor del momento en que se generó; el cliente lo corrige al hidratar.
+  const [cfpOpen, setCfpOpen] = useState(value.cfpOpen);
+  useEffect(() => {
+    setCfpOpen(cfpAbierto(value.cfpCierre, Date.now()));
+  }, [value.cfpCierre]);
+  return <Contexto.Provider value={{ ...value, cfpOpen }}>{children}</Contexto.Provider>;
 }
 
 const RESPALDO: ConfigDelSitio = {
@@ -28,6 +34,7 @@ const RESPALDO: ConfigDelSitio = {
   attendeeOpen: false,
   volunteerOpen: false,
   cfpOpen: false,
+  cfpCierre: "",
   buzones: { general: "", privacidad: "", patrocinios: "" },
 };
 
