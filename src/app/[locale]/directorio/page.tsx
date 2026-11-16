@@ -305,7 +305,7 @@ export default function DirectorioPage() {
             <img src={EVENTO.marca.mascota} alt="" className="mx-auto mb-4 h-24 w-auto sm:h-32 lg:h-40" />
           )}
 
-          <p className="dot-matrix mb-2 text-sm text-acento sm:text-base">
+          <p className="etiqueta mb-2 text-acento">
             Directorio de Speakers
           </p>
 
@@ -330,7 +330,7 @@ export default function DirectorioPage() {
 
           {/* Search */}
           <div className="relative mx-auto mt-8 max-w-md">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-500" />
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-300" />
             <input
               type="text"
               value={search}
@@ -341,7 +341,7 @@ export default function DirectorioPage() {
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-500 hover:text-surface-300"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-300 hover:text-surface-300"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -364,7 +364,7 @@ export default function DirectorioPage() {
                     }`}
                   >
                     {o.label}
-                    <span className="ml-1.5 text-surface-500">{trackCounts[o.value]}</span>
+                    <span className="ml-1.5 text-surface-300">{trackCounts[o.value]}</span>
                   </button>
                 );
               })}
@@ -401,7 +401,7 @@ export default function DirectorioPage() {
                   <h2 className="font-mono text-sm font-bold uppercase tracking-widest text-yellow-300">
                     Ahora en vivo
                   </h2>
-                  <span className="rounded-none bg-yellow-400/15 px-2 py-0.5 font-mono text-[11px] font-bold text-yellow-300">
+                  <span className="rounded-none bg-yellow-400/15 px-2 py-0.5 font-mono text-xs font-bold text-yellow-300">
                     {liveItems.length}
                   </span>
                 </div>
@@ -414,7 +414,7 @@ export default function DirectorioPage() {
                     >
                       <div className="min-w-0">
                         <p className="font-mono text-sm font-bold text-surface-50 line-clamp-1">{titleOf(i)}</p>
-                        <p className="mt-0.5 flex items-center gap-2 font-mono text-[11px] text-surface-400">
+                        <p className="mt-0.5 flex items-center gap-2 font-mono text-xs text-surface-400">
                           <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-yellow-300" />{msToKey(i.startMs)}–{msToKey(i.endMs)}</span>
                           {roomOf(i) && <span className="flex items-center gap-1"><MapPin className="h-3 w-3 text-yellow-300" />{roomOf(i)}</span>}
                         </p>
@@ -464,14 +464,14 @@ export default function DirectorioPage() {
             <SlidersHorizontal className="h-4 w-4" />
             Filtros
             {activeFilterCount > 0 && (
-              <span className="rounded-none bg-acento px-1.5 py-0.5 font-mono text-[10px] font-bold text-surface-900">
+              <span className="rounded-none bg-acento px-1.5 py-0.5 font-mono text-xs font-bold text-surface-900">
                 {activeFilterCount}
               </span>
             )}
           </button>
 
           {filteredItems.length > 0 && (
-            <p className="font-mono text-sm text-surface-500">
+            <p className="font-mono text-sm text-surface-300">
               {filteredItems.length} de {allItems.length}
             </p>
           )}
@@ -497,9 +497,9 @@ export default function DirectorioPage() {
           <aside className="hidden w-56 shrink-0 lg:block">
             <div className="sticky top-24">
               <div className="mb-4 flex items-center justify-between">
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-surface-500">Filtros</p>
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-surface-300">Filtros</p>
                 {activeFilterCount > 0 && (
-                  <span className="rounded-none bg-acento px-1.5 py-0.5 font-mono text-[10px] font-bold text-surface-900">
+                  <span className="rounded-none bg-acento px-1.5 py-0.5 font-mono text-xs font-bold text-surface-900">
                     {activeFilterCount}
                   </span>
                 )}
@@ -514,7 +514,7 @@ export default function DirectorioPage() {
             {/* Result count (desktop) */}
             {fetched && allItems.length > 0 && (
               <div className="mb-5 hidden items-center justify-between lg:flex">
-                <p className="font-mono text-sm text-surface-500">
+                <p className="font-mono text-sm text-surface-300">
                   {filteredItems.length === allItems.length
                     ? `${allItems.length} sesiones`
                     : `${filteredItems.length} de ${allItems.length} sesiones`}
@@ -540,7 +540,7 @@ export default function DirectorioPage() {
             {fetched && allItems.length === 0 && (
               <div className="py-24 text-center">
                 <p className="font-mono text-xl text-surface-300">Próximamente</p>
-                <p className={`mt-2 font-mono text-sm text-surface-500 ${showSpeakerCta ? "mb-8" : ""}`}>Los speakers confirmados aparecerán aquí</p>
+                <p className={`mt-2 font-mono text-sm text-surface-300 ${showSpeakerCta ? "mb-8" : ""}`}>Los speakers confirmados aparecerán aquí</p>
                 {showSpeakerCta && (
                   <Link
                     href={localePath(locale, "/speakers")}
@@ -560,7 +560,7 @@ export default function DirectorioPage() {
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   className="py-20 text-center"
                 >
-                  <p className="font-mono text-sm text-surface-500">Sin resultados para tu búsqueda</p>
+                  <p className="font-mono text-sm text-surface-300">Sin resultados para tu búsqueda</p>
                   <button onClick={clearAll} className="mt-4 font-mono text-xs text-acento hover:underline">
                     Limpiar filtros
                   </button>

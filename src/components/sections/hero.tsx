@@ -23,7 +23,7 @@ function Digit({ value, label }: { value: number; label: string }) {
           {String(value).padStart(2, "0")}
         </span>
       </div>
-      <span className="dot-matrix mt-2 text-[10px] text-surface-400 sm:text-xs">{label}</span>
+      <span className="etiqueta mt-2 text-surface-400">{label}</span>
     </div>
   );
 }
@@ -220,7 +220,7 @@ export function Hero() {
               label={EVENTO.ciudad}
               className="relative aspect-square w-full min-h-[320px]"
             />
-            <p className="dot-matrix mt-1 text-center text-[11px] text-surface-500 sm:text-xs">
+            <p className="etiqueta mt-1 text-center text-surface-300">
               {coordenadas(locale)} · {t("globe_hint")}
             </p>
           </div>

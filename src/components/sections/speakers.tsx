@@ -82,7 +82,7 @@ function IconGithub({ className }: { className?: string }) {
 }
 
 const btnClass =
-  "flex h-8 w-8 items-center justify-center rounded-full border border-glass-border bg-surface-800 text-surface-400 transition-all hover:border-acento/40 hover:text-acento hover:shadow-[0_0_12px_rgb(var(--tema-acento-rgb)_/_0.2)]";
+  "flex h-11 w-11 items-center justify-center border-2 border-surface-600 bg-surface-800 text-surface-300 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-acento hover:text-acento hover:shadow-[3px_3px_0_0_var(--color-acento)]";
 
 // ── Speaker card — organizer style ───────────────────────────────────────────
 
@@ -97,15 +97,13 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      {/* Glow */}
-      <div className="absolute -inset-1 rounded-3xl bg-gradient-to-b from-acento/20 via-acento/5 to-transparent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
 
       {/* Card — flex-col so info section fills remaining height */}
-      <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-glass-border bg-glass backdrop-blur-xl transition-all duration-500 group-hover:border-glass-border-hover group-hover:shadow-[0_0_40px_rgb(var(--tema-acento-rgb)_/_0.12)]">
+      <div className="relative flex h-full flex-col overflow-hidden border-2 border-surface-600 bg-surface-800 transition-all duration-200 group-hover:border-acento group-hover:shadow-[6px_6px_0_0_var(--color-acento)]">
 
         {/* Photo — fixed by aspect ratio, never grows */}
         <Link href={href} className="mx-6 mt-6 block shrink-0">
-          <div className="relative aspect-square overflow-hidden rounded-full">
+          <div className="relative aspect-square overflow-hidden border-2 border-surface-600">
             {profile.photo ? (
               <Image
                 src={profile.photo}
@@ -116,10 +114,10 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-800 to-surface-700">
-                <span className="font-mono text-4xl font-bold text-acento/50">{initials}</span>
+                <span className="font-mono text-4xl font-bold text-acento/70">{initials}</span>
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-glass to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface-800 to-transparent" />
           </div>
         </Link>
 
@@ -127,7 +125,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
         <div className="relative flex flex-1 flex-col px-5 pb-5 pt-3 text-center">
           {/* Name + tagline */}
           <Link href={href} className="block shrink-0">
-            <h3 className="font-mono text-base font-bold leading-tight text-surface-50 md:text-lg">{profile.name}</h3>
+            <h3 className="font-display text-lg font-semibold leading-tight tracking-tight text-surface-50 md:text-xl">{profile.name}</h3>
             <p className="mt-1 font-mono text-xs font-semibold text-acento line-clamp-2 leading-snug md:text-sm">
               {profile.tagline || profile.role}
             </p>
@@ -143,16 +141,16 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
                 className="max-h-[48px] w-auto max-w-[140px] object-contain opacity-60 transition-opacity duration-300 group-hover:opacity-100"
               />
             ) : esTrack(profile.track) ? (
-              <span className={`inline-flex rounded-none border px-3 py-1 font-mono text-xs font-semibold ${trackPublico(profile.track)}`}>
+              <span className={`inline-flex border-2 px-3 py-1 font-mono text-xs font-semibold ${trackPublico(profile.track)}`}>
                 {trackCorto(profile.track)}
               </span>
             ) : (
-              <div className="h-8 w-20 rounded-full border border-glass-border bg-surface-800/40" />
+              <div className="h-8 w-20 border-2 border-surface-600 bg-surface-800/40" />
             )}
           </Link>
 
           {/* Social links — pinned to bottom, always same height */}
-          <div className="mt-auto flex min-h-[32px] justify-center gap-2 pt-3">
+          <div className="mt-auto flex min-h-11 justify-center gap-2 pt-3">
             {profile.social?.linkedin && (
               <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className={btnClass} aria-label="LinkedIn">
                 <IconLinkedin className="h-3.5 w-3.5" />
@@ -222,7 +220,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
           <div className="mt-6 flex justify-center">
             <Link
               href={localePath(locale, "/directorio")}
-              className="inline-flex items-center gap-2 rounded-none border border-acento/40 bg-acento/10 px-6 py-3 font-mono text-sm font-semibold text-acento transition-all hover:bg-acento hover:text-surface-900"
+              className="inline-flex min-h-11 items-center gap-2 border-2 border-acento bg-acento/10 px-6 py-3 font-mono text-sm font-semibold text-acento transition-all hover:bg-acento hover:text-surface-900"
             >
               <Users className="h-4 w-4" />
               Ir al directorio de Speakers
@@ -236,7 +234,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
           <ScrollReveal>
             <div className="py-16 text-center">
               <p className="font-mono text-xl text-surface-300">{t("coming_soon")}</p>
-              <p className="mt-2 font-mono text-sm text-surface-500">{t("coming_soon_desc")}</p>
+              <p className="mt-2 font-mono text-sm text-surface-300">{t("coming_soon_desc")}</p>
             </div>
           </ScrollReveal>
         )}
@@ -263,7 +261,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
             <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href={localePath(locale, "/directorio")}
-                className="inline-flex items-center gap-2 rounded-none bg-acento px-8 py-3.5 font-mono text-sm font-bold text-surface-900 transition-all hover:shadow-[0_0_30px_rgb(var(--tema-acento-rgb)_/_0.4)] active:scale-[0.98]"
+                className="inline-flex min-h-11 items-center gap-2 border-2 border-acento bg-acento px-8 py-3.5 font-mono text-sm font-bold text-tinta transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_var(--color-acento-fuerte)] active:translate-x-0 active:translate-y-0 active:shadow-none"
               >
                 <Users className="h-4 w-4" />
                 {profiles.length > 0 ? `Ver los ${profiles.length} speakers` : "Ver directorio completo"}
@@ -272,7 +270,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
               {showSpeakerCta && (
                 <Link
                   href={localePath(locale, "/speakers")}
-                  className="inline-flex items-center gap-2 rounded-none border border-acento/40 bg-acento/10 px-6 py-3 font-mono text-sm font-semibold text-acento transition-all hover:bg-acento hover:text-surface-900"
+                  className="inline-flex min-h-11 items-center gap-2 border-2 border-acento bg-acento/10 px-6 py-3 font-mono text-sm font-semibold text-acento transition-all hover:bg-acento hover:text-surface-900"
                 >
                   <Mic2 className="h-4 w-4" /> {t("apply_speaker")}
                 </Link>

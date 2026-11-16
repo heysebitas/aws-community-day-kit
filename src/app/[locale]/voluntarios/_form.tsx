@@ -6,7 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/turnstile";
 import { SearchSelect, type SelectOption } from "@/components/forms/search-select";
-import { PhoneInput } from "@/components/forms/phone-input";
+import { PhoneInput, DEFAULT_COUNTRY } from "@/components/forms/phone-input";
 import { ObfuscatedEmail } from "@/components/ui/obfuscated-email";
 import { useHydrated } from "@/hooks/use-hydrated";
 import {
@@ -70,13 +70,13 @@ export type VolunteerValues = {
 
 
 const EMPTY: VolunteerValues = {
-  firstName: "", lastName: "", email: "", phone: "", phoneCountry: "CL",
+  firstName: "", lastName: "", email: "", phone: "", phoneCountry: DEFAULT_COUNTRY.code,
   documentType: "", documentNumber: "",
   role: "", roleOther: "", entityType: "", entityName: "",
   sbg: "", sbgOther: "",
   availability: "", interestAreas: [], previousExperience: "", motivation: "",
   shirtSize: "", dietary: "", dietaryOther: "",
-  emergencyName: "", emergencyPhone: "", emergencyCountry: "CL",
+  emergencyName: "", emergencyPhone: "", emergencyCountry: DEFAULT_COUNTRY.code,
 };
 
 /** Fila de dos campos que se alinean entre sí. */
@@ -105,13 +105,13 @@ function Field({
         {label} {required && <span className="text-acento-profundo">*</span>}
       </label>
       {hint ? (
-        <p className="m-0 mt-1 font-mono text-xs text-tinta/55">{hint}</p>
+        <p className="m-0 mt-1 font-mono text-xs text-tinta/70">{hint}</p>
       ) : (
         <span aria-hidden="true" />
       )}
       <div className="mt-2">{children}</div>
       {error ? (
-        <p className="m-0 mt-1.5 font-mono text-xs text-[#7f1d1d]">{error}</p>
+        <p className="m-0 mt-1.5 font-mono text-xs text-error">{error}</p>
       ) : (
         <span aria-hidden="true" />
       )}
@@ -121,7 +121,7 @@ function Field({
 
 const inputCls =
   "w-full border-2 border-tinta/35 bg-white/55 px-4 py-3 font-mono text-sm text-tinta " +
-  "placeholder:text-tinta/40 outline-none transition-all " +
+  "placeholder:text-tinta/70 outline-none transition-all " +
   "focus:-translate-y-px focus:border-tinta focus:bg-white " +
   "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
 
@@ -160,7 +160,7 @@ function Choice({
 function Bloque({ children }: { children: React.ReactNode }) {
   return (
     <div className="border-t-2 border-tinta/20 pt-6">
-      <p className="m-0 dot-matrix text-base leading-none text-tinta/60">{children}</p>
+      <p className="m-0 etiqueta leading-none text-tinta/70">{children}</p>
     </div>
   );
 }
@@ -388,7 +388,7 @@ export function VoluntariosForm({
               onChange={(e) => set("firstName", e.target.value)}
               placeholder={t.firstName_ph}
               maxLength={60}
-              className={cn(inputCls, errors.firstName && "border-[#7f1d1d]")}
+              className={cn(inputCls, errors.firstName && "border-error")}
             />
           </Field>
           <Field label={t.lastName} required htmlFor="v-last" error={errors.lastName}>
@@ -398,7 +398,7 @@ export function VoluntariosForm({
               onChange={(e) => set("lastName", e.target.value)}
               placeholder={t.lastName_ph}
               maxLength={60}
-              className={cn(inputCls, errors.lastName && "border-[#7f1d1d]")}
+              className={cn(inputCls, errors.lastName && "border-error")}
             />
           </Field>
         </Row>
@@ -422,7 +422,7 @@ export function VoluntariosForm({
               setErrors((x) => ({ ...x, email: r.ok ? undefined : r.reason }));
             }}
             placeholder={t.email_ph}
-            className={cn(inputCls, errors.email && "border-[#7f1d1d]")}
+            className={cn(inputCls, errors.email && "border-error")}
           />
         </Field>
 
@@ -473,7 +473,7 @@ export function VoluntariosForm({
               maxLength={24}
               className={cn(
                 inputCls,
-                errors.documentNumber && "border-[#7f1d1d]",
+                errors.documentNumber && "border-error",
                 !v.documentType && "cursor-not-allowed opacity-50",
               )}
             />
@@ -509,7 +509,7 @@ export function VoluntariosForm({
                   onChange={(e) => set("roleOther", e.target.value)}
                   placeholder={t.which_ph}
                   maxLength={FREE_TEXT_MAX}
-                  className={cn(inputCls, errors.roleOther && "border-[#7f1d1d]")}
+                  className={cn(inputCls, errors.roleOther && "border-error")}
                 />
               </Field>
             </motion.div>
@@ -549,7 +549,7 @@ export function VoluntariosForm({
                   onChange={(e) => set("entityName", e.target.value)}
                   placeholder={t.entityName_ph}
                   maxLength={FREE_TEXT_MAX}
-                  className={cn(inputCls, errors.entityName && "border-[#7f1d1d]")}
+                  className={cn(inputCls, errors.entityName && "border-error")}
                 />
               </Field>
             </motion.div>
@@ -589,7 +589,7 @@ export function VoluntariosForm({
                   onChange={(e) => set("sbgOther", e.target.value)}
                   placeholder={t.sbgOther_ph}
                   maxLength={VOLUNTEER_TEXT_MAX}
-                  className={cn(inputCls, errors.sbgOther && "border-[#7f1d1d]")}
+                  className={cn(inputCls, errors.sbgOther && "border-error")}
                 />
               </Field>
             </motion.div>
@@ -734,7 +734,7 @@ export function VoluntariosForm({
                   onChange={(e) => set("dietaryOther", e.target.value)}
                   placeholder={t.dietaryOther_ph}
                   maxLength={VOLUNTEER_TEXT_MAX}
-                  className={cn(inputCls, errors.dietaryOther && "border-[#7f1d1d]")}
+                  className={cn(inputCls, errors.dietaryOther && "border-error")}
                 />
               </Field>
             </motion.div>
@@ -754,7 +754,7 @@ export function VoluntariosForm({
             onChange={(e) => set("emergencyName", e.target.value)}
 placeholder={t.emergency_ph}
             maxLength={80}
-            className={cn(inputCls, errors.emergencyName && "border-[#7f1d1d]")}
+            className={cn(inputCls, errors.emergencyName && "border-error")}
           />
         </Field>
 
@@ -789,7 +789,7 @@ placeholder={t.emergency_ph}
                   className={cn(
                     "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-all",
                     checked ? "border-tinta bg-tinta" : "border-tinta/40 bg-white/55",
-                    errors[key] && "border-[#7f1d1d]",
+                    errors[key] && "border-error",
                   )}
                 >
                   {checked && (
@@ -813,7 +813,7 @@ placeholder={t.emergency_ph}
                 </span>
               </label>
               {errors[key] && (
-                <p className="m-0 pl-8 font-mono text-xs text-[#7f1d1d]">{errors[key]}</p>
+                <p className="m-0 pl-8 font-mono text-xs text-error">{errors[key]}</p>
               )}
             </div>
           ))}
@@ -860,13 +860,13 @@ placeholder={t.emergency_ph}
         )}
 
         {formError && (
-          <p className="m-0 border-2 border-[#7f1d1d] bg-[#7f1d1d]/10 px-4 py-3 font-mono text-sm text-[#7f1d1d]">
+          <p className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
             {formError}
           </p>
         )}
 
         {siteKey && !captchaToken && !formError && (
-          <p className="m-0 text-center font-mono text-xs text-tinta/50">
+          <p className="m-0 text-center font-mono text-xs text-tinta/70">
             {t.captcha}
           </p>
         )}

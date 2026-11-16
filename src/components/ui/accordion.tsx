@@ -16,7 +16,7 @@ function renderAnswer(text: string): React.ReactNode[] {
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold text-acento underline underline-offset-2 break-all transition-colors hover:text-acento/70"
+            className="font-bold text-acento underline underline-offset-2 break-all transition-colors hover:text-acento-claro"
           >
             {part}
           </a>
@@ -66,7 +66,7 @@ export function Accordion({ items, className }: AccordionProps) {
               className="flex w-full items-start gap-4 px-3 py-5 text-left"
               aria-expanded={isOpen}
             >
-              <span className="dot-matrix mt-0.5 shrink-0 text-sm text-acento/60">
+              <span className="etiqueta mt-0.5 shrink-0 text-acento">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span

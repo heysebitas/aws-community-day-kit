@@ -48,6 +48,7 @@ function WhyRow({ num, titleKey, tagKey, descKey, t }: {
 
       {/* Number — outline → fills on hover (desktop) or scroll-enter (mobile) */}
       <span
+        aria-hidden="true"
         className={`font-display font-medium leading-none tracking-tight select-none transition-colors duration-500 ${lit ? "text-acento" : "text-white/10 group-hover:text-acento"} [-webkit-text-stroke:1.5px_rgba(255,255,255,0.22)] group-hover:[-webkit-text-stroke-color:var(--color-acento)] [transition:color_0.5s_ease,_-webkit-text-stroke-color_0.5s_ease]`}
         style={{ fontSize: "clamp(32px,4.5vw,58px)" }}
       >
@@ -59,7 +60,7 @@ function WhyRow({ num, titleKey, tagKey, descKey, t }: {
         <h3 className="font-display font-medium lowercase leading-tight tracking-tight text-surface-50 m-0 text-lg md:text-xl lg:text-2xl">
           {t(titleKey)}
         </h3>
-        <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-surface-500">
+        <span className="font-mono text-xs tracking-[0.18em] uppercase text-surface-300">
           {t(tagKey)}
         </span>
       </div>

@@ -78,7 +78,7 @@ export function OrganizerCard({ org }: { org: Organizador }) {
           </div>
         )}
         {org.pais && (
-          <span className="absolute right-2 top-2 bg-acento px-1.5 py-0.5 font-mono text-[10px] font-bold leading-none text-tinta">
+          <span className="absolute right-2 top-2 bg-acento px-1.5 py-0.5 font-mono text-xs font-bold leading-none text-tinta">
             {org.pais}
           </span>
         )}

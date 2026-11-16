@@ -62,7 +62,7 @@ export function RegistroScreen({
       ) : (
         <div className="py-12 text-center">
           <p className="font-mono text-sm text-tinta/70">{closedTitle}</p>
-          <p className="mt-2 font-mono text-xs text-tinta/50">{closedLead}</p>
+          <p className="mt-2 font-mono text-xs text-tinta/70">{closedLead}</p>
         </div>
       )}
     </FormShell>

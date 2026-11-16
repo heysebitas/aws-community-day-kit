@@ -62,7 +62,7 @@ function Tarjeta({ comunidad }: { comunidad: Comunidad }) {
         pegado a la izquierda dejaba la ficha descuadrada consigo misma.
       */}
       <div className="flex min-h-[3.25rem] items-center justify-center border-t-2 border-tinta px-3 py-2">
-        <p className="m-0 text-center font-mono text-[11px] font-bold leading-tight text-tinta">
+        <p className="m-0 text-center font-mono text-xs font-bold leading-tight text-tinta">
           {comunidad.nombre}
         </p>
       </div>

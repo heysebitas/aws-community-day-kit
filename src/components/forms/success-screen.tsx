@@ -120,7 +120,7 @@ export function SuccessScreen({
         </motion.div>
 
         {/* Atribución del modelo. La licencia CC-BY la exige, y es una línea. */}
-        <p className="m-0 text-center font-mono text-[10px] text-tinta/45">
+        <p className="m-0 text-center font-mono text-xs text-tinta/70">
           {t("plane_credit")}{" "}
           <a
             href="https://creativecommons.org/licenses/by/3.0/"
@@ -174,7 +174,7 @@ export function SuccessScreen({
                 {t("success_download")}
               </button>
 
-              <p className="dot-matrix mt-2 text-sm leading-none text-tinta/60">
+              <p className="etiqueta mt-2 leading-none text-tinta/70">
                 {t("success_share_direct")}
               </p>
 
@@ -225,7 +225,7 @@ export function SuccessScreen({
             transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto mt-16 max-w-3xl border-2 border-tinta/25 bg-white/25 p-5 sm:p-7"
           >
-            <p className="dot-matrix m-0 text-base leading-none text-tinta/70">
+            <p className="etiqueta m-0 leading-none text-tinta/70">
               {t("summary_title")}
             </p>
             <dl className="mt-4 border-t-2 border-tinta/20">
@@ -234,14 +234,14 @@ export function SuccessScreen({
                   key={r.label}
                   className="flex items-start justify-between gap-4 border-b border-tinta/15 py-3"
                 >
-                  <dt className="dot-matrix shrink-0 text-[11px] text-tinta/70">{r.label}</dt>
+                  <dt className="etiqueta shrink-0 text-tinta/70">{r.label}</dt>
                   <dd className="m-0 min-w-0 break-words text-right font-mono text-sm text-tinta">
                     {r.value || "—"}
                   </dd>
                 </div>
               ))}
             </dl>
-            <p className="m-0 mt-4 font-mono text-xs leading-relaxed text-tinta/65">
+            <p className="m-0 mt-4 font-mono text-xs leading-relaxed text-tinta/70">
               {t("summary_note")}
             </p>
           </motion.div>
@@ -255,7 +255,7 @@ export function SuccessScreen({
             <span
               key={i}
               className={cn(
-                "dot-matrix whitespace-nowrap px-6 py-2.5 text-base leading-none sm:text-lg",
+                "dot-matrix whitespace-nowrap px-6 py-2.5 text-lg leading-none",
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >

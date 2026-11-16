@@ -33,6 +33,7 @@
   --color-acento-profundo: var(--tema-profundo);
   --color-tinta: #000000;
   --color-papel: #FFFFFF;
+  --color-error: #7F1D1D;
 
   /* Escala neutra, de oscuro a claro. */
   --color-surface-900: #000000;
@@ -40,7 +41,7 @@
   --color-surface-700: #16161F;
   --color-surface-600: #252530;
   --color-surface-500: #3A3A4A;
-  --color-surface-400: #6B6B80;
+  --color-surface-400: #7E7E94; /* 4,5:1 hasta surface-700 */
   --color-surface-300: #8E8EA0;
   --color-surface-200: #B0B0C0;
   --color-surface-100: #E0E0EB;
@@ -146,6 +147,17 @@
   text-transform: uppercase;
 }
 
+/* Rótulo pequeño: lo que por debajo de 18 px sería `.dot-matrix` y los rótulos de
+   formulario. Handjet pierde la forma de la matriz en tamaños de texto. */
+@utility etiqueta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.33;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .font-flag {
   font-family: "Country Flags", var(--font-jetbrains), monospace;
 }
@@ -186,6 +198,15 @@ body {
   }
 }
 
+/* `ScrollReveal` sale del servidor oculto para animar la entrada. Sin JS o con
+   movimiento reducido se queda en su sitio y visible desde el principio. */
+@media (scripting: none), (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* Formularios sobre el bloque del tema.
    Los públicos corren sobre el bloque claro con tinta negra; el panel usa las
    mismas primitivas en oscuro. En vez de un prop `tone` en cada una, todo lo
@@ -200,14 +221,18 @@ body {
   color: color-mix(in srgb, var(--color-tinta) 88%, transparent);
   font-weight: 600;
 }
+/* Un solo secundario sobre el bloque: tinta al 70 % (AA sobre cualquier tema). */
 .form-block .text-surface-300,
-.form-block .text-surface-400 { color: color-mix(in srgb, var(--color-tinta) 65%, transparent); }
+.form-block .text-surface-400,
 .form-block .text-surface-500,
-.form-block .text-surface-600 { color: color-mix(in srgb, var(--color-tinta) 50%, transparent); }
+.form-block .text-surface-600 { color: color-mix(in srgb, var(--color-tinta) 70%, transparent); }
 .form-block .text-surface-50,
 .form-block .text-surface-100 { color: var(--color-tinta); }
 /* Sobre el bloque el acento no se ve: pasa al profundo. */
 .form-block .text-acento { color: var(--color-acento-profundo); }
+/* Salvo dentro de una caja negra, donde el acento vuelve a ser el claro. */
+.form-block .bg-tinta.text-acento,
+.form-block .bg-tinta .text-acento { color: var(--color-acento); }
 
 .form-block input:not([type="checkbox"]):not([type="radio"]),
 .form-block textarea,
@@ -220,7 +245,7 @@ body {
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 .form-block input::placeholder,
-.form-block textarea::placeholder { color: color-mix(in srgb, var(--color-tinta) 42%, transparent); }
+.form-block textarea::placeholder { color: color-mix(in srgb, var(--color-tinta) 70%, transparent); }
 .form-block input:not([type="checkbox"]):not([type="radio"]):hover,
 .form-block textarea:hover,
 .form-block select:hover {
@@ -281,10 +306,10 @@ body {
 
 .form-block .border-red-500\/30 {
   border-radius: 0;
-  border-color: #7f1d1d;
-  background: color-mix(in srgb, #7f1d1d 12%, transparent);
+  border-color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 12%, transparent);
 }
-.form-block .text-red-400 { color: #7f1d1d; }
+.form-block .text-red-400 { color: var(--color-error); }
 .form-block .border-acento { border-color: var(--color-tinta); }
 
 /* Safari en iOS hace zoom al enfocar un campo de menos de 16px. Bloquearlo con

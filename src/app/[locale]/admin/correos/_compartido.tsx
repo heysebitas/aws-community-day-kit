@@ -69,7 +69,7 @@ export function Volver({ donde }: { donde: string }) {
       >
         <ArrowLeft className="h-3.5 w-3.5" /> Correos
       </Link>
-      <span className="font-mono text-xs uppercase tracking-wider text-surface-500">/</span>
+      <span className="font-mono text-xs uppercase tracking-wider text-surface-300">/</span>
       <span className="font-mono text-xs font-bold uppercase tracking-wider text-acento">{donde}</span>
     </div>
   );
@@ -139,7 +139,7 @@ export function ListaPlantillas({
           propias
         </span>
         {propias.length ? propias.map(fila) : (
-          <p className="m-0 font-mono text-[11px] leading-relaxed text-surface-500">
+          <p className="m-0 font-mono text-[11px] leading-relaxed text-surface-300">
             Ninguna todavía. Las propias son las que escribes tú desde acá.
           </p>
         )}

@@ -161,7 +161,7 @@ export function EditorBloques({
                 <>
                   {b.items.map((it, ii) => (
                     <div key={ii} className="flex gap-2">
-                      <span className="w-6 shrink-0 pt-2 text-right font-mono text-xs text-surface-500">{ii + 1}.</span>
+                      <span className="w-6 shrink-0 pt-2 text-right font-mono text-xs text-surface-300">{ii + 1}.</span>
                       <input className={CAMPO} value={it}
                         onChange={(e) => cambiar(b.id, {
                           items: b.items.map((x, k) => (k === ii ? e.target.value : x)),

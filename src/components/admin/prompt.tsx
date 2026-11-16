@@ -129,7 +129,7 @@ function Caja({
               // campo que se abre con el foco dentro.
               if (e.key === "Enter") { e.preventDefault(); aceptar(); }
             }}
-            className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-500 outline-none transition-colors focus:border-acento"
+            className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-300 outline-none transition-colors focus:border-acento"
           />
 
           {error && <p className="m-0 font-mono text-[11px] text-red-400">{error}</p>}

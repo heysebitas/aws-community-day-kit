@@ -291,7 +291,8 @@ export const COUNTRIES: Country[] = [
   ...LISTA.filter((c) => c.code !== PAIS.codigo),
 ];
 
-export const DEFAULT_COUNTRY = COUNTRIES[0];
+// El país de la edición (`PAIS`), no el primero de la lista.
+export const DEFAULT_COUNTRY = LISTA.find((c) => c.code === PAIS.codigo) ?? COUNTRIES[0];
 
 export function findCountry(code: string): Country {
   return COUNTRIES.find((c) => c.code === code) ?? DEFAULT_COUNTRY;

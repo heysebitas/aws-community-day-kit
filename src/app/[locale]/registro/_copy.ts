@@ -8,7 +8,7 @@ export const COPY = {
     lastName_ph: "Tu apellido",
     email: "Correo electrónico",
     email_hint: "Ahí te llega la confirmación.",
-    email_ph: "tu@correo.cl",
+    email_ph: "tu@correo.com",
 
     attendance: "¿Asistirás de manera presencial o virtual?",
     inPerson: "Presencial",

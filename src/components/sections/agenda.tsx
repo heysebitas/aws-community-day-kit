@@ -70,7 +70,7 @@ function getTrackLabel(track: string) { return trackLabels[track] || (track.char
 
 function OnlineBadge() {
   return (
-    <span className="inline-flex items-center gap-0.5 rounded border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 font-mono text-[10px] text-blue-400">
+    <span className="inline-flex items-center gap-0.5 rounded border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 font-mono text-xs text-blue-400">
       <Wifi className="h-2.5 w-2.5" /> Online
     </span>
   );
@@ -101,7 +101,7 @@ function EventCard({ event, onClick }: { event: AgendaEvent; onClick: () => void
         <div className="flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-center gap-1">
           <p className="font-mono text-[13px] font-bold leading-snug line-clamp-3">{event.title}</p>
           {event.speaker && (
-            <p className="font-mono text-[11px] opacity-60 line-clamp-1">{event.speaker}</p>
+            <p className="font-mono text-xs opacity-60 line-clamp-1">{event.speaker}</p>
           )}
           {event.sessionType === "online" && (
             <div className="mt-0.5"><OnlineBadge /></div>
@@ -269,7 +269,7 @@ function Placeholder({ t }: { t: ReturnType<typeof useTranslations<"Agenda">> })
         {Array.from({ length: 6 }).map((_, i) => (
           <ScrollReveal key={i} delay={i * 0.06} from={i % 2 ? "right" : "left"} distance={40}>
             <div className="flex h-full items-center gap-4 bg-surface-800 px-5 py-6">
-              <span className="dot-matrix shrink-0 text-sm text-acento/50">
+              <span className="etiqueta shrink-0 text-acento">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div className="flex-1">
@@ -428,7 +428,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
                     <thead>
                       <tr className="bg-surface-800/80 border-b border-surface-700">
                         <th className="px-5 py-3.5 text-left w-[148px] shrink-0">
-                          <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-surface-500">Hora ({zonaDe(EVENTO.inicio)})</span>
+                          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-surface-300">Hora ({zonaDe(EVENTO.inicio)})</span>
                         </th>
                         {rooms.map((room) => (
                           <th key={room} className="px-4 py-3.5 text-left border-l border-surface-700/60">
@@ -505,7 +505,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
                       .sort((a, b) => a.room.localeCompare(b.room))
                       .map((event) => (
                         <div key={event._id}>
-                          <p className="mb-1 pl-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-acento/50">
+                          <p className="mb-1 pl-0.5 font-mono text-xs font-semibold uppercase tracking-widest text-acento">
                             {event.room}
                           </p>
                           <EventCard event={event} onClick={() => setSelected(event)} />

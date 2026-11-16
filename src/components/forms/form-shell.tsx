@@ -89,7 +89,7 @@ export function FormShell({
             <span
               key={i}
               className={cn(
-                "dot-matrix whitespace-nowrap px-6 py-2.5 text-base leading-none sm:text-lg",
+                "dot-matrix whitespace-nowrap px-6 py-2.5 text-lg leading-none",
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >

@@ -77,7 +77,7 @@ export function RegistrationCTA() {
           />
 
           <div className="relative text-center">
-            <p className="dot-matrix text-sm text-acento/70 sm:text-base">
+            <p className="etiqueta text-acento">
               {"// "}
               {t("description")}
             </p>
@@ -87,10 +87,10 @@ export function RegistrationCTA() {
             </h2>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="dot-matrix text-sm text-surface-300">
+              <span className="etiqueta text-surface-300">
                 {EVENTO.cupos}+ cupos
               </span>
-              <span className="dot-matrix text-sm text-surface-300">{t("free")}</span>
+              <span className="etiqueta text-surface-300">{t("free")}</span>
             </div>
 
             {/* Con el registro cerrado deja de ser un enlace y lo dice, igual que en la portada. */}
@@ -109,7 +109,7 @@ export function RegistrationCTA() {
                 className="mt-8 inline-flex cursor-not-allowed flex-col items-center justify-center border-2 border-acento/40 px-10 py-4 text-acento/50"
               >
                 <span className="dot-matrix text-lg leading-none sm:text-xl">{t("cta_closed")}</span>
-                <span className="dot-matrix mt-1.5 text-[11px] leading-none">{t("closed_note")}</span>
+                <span className="etiqueta mt-1.5 leading-none">{t("closed_note")}</span>
               </span>
             )}
           </div>

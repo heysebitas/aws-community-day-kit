@@ -111,14 +111,14 @@ export function Navbar() {
                   "active:translate-x-0 active:translate-y-0 active:shadow-none",
                 )}
               >
-                <span className="dot-matrix text-sm leading-none">{t("register")}</span>
+                <span className="etiqueta leading-none">{t("register")}</span>
               </a>
             ) : (
               <span
                 aria-disabled="true"
                 className="hidden cursor-not-allowed items-center border-2 border-acento/40 px-6 py-2 text-acento/50 sm:inline-flex"
               >
-                <span className="dot-matrix text-sm leading-none">{t("register_closed")}</span>
+                <span className="etiqueta leading-none">{t("register_closed")}</span>
               </span>
             )}
             <button

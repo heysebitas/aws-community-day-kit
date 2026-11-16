@@ -202,7 +202,7 @@ export function Vista({
       </div>
 
       {telefono && (
-        <p className="m-0 mt-2 text-center font-mono text-[10px] text-surface-500">
+        <p className="m-0 mt-2 text-center font-mono text-[10px] text-surface-300">
           390 × 780 — lo que mide la pantalla de un teléfono corriente
         </p>
       )}

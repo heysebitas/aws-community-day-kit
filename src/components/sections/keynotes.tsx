@@ -30,12 +30,12 @@ function KeynoteBody({ kn, size = "sm" }: { kn: Keynote; size?: "sm" | "lg" }) {
 
   return (
     <div className={`relative z-10 ${padding} flex flex-col justify-center gap-${size === "lg" ? "5" : "4"}`}>
-      <span className={`self-start font-mono font-bold tracking-[0.28em] uppercase text-acento bg-acento/10 border border-acento/30 rounded-full ${size === "lg" ? "text-[11px] px-4 py-1.5" : "text-[10px] px-3 py-1"}`}>
+      <span className={`self-start etiqueta text-acento bg-acento/10 border-2 border-acento ${size === "lg" ? "px-4 py-1.5" : "px-3 py-1"}`}>
         Keynote
       </span>
 
       <div>
-        <h3 className="font-mono font-bold leading-none tracking-tight text-surface-50 m-0"
+        <h3 className="font-display font-semibold leading-none tracking-tight text-surface-50 m-0"
           style={{ fontSize: nameSize }}>
           {kn.nombre}<br />{kn.apellido}
         </h3>
@@ -49,8 +49,8 @@ function KeynoteBody({ kn, size = "sm" }: { kn: Keynote; size?: "sm" | "lg" }) {
       </div>
 
       {kn.tipoCharla && (
-        <div className="border-t border-surface-700/60 pt-4 flex flex-col gap-1.5">
-          <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-surface-500">
+        <div className="border-t-2 border-surface-700 pt-4 flex flex-col gap-1.5">
+          <span className="font-mono text-xs tracking-[0.2em] uppercase text-surface-300">
             {kn.tipoCharla}
           </span>
           {kn.tituloCharla && (
@@ -78,7 +78,7 @@ function KeynoteBody({ kn, size = "sm" }: { kn: Keynote; size?: "sm" | "lg" }) {
           <Link
             href={`/speakers/${kn.perfil}`}
             onClick={(e) => e.stopPropagation()}
-            className={`self-start inline-flex items-center gap-1.5 font-mono font-semibold text-acento border border-acento/40 bg-acento/8 rounded-full transition-all hover:bg-acento hover:text-surface-900 ${size === "lg" ? "text-sm px-4 py-1.5" : "text-xs px-3 py-1"}`}
+            className={`self-start inline-flex items-center gap-1.5 font-mono font-semibold text-acento border-2 border-acento/40 bg-acento/8 transition-all hover:bg-acento hover:text-surface-900 ${size === "lg" ? "text-sm px-4 py-1.5" : "text-xs px-3 py-1"}`}
           >
             Ver perfil completo
             <ArrowRight className={size === "lg" ? "w-4 h-4" : "w-3 h-3"} />
@@ -94,9 +94,8 @@ function HeadlinerCard({ kn }: { kn: Keynote }) {
   const router = useRouter();
   return (
     <div className="relative">
-      <div className="absolute inset-0 -m-6 rounded-3xl bg-acento/[0.07] blur-2xl pointer-events-none" />
       <article
-        className={`relative grid grid-cols-1 md:grid-cols-[0.92fr_1.08fr] border border-surface-700 rounded-2xl overflow-hidden bg-surface-800/60 isolate transition-colors duration-300 ${kn.perfil ? "hover:border-acento/50 cursor-pointer" : ""}`}
+        className={`relative grid grid-cols-1 md:grid-cols-[0.92fr_1.08fr] border-2 border-surface-600 overflow-hidden bg-surface-800/60 isolate shadow-[6px_6px_0_0_rgb(var(--tema-acento-rgb)/0.35)] transition-colors duration-300 ${kn.perfil ? "hover:border-acento/50 cursor-pointer" : ""}`}
         onClick={() => kn.perfil && router.push(`/speakers/${kn.perfil}`)}
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_0%_0%,rgb(var(--tema-acento-rgb)_/_0.07),transparent_45%)] pointer-events-none z-0" />
@@ -126,7 +125,7 @@ function HeadlinerCard({ kn }: { kn: Keynote }) {
             </>
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-surface-700 to-surface-900 flex items-center justify-center">
-              <span className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(64px,10vw,120px)" }}>
+              <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(64px,10vw,120px)" }}>
                 {kn.nombre[0]}{kn.apellido[0]}
               </span>
             </div>
@@ -139,14 +138,13 @@ function HeadlinerCard({ kn }: { kn: Keynote }) {
   );
 }
 
-/* ── Secondary card — same proportions as headliner, less blur ── */
+/* ── Tarjeta secundaria: mismas proporciones, sombra más corta ── */
 function SecondaryCard({ kn }: { kn: Keynote }) {
   const router = useRouter();
   return (
     <div className="relative w-full h-full">
-      <div className="absolute inset-0 -m-3 rounded-3xl bg-acento/[0.03] blur-xl pointer-events-none" />
       <article
-        className={`relative grid grid-cols-1 md:grid-cols-[0.92fr_1.08fr] border border-surface-700 rounded-2xl overflow-hidden bg-surface-800/60 h-full isolate transition-colors duration-300 ${kn.perfil ? "hover:border-acento/50 cursor-pointer" : ""}`}
+        className={`relative grid grid-cols-1 md:grid-cols-[0.92fr_1.08fr] border-2 border-surface-600 overflow-hidden bg-surface-800/60 h-full isolate shadow-[4px_4px_0_0_rgb(var(--tema-acento-rgb)/0.2)] transition-colors duration-300 ${kn.perfil ? "hover:border-acento/50 cursor-pointer" : ""}`}
         onClick={() => kn.perfil && router.push(`/speakers/${kn.perfil}`)}
       >
         {kn.delPrograma && (
@@ -174,7 +172,7 @@ function SecondaryCard({ kn }: { kn: Keynote }) {
             </>
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-surface-700 to-surface-900 flex items-center justify-center">
-              <span className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(48px,7vw,88px)" }}>
+              <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(48px,7vw,88px)" }}>
                 {kn.nombre[0]}{kn.apellido[0]}
               </span>
             </div>
@@ -221,7 +219,7 @@ export function Keynotes() {
             </p>
             <Link
               href={localePath(locale, "/directorio")}
-              className="inline-flex items-center gap-2 font-mono text-sm font-semibold text-acento border border-acento/40 bg-acento/8 px-5 py-2.5 rounded-none transition-all duration-300 hover:bg-acento hover:text-surface-900 hover:border-acento group"
+              className="inline-flex items-center gap-2 font-mono text-sm font-semibold text-acento border-2 border-acento/40 bg-acento/8 px-5 py-2.5 transition-all duration-300 hover:bg-acento hover:text-surface-900 hover:border-acento group"
             >
               {t("speakers_cta_btn")}
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

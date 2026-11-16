@@ -8,7 +8,7 @@ import { grupos } from "@evento/grupos";
 import { Marca } from "./marca";
 
 const enlace = "text-sm text-tinta/70 transition-colors hover:text-tinta";
-const titulo = "font-mono text-sm font-semibold uppercase tracking-wider text-tinta";
+const titulo = "etiqueta m-0 text-tinta";
 
 const DEL_EVENTO = [
   { key: "about", href: "#about" },
@@ -46,7 +46,7 @@ export async function Footer({ locale }: { locale: string }) {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-tinta/60 transition-colors hover:text-tinta"
+                  className="text-tinta/70 transition-colors hover:text-tinta"
                   aria-label={red}
                 >
                   <IconoRed red={red} className="h-5 w-5" />
@@ -59,7 +59,7 @@ export async function Footer({ locale }: { locale: string }) {
 
           <div className="grid flex-1 grid-cols-2 gap-10 sm:grid-cols-4">
             <div>
-              <h3 className={titulo}>{t("the_event")}</h3>
+              <p className={titulo}>{t("the_event")}</p>
               <ul className="mt-4 space-y-2.5">
                 {DEL_EVENTO.map(({ key, href }) => (
                   <li key={key}>
@@ -75,7 +75,7 @@ export async function Footer({ locale }: { locale: string }) {
             </div>
 
             <div>
-              <h3 className={titulo}>{t("community")}</h3>
+              <p className={titulo}>{t("community")}</p>
               <ul className="mt-4 space-y-2.5">
                 <li>
                   <a href={EXTERNAL_LINKS.awsCloudClubs} target="_blank" rel="noopener noreferrer" className={enlace}>
@@ -96,7 +96,7 @@ export async function Footer({ locale }: { locale: string }) {
             </div>
 
             <div>
-              <h3 className={titulo}>{t("resources")}</h3>
+              <p className={titulo}>{t("resources")}</p>
               <ul className="mt-4 space-y-2.5">
                 {RECURSOS.map(({ key, href }) => (
                   <li key={key}>
@@ -110,7 +110,7 @@ export async function Footer({ locale }: { locale: string }) {
 
             {grupos.length > 0 && (
               <div>
-                <h3 className={titulo}>{t("cloud_clubs")}</h3>
+                <p className={titulo}>{t("cloud_clubs")}</p>
                 <ul className="mt-4 space-y-2.5">
                   {grupos.map((g) => (
                     <li key={g.nombre}>
@@ -155,7 +155,7 @@ export async function Footer({ locale }: { locale: string }) {
               </>
             )}
           </p>
-          <p className="text-xs text-tinta/60">{t("copyright")}</p>
+          <p className="text-xs text-tinta/70">{t("copyright")}</p>
         </div>
       </div>
     </footer>

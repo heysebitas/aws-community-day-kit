@@ -72,16 +72,16 @@ function Field({
       <label htmlFor={htmlFor} className="font-mono text-sm font-semibold text-tinta">
         {label} {required && <span className="text-acento-profundo">*</span>}
       </label>
-      {hint && <p className="m-0 -mt-1 font-mono text-xs text-tinta/55">{hint}</p>}
+      {hint && <p className="m-0 -mt-1 font-mono text-xs text-tinta/70">{hint}</p>}
       {children}
-      {error && <p className="m-0 font-mono text-xs text-[#7f1d1d]">{error}</p>}
+      {error && <p className="m-0 font-mono text-xs text-error">{error}</p>}
     </div>
   );
 }
 
 const inputCls =
   "w-full border-2 border-tinta/35 bg-white/55 px-4 py-3 font-mono text-sm text-tinta " +
-  "placeholder:text-tinta/40 outline-none transition-all " +
+  "placeholder:text-tinta/70 outline-none transition-all " +
   "focus:-translate-y-px focus:border-tinta focus:bg-white " +
   "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
 
@@ -263,7 +263,7 @@ export function RegistroForm({
               onChange={(e) => set("firstName", e.target.value)}
               placeholder={t.firstName_ph}
               maxLength={60}
-              className={cn(inputCls, errors.firstName && "border-[#7f1d1d]")}
+              className={cn(inputCls, errors.firstName && "border-error")}
             />
           </Field>
           <Field label={t.lastName} required htmlFor="f-last" error={errors.lastName}>
@@ -273,7 +273,7 @@ export function RegistroForm({
               onChange={(e) => set("lastName", e.target.value)}
               placeholder={t.lastName_ph}
               maxLength={60}
-              className={cn(inputCls, errors.lastName && "border-[#7f1d1d]")}
+              className={cn(inputCls, errors.lastName && "border-error")}
             />
           </Field>
         </div>
@@ -291,7 +291,7 @@ export function RegistroForm({
               setErrors((x) => ({ ...x, email: r.ok ? undefined : r.reason }));
             }}
             placeholder={t.email_ph}
-            className={cn(inputCls, errors.email && "border-[#7f1d1d]")}
+            className={cn(inputCls, errors.email && "border-error")}
           />
         </Field>
 
@@ -361,7 +361,7 @@ export function RegistroForm({
                     maxLength={24}
                     className={cn(
                       inputCls,
-                      errors.documentNumber && "border-[#7f1d1d]",
+                      errors.documentNumber && "border-error",
                       !v.documentType && "cursor-not-allowed opacity-50",
                     )}
                   />
@@ -400,7 +400,7 @@ export function RegistroForm({
                   onChange={(e) => set("roleOther", e.target.value)}
                   placeholder={t.which_ph}
                   maxLength={FREE_TEXT_MAX}
-                  className={cn(inputCls, errors.roleOther && "border-[#7f1d1d]")}
+                  className={cn(inputCls, errors.roleOther && "border-error")}
                 />
               </Field>
             </motion.div>
@@ -445,7 +445,7 @@ export function RegistroForm({
                   onChange={(e) => set("entityName", e.target.value)}
                   placeholder={t.entityName_ph}
                   maxLength={FREE_TEXT_MAX}
-                  className={cn(inputCls, errors.entityName && "border-[#7f1d1d]")}
+                  className={cn(inputCls, errors.entityName && "border-error")}
                 />
               </Field>
             </motion.div>
@@ -466,6 +466,9 @@ export function RegistroForm({
                   type="button"
                   role="checkbox"
                   aria-checked={checked}
+                  aria-labelledby={`consent-${key}-text`}
+                  aria-invalid={errors[key] ? true : undefined}
+                  aria-describedby={errors[key] ? `consent-${key}-error` : undefined}
                   onClick={() => {
                     setter(!checked);
                     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
@@ -473,7 +476,7 @@ export function RegistroForm({
                   className={cn(
                     "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-all",
                     checked ? "border-tinta bg-tinta" : "border-tinta/40 bg-white/55",
-                    errors[key] && "border-[#7f1d1d]",
+                    errors[key] && "border-error",
                   )}
                 >
                   {checked && (
@@ -482,7 +485,7 @@ export function RegistroForm({
                     </svg>
                   )}
                 </button>
-                <span className="font-mono text-xs leading-relaxed text-tinta/85">
+                <span id={`consent-${key}-text`} className="font-mono text-xs leading-relaxed text-tinta/85">
                   {text}
                   <a
                     href={href}
@@ -497,7 +500,7 @@ export function RegistroForm({
                 </span>
               </label>
               {errors[key] && (
-                <p className="m-0 pl-8 font-mono text-xs text-[#7f1d1d]">{errors[key]}</p>
+                <p id={`consent-${key}-error`} role="alert" className="m-0 pl-8 font-mono text-xs text-error">{errors[key]}</p>
               )}
             </div>
           ))}
@@ -546,13 +549,13 @@ export function RegistroForm({
         )}
 
         {formError && (
-          <p className="m-0 border-2 border-[#7f1d1d] bg-[#7f1d1d]/10 px-4 py-3 font-mono text-sm text-[#7f1d1d]">
+          <p className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
             {formError}
           </p>
         )}
 
         {siteKey && !captchaToken && !formError && (
-          <p className="m-0 text-center font-mono text-xs text-tinta/50">
+          <p className="m-0 text-center font-mono text-xs text-tinta/70">
             {t.captcha}
           </p>
         )}

@@ -36,7 +36,7 @@ export function ScrollReveal({
       // Misma curva y duración que el `landingFadeIn` de Platanus: sale rápido
       // y frena largo, por eso su scroll se siente pesado en el buen sentido.
       transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={cn(className)}
+      className={cn("scroll-reveal", className)}
     >
       {children}
     </motion.div>

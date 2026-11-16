@@ -130,7 +130,7 @@ function Puerta({
             <span key={l} className="font-mono text-[11px] text-surface-400">{l}</span>
           ))}
         </span>
-        <ArrowRight className="h-5 w-5 shrink-0 text-surface-500 transition-all group-hover:translate-x-1 group-hover:text-acento" />
+        <ArrowRight className="h-5 w-5 shrink-0 text-surface-300 transition-all group-hover:translate-x-1 group-hover:text-acento" />
       </div>
     </Link>
   );

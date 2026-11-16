@@ -64,7 +64,7 @@ export function HardButton({
     <>
       <span className="dot-matrix text-lg leading-none md:text-xl">{children}</span>
       {sub && (
-        <span className="dot-matrix mt-1.5 text-[11px] leading-none opacity-70">
+        <span className="etiqueta mt-1.5 leading-none opacity-70">
           {sub}
         </span>
       )}
