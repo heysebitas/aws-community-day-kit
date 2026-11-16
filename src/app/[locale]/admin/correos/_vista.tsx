@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Monitor, Smartphone, TriangleAlert } from "lucide-react";
 import { SectionHead } from "@/components/admin/ui";
@@ -59,7 +59,6 @@ export function Vista({
 
   const [enlaces, setEnlaces] = useState<Record<string, string> | null>(null);
   const [html, setHtml] = useState("");
-  const marco = useRef<HTMLIFrameElement>(null);
 
   // Los enlaces configurados, una vez. Son los mismos para todas las plantillas.
   useEffect(() => {
@@ -103,17 +102,6 @@ export function Vista({
     }, 80);
     return () => { vivo = false; clearTimeout(t); };
   }, [bloques, preview, valores, banderas, enlaces]);
-
-  /** El HTML entra reescribiendo el documento del marco, no por `srcdoc`. */
-  useEffect(() => {
-    const doc = marco.current?.contentDocument;
-    if (!doc || !html) return;
-    const arriba = doc.documentElement?.scrollTop ?? 0;
-    doc.open();
-    doc.write(html);
-    doc.close();
-    doc.documentElement.scrollTop = arriba;
-  }, [html]);
 
   const pesoKb = Math.round((new Blob([html]).size / 1024) * 10) / 10;
 
@@ -194,8 +182,10 @@ export function Vista({
           style={telefono ? { width: 390, height: 780 } : undefined}
         >
           <iframe
-            ref={marco}
             title="Vista previa del correo"
+            // Sin `allow-scripts`: un script metido en un bloque no corre con la sesión del panel.
+            sandbox=""
+            srcDoc={html}
             className={cn("block w-full", telefono ? "h-full" : "h-[70vh]")}
           />
         </div>
