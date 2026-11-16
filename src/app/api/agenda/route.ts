@@ -3,43 +3,18 @@ import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { AgendaEvent } from "@/models/agenda-event";
 import { SpeakerProfile } from "@/models/speaker-profile";
+import { getAgendaEvents } from "@/lib/data/agenda";
 import { revalidatePublic, AGENDA_TAG, SPEAKERS_TAG } from "@/lib/data/revalidate";
 import { createLog } from "@/lib/log";
 import { resolverSala } from "@/lib/agenda-sala";
-
-import { Room } from "@/models/room";
 import { horaDelEvento } from "@/config/fechas";
+
+const CACHE_PUBLICA = "public, s-maxage=60, stale-while-revalidate=300";
 
 export async function GET() {
   try {
-    await connectDB();
-    const events = await AgendaEvent.find({}).sort({ startTime: 1, room: 1 }).lean();
-
-    const speakerIds = events.map((e) => e.speakerId).filter((id): id is NonNullable<typeof id> => id != null);
-    const photoMap: Record<string, string> = {};
-    if (speakerIds.length > 0) {
-      const profiles = await SpeakerProfile.find({ _id: { $in: speakerIds } })
-        .select("_id photo").lean();
-      profiles.forEach((p) => { photoMap[p._id.toString()] = (p.photo as string) ?? ""; });
-    }
-
-    // El nombre de la sala sale del salón cuando el bloque apunta a uno, para que
-    // renombrar un salón se refleje en la agenda. El texto guardado queda de
-    // respaldo para los bloques sin `roomId`.
-    const roomIds = events.map((e) => e.roomId).filter((id): id is NonNullable<typeof id> => id != null);
-    const roomMap: Record<string, string> = {};
-    if (roomIds.length > 0) {
-      const rooms = await Room.find({ _id: { $in: roomIds } }).select("_id name").lean();
-      rooms.forEach((r) => { roomMap[r._id.toString()] = (r.name as string) ?? ""; });
-    }
-
-    const result = events.map((e) => ({
-      ...e,
-      room: (e.roomId && roomMap[e.roomId.toString()]) || e.room,
-      speakerPhoto: e.speakerId ? (photoMap[e.speakerId.toString()] ?? "") : "",
-    }));
-
-    return Response.json({ events: result });
+    const events = await getAgendaEvents();
+    return Response.json({ events }, { headers: { "Cache-Control": CACHE_PUBLICA } });
   } catch {
     return Response.json({ error: "Error interno" }, { status: 500 });
   }

@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/db";
 import { AgendaEvent } from "@/models/agenda-event";
 import { SpeakerProfile } from "@/models/speaker-profile";
 // Side-effect import para registrar el schema de Room
-import "@/models/room";
+import { Room } from "@/models/room";
 
 export const AGENDA_TAG = "agenda";
 
@@ -14,6 +14,8 @@ export type AgendaEventDTO = {
   speaker: string;
   speakerSlug?: string;
   speakerPhoto?: string;
+  speakerId?: string;
+  roomId?: string;
   description: string;
   startTime: string;
   endTime: string;
@@ -45,6 +47,14 @@ export const getAgendaEvents = unstable_cache(
       profiles.forEach((p) => { photoMap[String(p._id)] = p.photo ?? ""; });
     }
 
+    // El nombre sale del salón cuando el bloque apunta a uno; el texto guardado es respaldo.
+    const roomIds = events.map((e) => e.roomId).filter((id): id is object => id != null).map((id) => String(id));
+    const roomMap: Record<string, string> = {};
+    if (roomIds.length > 0) {
+      const rooms = await Room.find({ _id: { $in: roomIds } }).select("_id name").lean<{ _id: unknown; name?: string }[]>();
+      rooms.forEach((r) => { roomMap[String(r._id)] = r.name ?? ""; });
+    }
+
     return events.map((e) => ({
       _id: String(e._id),
       title: (e.title as string) ?? "",
@@ -54,7 +64,9 @@ export const getAgendaEvents = unstable_cache(
       description: (e.description as string) ?? "",
       startTime: (e.startTime as string) ?? "",
       endTime: (e.endTime as string) ?? "",
-      room: (e.room as string) ?? "",
+      speakerId: e.speakerId ? String(e.speakerId) : undefined,
+      roomId: e.roomId ? String(e.roomId) : undefined,
+      room: (e.roomId ? roomMap[String(e.roomId)] : "") || (e.room as string) || "",
       track: (e.track as string) ?? "general",
       order: (e.order as number) ?? 0,
       sessionType: e.sessionType as AgendaEventDTO["sessionType"],

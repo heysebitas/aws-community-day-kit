@@ -1,9 +1,11 @@
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { SpeakerProfile } from "@/models/speaker-profile";
 import { Setting } from "@/models/setting";
 // Side-effect import para registrar el schema de Room (lo usa populate)
 import "@/models/room";
+import type { ISpeakerProfile } from "@/models/speaker-profile";
 import type { PublicProfile } from "@/components/sections/speakers";
 
 export const SPEAKERS_TAG = "speakers";
@@ -53,3 +55,29 @@ export const getPublicSpeakers = unstable_cache(
   ["public-speakers"],
   { tags: [SPEAKERS_TAG], revalidate: 120 },
 );
+
+export type PerfilPublicoDTO = Pick<
+  ISpeakerProfile,
+  "name" | "slug" | "role" | "tagline" | "bio" | "photo" | "social" | "track" | "talkTitle" | "talkAbstract" | "countryCity"
+> & {
+  scheduledAt?: string | null;
+  sessionId?: string | null;
+  coSpeakers: Pick<ISpeakerProfile["coSpeakers"][number], "firstName" | "lastName" | "role" | "tagline" | "bio" | "photo" | "social">[];
+};
+
+const CAMPOS_PERFIL =
+  "name slug role tagline bio photo social track talkTitle talkAbstract countryCity scheduledAt sessionId coSpeakers.firstName coSpeakers.lastName coSpeakers.role coSpeakers.tagline coSpeakers.bio coSpeakers.photo coSpeakers.social";
+
+const leerPerfilPublico = unstable_cache(
+  async (slug: string): Promise<PerfilPublicoDTO | null> => {
+    await connectDB();
+    const perfil = await SpeakerProfile.findOne({ slug, isPublic: true }).select(CAMPOS_PERFIL).lean();
+    // Serializable: la caché de datos no admite ObjectId ni Date.
+    return perfil ? (JSON.parse(JSON.stringify(perfil)) as PerfilPublicoDTO) : null;
+  },
+  ["public-speaker-by-slug"],
+  { tags: [SPEAKERS_TAG], revalidate: 120 },
+);
+
+// Perfil público por slug: caché de datos + `cache()` para que metadata y página compartan la lectura.
+export const getPublicSpeakerBySlug = cache((slug: string) => leerPerfilPublico(slug));

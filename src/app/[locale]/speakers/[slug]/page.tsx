@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { connectDB } from "@/lib/db";
-import { SpeakerProfile } from "@/models/speaker-profile";
-import { AgendaEvent } from "@/models/agenda-event";
+import { getPublicSpeakerBySlug } from "@/lib/data/speakers";
+import { getAgendaEvents } from "@/lib/data/agenda";
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -15,8 +14,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  await connectDB();
-  const profile = await SpeakerProfile.findOne({ slug, isPublic: true }).lean();
+  const profile = await getPublicSpeakerBySlug(slug);
   if (!profile) return {};
   return {
     title: profile.name,
@@ -47,15 +45,14 @@ export default async function SpeakerProfilePage({ params }: PageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  await connectDB();
-  const profile = await SpeakerProfile.findOne({ slug, isPublic: true }).lean();
+  const profile = await getPublicSpeakerBySlug(slug);
   if (!profile) notFound();
 
   // La hora y la sala salen del bloque de la agenda cuando ya está agendado.
   let horaFin: string | null = null;
   let sala: string | null = null;
   if (profile.sessionId) {
-    const bloque = await AgendaEvent.findById(profile.sessionId).select("endTime room").lean();
+    const bloque = (await getAgendaEvents()).find((e) => e._id === String(profile.sessionId));
     horaFin = bloque?.endTime ?? null;
     sala = bloque?.room ?? null;
   }
