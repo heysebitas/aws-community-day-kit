@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import { DotHeading } from "@/components/ui/dot-heading";
 import { cn } from "@/lib/utils";
-import { EVENTO } from "@/config";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -65,7 +64,7 @@ export function FormShell({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.12, ease }}
-            className="border-2 border-tinta bg-acento/40 p-5 shadow-[8px_8px_0_0_rgba(10,10,15,0.28)] sm:p-8"
+            className="border-2 border-tinta p-5 shadow-[8px_8px_0_0_var(--color-tinta)] sm:p-8"
           >
             {children}
           </motion.div>
@@ -93,7 +92,7 @@ export function FormShell({
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >
-              {EVENTO.ciudad} · {EVENTO.anio} · {title}
+              {title}
             </span>
           ))}
         </div>

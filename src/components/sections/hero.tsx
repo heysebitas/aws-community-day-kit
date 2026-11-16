@@ -63,6 +63,7 @@ function renglones(nombre: string): [string, string] {
 
 export function Hero() {
   const t = useTranslations("Hero");
+  const tCinta = useTranslations("Strip");
   const locale = useLocale();
   const { isExpired, isPostEvent } = useCountdown(EVENTO.inicio);
   const {
@@ -224,7 +225,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-20">
-        <MarqueeStrip text={`${EVENTO.nombre} · ${EVENTO.edicion} ${EVENTO.anio}`} tone="block" duration={40} />
+        <MarqueeStrip text={tCinta("date")} tone="block" duration={40} />
       </div>
     </section>
   );
