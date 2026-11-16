@@ -235,7 +235,8 @@
     "aws_certification": "AWS Certification",
     "aws_docs": "AWS Docs",
     "made_with": "Hecho con",
-    "made_by": "por",
+    "open_source": "código abierto, licencia MIT",
+    "made_by": "sitio por",
     "copyright": "© [[anio]] [[nombre]] [[edicion]]. Todos los derechos reservados."
   },
   "Metadata": {

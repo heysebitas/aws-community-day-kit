@@ -53,7 +53,7 @@ function pedir(url: URL, ip: string, familia: number): Promise<{ estado: number;
         port: 443,
         path: url.pathname + url.search,
         method: "GET",
-        headers: { Accept: "image/*", "User-Agent": "community-day-kit" },
+        headers: { Accept: "image/*", "User-Agent": "aws-community-day-kit" },
         // La conexión va a la IP que ya se comprobó.
         lookup: (_h, _o, cb) => cb(null, ip, familia),
         timeout: TIEMPO_MS,

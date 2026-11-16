@@ -6,13 +6,11 @@ import { LowPoly } from "@/components/effects/low-poly";
 import { DotHeading } from "@/components/ui/dot-heading";
 import { POS, TRI } from "@/data/truck-model";
 import { cn } from "@/lib/utils";
+import { KIT } from "@/config/kit";
 
 /** Quién hizo el kit y dónde está el código. */
 
 const ease = [0.22, 1, 0.36, 1] as const;
-
-/** El repositorio del kit. */
-const REPO = "https://github.com/heysebitas/community-day-kit";
 
 const ENLACES = [
   {
@@ -39,8 +37,8 @@ const ENLACES = [
   },
   {
     label: "Código",
-    handle: "community-day-kit",
-    href: REPO,
+    handle: KIT.slug,
+    href: KIT.repo,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden="true">
         <path d="m8 6-6 6 6 6M16 6l6 6-6 6" />
@@ -123,7 +121,7 @@ export function CreditosScreen() {
         </motion.div>
 
         <motion.a
-          href={REPO}
+          href={KIT.repo}
           target="_blank"
           rel="noopener noreferrer"
           initial={{ opacity: 0, y: 16 }}

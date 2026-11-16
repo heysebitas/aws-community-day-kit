@@ -264,7 +264,6 @@ ${redes}
     legalActualizado: ${q(new Date().toISOString().slice(0, 10))},
   },
 
-  hechoPor: { nombre: "Sebastián Acuña", url: "https://github.com/heysebitas" },
 });
 `;
 }

@@ -76,5 +76,4 @@ export default definirEvento({
     legalActualizado: "2027-01-15",
   },
 
-  hechoPor: { nombre: "Sebastián Acuña", url: "https://github.com/heysebitas" },
 });

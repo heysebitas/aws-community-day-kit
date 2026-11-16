@@ -1,5 +1,5 @@
 {
-  "name": "community-day-kit",
+  "name": "aws-community-day-kit",
   "version": "1.0.0",
   "description": "Sitio, registro y panel de operación para un Student Community Day. Configurable por país, tema e idioma.",
   "private": true,

@@ -4,7 +4,7 @@ Gracias por querer mejorar el kit. Se puede escribir en español o en inglés.
 
 ## Reportar algo
 
-Abre un [issue](https://github.com/heysebitas/community-day-kit/issues/new/choose).
+Abre un [issue](https://github.com/heysebitas/aws-community-day-kit/issues/new/choose).
 Hay tres plantillas:
 
 - **Error**: algo no funciona. Cuenta qué hiciste, qué esperabas y qué pasó.
@@ -19,8 +19,8 @@ issue. Los problemas de seguridad no van en issues: ver [SECURITY.md](SECURITY.m
 ## Mandar un cambio
 
 ```bash
-git clone https://github.com/<tu-usuario>/community-day-kit.git
-cd community-day-kit
+git clone https://github.com/<tu-usuario>/aws-community-day-kit.git
+cd aws-community-day-kit
 npm install
 npm run demo        # el sitio en http://localhost:3000, sin configurar nada
 ```

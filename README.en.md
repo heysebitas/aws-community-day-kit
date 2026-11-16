@@ -1,4 +1,4 @@
-# Community Day Kit
+# AWS Community Day Kit
 
 The website, forms and operations panel for a **Student Community Day**, ready
 for any community in Latin America to run their own. It grew out of the 2026
@@ -29,8 +29,8 @@ your event in one folder and everything else adapts.
 You only need Node 20.12+. No database, accounts or keys.
 
 ```bash
-git clone https://github.com/heysebitas/community-day-kit.git
-cd community-day-kit
+git clone https://github.com/heysebitas/aws-community-day-kit.git
+cd aws-community-day-kit
 npm install
 npm run demo
 ```
@@ -54,6 +54,16 @@ npm run doctor    # tells you what is missing
 
 Everything about your edition lives in `evento/` and `public/evento/`; `src/`
 is the kit. The guides are in [docs/](docs/).
+
+## Who uses it
+
+| Edition | Site |
+|---|---|
+| AWS Student Community Day Colombia | [awsstudentcommunity.day](https://awsstudentcommunity.day) |
+| AWS Student Community Day Chile | [scdchile.cl](https://scdchile.cl) |
+| AWS Student Community Day Mexico | [studentcommunitydaymexico.com](https://studentcommunitydaymexico.com/) |
+
+Running yours on the kit? Open a PR and add it to the list.
 
 ## Contributing
 

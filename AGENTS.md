@@ -1,6 +1,6 @@
 # Guía para asistentes de IA
 
-Este repo es **Community Day Kit**: el sitio, los formularios y el panel de
+Este repo es **AWS Community Day Kit**: el sitio, los formularios y el panel de
 operación de un Student Community Day (registro, speakers, voluntarios, agenda,
 check-in con QR, pasaporte digital, correos, escarapelas, certificados). Una edición se configura sin
 tocar el código del kit.

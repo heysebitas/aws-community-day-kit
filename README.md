@@ -1,9 +1,12 @@
-# Community Day Kit
+# AWS Community Day Kit
 
-El sitio, los formularios y el panel de operación de un **Student Community
-Day**, listos para que cualquier comunidad de Latinoamérica monte el suyo.
-Nació en las ediciones de Colombia y Chile de 2026 y aquí está sin nada de
-ninguna de las dos: tu evento se describe en una carpeta y el resto se adapta.
+El sitio, los formularios y el panel de operación de un **AWS Student
+Community Day** o de cualquier **Community Day**, listos para que cualquier
+comunidad de Latinoamérica monte el suyo. Es la plataforma con la que se
+hicieron los Student Community Days de [Colombia](https://awsstudentcommunity.day),
+[Chile](https://scdchile.cl) y [México](https://studentcommunitydaymexico.com/),
+y aquí está sin nada de ninguno de los tres: tu evento se describe en una
+carpeta y el resto se adapta.
 
 [English](README.en.md)
 
@@ -29,8 +32,8 @@ ninguna de las dos: tu evento se describe en una carpeta y el resto se adapta.
 Sólo hace falta Node 20.12 o más. Ni base de datos, ni cuentas, ni llaves.
 
 ```bash
-git clone https://github.com/heysebitas/community-day-kit.git
-cd community-day-kit
+git clone https://github.com/heysebitas/aws-community-day-kit.git
+cd aws-community-day-kit
 npm install
 npm run demo
 ```
@@ -59,6 +62,16 @@ npm run doctor    # dice qué falta
 Después se completa el contenido en `evento/` (equipo, keynotes,
 patrocinadores, tracks) y se despliega.
 
+## Quién lo usa
+
+| Edición | Sitio |
+|---|---|
+| AWS Student Community Day Colombia | [awsstudentcommunity.day](https://awsstudentcommunity.day) |
+| AWS Student Community Day Chile | [scdchile.cl](https://scdchile.cl) |
+| AWS Student Community Day México | [studentcommunitydaymexico.com](https://studentcommunitydaymexico.com/) |
+
+¿Montaste el tuyo con el kit? Abre un PR y súmalo a la lista.
+
 ## Cómo está armado
 
 ```
@@ -83,7 +96,7 @@ docs/            la documentación
 ## Participar
 
 ¿Encontraste un error o le falta algo a tu país? Abre un
-[issue](https://github.com/heysebitas/community-day-kit/issues/new/choose) o
+[issue](https://github.com/heysebitas/aws-community-day-kit/issues/new/choose) o
 manda un PR: [CONTRIBUTING.md](CONTRIBUTING.md) lo explica en una página. Los
 problemas de seguridad van por privado: [SECURITY.md](SECURITY.md). Lo que
 viene está en [ROADMAP.md](ROADMAP.md).

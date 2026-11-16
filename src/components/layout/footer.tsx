@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { Heart } from "lucide-react";
 import { EVENTO } from "@/config";
+import { KIT } from "@/config/kit";
 import { EXTERNAL_LINKS } from "@/lib/constants";
 import { localePath } from "@/lib/utils";
 import { IconoRed, type Red } from "@/components/ui/social-icons";
@@ -132,23 +132,29 @@ export async function Footer({ locale }: { locale: string }) {
 
       <div className="border-t border-tinta/20">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
-          {EVENTO.hechoPor && (
-            <p className="text-sm text-tinta/70">
-              {t("made_with")} <Heart className="inline h-4 w-4 fill-tinta text-tinta" /> {t("made_by")}{" "}
-              {EVENTO.hechoPor.url ? (
-                <a
-                  href={EVENTO.hechoPor.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-tinta transition-colors hover:underline"
-                >
-                  {EVENTO.hechoPor.nombre}
-                </a>
-              ) : (
-                <span className="font-semibold text-tinta">{EVENTO.hechoPor.nombre}</span>
-              )}
-            </p>
-          )}
+          <p className="text-sm text-tinta/70">
+            {t("made_with")}{" "}
+            <a href={KIT.repo} target="_blank" rel="noopener noreferrer" className="font-semibold text-tinta transition-colors hover:underline">
+              {KIT.nombre}
+            </a>
+            {" · "}
+            <a href={KIT.licencia} target="_blank" rel="noopener noreferrer" className="transition-colors hover:underline">
+              {t("open_source")}
+            </a>
+            {EVENTO.hechoPor && (
+              <>
+                {" · "}
+                {t("made_by")}{" "}
+                {EVENTO.hechoPor.url ? (
+                  <a href={EVENTO.hechoPor.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-tinta transition-colors hover:underline">
+                    {EVENTO.hechoPor.nombre}
+                  </a>
+                ) : (
+                  <span className="font-semibold text-tinta">{EVENTO.hechoPor.nombre}</span>
+                )}
+              </>
+            )}
+          </p>
           <p className="text-xs text-tinta/60">{t("copyright")}</p>
         </div>
       </div>

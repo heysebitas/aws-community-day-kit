@@ -174,6 +174,6 @@ export type ConfigEvento = {
     legalActualizado: `${number}-${number}-${number}`;
   };
 
-  /** Crédito del pie de página. */
+  /** Quién hizo el sitio de esta edición, si quieres decirlo en el pie junto al crédito del kit. */
   hechoPor?: { nombre: string; url?: string };
 };

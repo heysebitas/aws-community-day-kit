@@ -3,7 +3,7 @@
 ## Reportar una vulnerabilidad
 
 **No abras un issue público.** Usa el reporte privado de GitHub:
-[Security → Report a vulnerability](https://github.com/heysebitas/community-day-kit/security/advisories/new).
+[Security → Report a vulnerability](https://github.com/heysebitas/aws-community-day-kit/security/advisories/new).
 
 Cuenta, en español o en inglés:
 

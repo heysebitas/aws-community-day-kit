@@ -234,8 +234,9 @@
     "aws_skill_builder": "AWS Skill Builder",
     "aws_certification": "AWS Certification",
     "aws_docs": "AWS Docs",
-    "made_with": "Made with",
-    "made_by": "by",
+    "made_with": "Built with",
+    "open_source": "open source, MIT license",
+    "made_by": "site by",
     "copyright": "© [[anio]] [[nombre]] [[edicion]]. All rights reserved."
   },
   "Metadata": {
