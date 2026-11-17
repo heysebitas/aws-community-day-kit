@@ -195,7 +195,7 @@ export function EventoForm({
           value={salonId}
           onChange={(e) => elegirSalon(e.target.value)}
           required
-          className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 outline-none transition-colors focus:border-acento"
+          className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 outline-hidden transition-colors focus:border-acento"
         >
           <option value="">— Elige un salón —</option>
           {salones.map((r) => (
@@ -210,7 +210,7 @@ export function EventoForm({
           onChange={(e) => set("room", e.target.value)}
           required
           placeholder="Ej. Auditorio principal"
-          className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-none focus:border-acento"
+          className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-hidden focus:border-acento"
         />
       )}
       {salones.length === 0 && (
@@ -269,7 +269,7 @@ export function EventoForm({
                   else setSpeakerId(e.target.value);
                 }}
                 required
-                className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 outline-none transition-colors focus:border-acento"
+                className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 outline-hidden transition-colors focus:border-acento"
               >
                 <option value="">— Elige un speaker —</option>
                 {speakers.map((sp) => (
@@ -309,7 +309,7 @@ export function EventoForm({
                   setKeynoteIdx(i);
                   if (keynotes[i]) aplicarKeynote(keynotes[i]);
                 }}
-                className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 outline-none transition-colors focus:border-acento"
+                className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 outline-hidden transition-colors focus:border-acento"
               >
                 {keynotes.map((kn, i) => (
                   <option key={i} value={i}>
@@ -353,7 +353,7 @@ export function EventoForm({
                 onChange={(e) => set("description", e.target.value)}
                 rows={3}
                 placeholder="De qué va este bloque."
-                className="w-full resize-none border-2 border-surface-600 bg-surface-900 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-none transition-colors focus:border-acento"
+                className="w-full resize-none border-2 border-surface-600 bg-surface-900 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-hidden transition-colors focus:border-acento"
               />
             </label>
 

@@ -55,7 +55,7 @@ export function Tracks() {
           </DotHeading>
           <h2
             className="m-0 max-w-[16ch] font-display font-medium lowercase leading-[1.02] tracking-tight"
-            style={{ fontSize: "clamp(28px,4vw,48px)" }}
+            style={{ fontSize: "clamp(1.75rem,4vw,3rem)" }}
           >
             {t("section_pre")}
             <em className="not-italic text-acento">{t("section_em")}</em>

@@ -9,6 +9,7 @@ import {
 } from "@/data/attendee-form";
 import { csvResponse, csvRow } from "@/lib/csv";
 import { SLUG } from "@/config";
+import { ruta } from "@/lib/api";
 
 /** Columnas de la persona, en orden fijo. */
 const PERSON_COLUMNS: { label: string; value: (r: IRegistration) => string }[] = [
@@ -31,42 +32,35 @@ const PERSON_COLUMNS: { label: string; value: (r: IRegistration) => string }[] =
   },
 ];
 
-export async function GET() {
-  try {
-    await requireAccess("registrations", "ver", ["admin", "organizer"]);
-    await connectDB();
+export const GET = ruta(async () => {
+  await requireAccess("registrations", "ver", ["admin", "organizer"]);
+  await connectDB();
 
-    const registrations = await Registration.find({}).sort({ createdAt: 1 }).lean();
+  const registrations = await Registration.find({}).sort({ createdAt: 1 }).lean();
 
-    // El formulario es fijo, así que el CSV tiene siempre las mismas columnas y en el mismo orden.
+  // El formulario es fijo, así que el CSV tiene siempre las mismas columnas y en el mismo orden.
 
-    const systemColumns = ["id", "qrCode", "checkedIn", "checkedInAt", "checkedInBy", "emailStatus", "emailError", "emailSentAt", "createdAt"];
-    const allColumns = [...PERSON_COLUMNS.map((c) => c.label), ...systemColumns];
+  const systemColumns = ["id", "qrCode", "checkedIn", "checkedInAt", "checkedInBy", "emailStatus", "emailError", "emailSentAt", "createdAt"];
+  const allColumns = [...PERSON_COLUMNS.map((c) => c.label), ...systemColumns];
 
-    const header = csvRow(allColumns);
+  const header = csvRow(allColumns);
 
-    const rows = registrations.map((reg) =>
-      csvRow([
-        ...PERSON_COLUMNS.map((c) => c.value(reg)),
-        String(reg._id),
-        reg.qrCode,
-        reg.checkedIn ? "Sí" : "No",
-        reg.checkedInAt ? reg.checkedInAt.toISOString() : "",
-        reg.checkedInBy ?? "",
-        reg.emailStatus,
-        reg.emailError ?? "",
-        reg.emailSentAt ? reg.emailSentAt.toISOString() : "",
-        reg.createdAt.toISOString(),
-      ]),
-    );
+  const rows = registrations.map((reg) =>
+    csvRow([
+      ...PERSON_COLUMNS.map((c) => c.value(reg)),
+      String(reg._id),
+      reg.qrCode,
+      reg.checkedIn ? "Sí" : "No",
+      reg.checkedInAt ? reg.checkedInAt.toISOString() : "",
+      reg.checkedInBy ?? "",
+      reg.emailStatus,
+      reg.emailError ?? "",
+      reg.emailSentAt ? reg.emailSentAt.toISOString() : "",
+      reg.createdAt.toISOString(),
+    ]),
+  );
 
-    const csv = [header, ...rows].join("\r\n");
+  const csv = [header, ...rows].join("\r\n");
 
-    return csvResponse(csv, `registros-${SLUG}.csv`);
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    if (msg === "Forbidden") return Response.json({ error: msg }, { status: 403 });
-    return Response.json({ error: "Error interno" }, { status: 500 });
-  }
-}
+  return csvResponse(csv, `registros-${SLUG}.csv`);
+});

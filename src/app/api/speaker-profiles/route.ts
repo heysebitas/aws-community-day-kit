@@ -5,6 +5,7 @@ import { SpeakerProfile } from "@/models/speaker-profile";
 import { getPublicSpeakers } from "@/lib/data/speakers";
 import { revalidatePublic, SPEAKERS_TAG, AGENDA_TAG } from "@/lib/data/revalidate";
 import { createLog } from "@/lib/log";
+import { ruta } from "@/lib/api";
 
 function toSlug(name: string): string {
   return name
@@ -37,54 +38,47 @@ export async function GET() {
 }
 
 // Admin: create profile
-export async function POST(request: NextRequest) {
-  try {
-    const user = await requireAccess("speakers", "editar", ["admin", "organizer"]);
-    await connectDB();
+export const POST = ruta(async (request: NextRequest) => {
+  const user = await requireAccess("speakers", "editar", ["admin", "organizer"]);
+  await connectDB();
 
-    const body = await request.json();
-    const { name, role, company, companyLogo, bio, photo, social, talkTitle, talkAbstract, track, sessionId, isPublic, slug: rawSlug } = body;
+  const body = await request.json();
+  const { name, role, company, companyLogo, bio, photo, social, talkTitle, talkAbstract, track, sessionId, isPublic, slug: rawSlug } = body;
 
-    if (!name) {
-      return Response.json({ error: "El nombre es obligatorio" }, { status: 400 });
-    }
-
-    const baseSlug = rawSlug ? toSlug(rawSlug) : toSlug(name);
-    const slug = await uniqueSlug(baseSlug);
-
-    const profile = await SpeakerProfile.create({
-      name,
-      role: role ?? "",
-      company: company ?? "",
-      companyLogo: companyLogo ?? "",
-      bio: bio ?? "",
-      photo: photo ?? "",
-      social: social ?? {},
-      talkTitle: talkTitle ?? "",
-      talkAbstract: talkAbstract ?? "",
-      track: track ?? "general",
-      sessionId: sessionId || null,
-      isPublic: isPublic ?? false,
-      slug,
-    });
-
-    revalidatePublic(SPEAKERS_TAG, AGENDA_TAG);
-
-    await createLog({
-      userId: user._id.toString(),
-      userName: user.name,
-      userRole: user.role,
-      action: "SPEAKER_PROFILE_CREATED",
-      target: name,
-      targetId: profile._id.toString(),
-      details: slug,
-    });
-
-    return Response.json({ profile }, { status: 201 });
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    if (msg === "Forbidden") return Response.json({ error: msg }, { status: 403 });
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  if (!name) {
+    return Response.json({ error: "El nombre es obligatorio" }, { status: 400 });
   }
-}
+
+  const baseSlug = rawSlug ? toSlug(rawSlug) : toSlug(name);
+  const slug = await uniqueSlug(baseSlug);
+
+  const profile = await SpeakerProfile.create({
+    name,
+    role: role ?? "",
+    company: company ?? "",
+    companyLogo: companyLogo ?? "",
+    bio: bio ?? "",
+    photo: photo ?? "",
+    social: social ?? {},
+    talkTitle: talkTitle ?? "",
+    talkAbstract: talkAbstract ?? "",
+    track: track ?? "general",
+    sessionId: sessionId || null,
+    isPublic: isPublic ?? false,
+    slug,
+  });
+
+  revalidatePublic(SPEAKERS_TAG, AGENDA_TAG);
+
+  await createLog({
+    userId: user._id.toString(),
+    userName: user.name,
+    userRole: user.role,
+    action: "SPEAKER_PROFILE_CREATED",
+    target: name,
+    targetId: profile._id.toString(),
+    details: slug,
+  });
+
+  return Response.json({ profile }, { status: 201 });
+});

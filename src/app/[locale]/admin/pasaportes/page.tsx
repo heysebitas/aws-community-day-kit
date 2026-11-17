@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import { Plus, Check, Loader2, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { Foto } from "@/components/ui/foto";
 import { useUrlFilters } from "@/hooks/use-url-filters";
 import { useConfirm } from "@/components/admin/confirm";
 
@@ -113,13 +114,13 @@ function SponsorsTab() {
               <label className="font-mono text-xs text-surface-400">Nombre del sponsor</label>
               <input value={form.sponsorName} onChange={(e) => setForm((f) => ({ ...f, sponsorName: e.target.value }))}
                 placeholder="Clouxter, Epam, AWS…"
-                className="border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 focus:border-acento focus:outline-none" />
+                className="border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm text-surface-100 focus:border-acento focus:outline-hidden" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="font-mono text-xs text-surface-400">PIN (4 dígitos)</label>
               <input value={form.pin} onChange={(e) => setForm((f) => ({ ...f, pin: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
                 placeholder="1234" maxLength={4} inputMode="numeric"
-                className="border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm tracking-[0.3em] text-surface-100 focus:border-acento focus:outline-none" />
+                className="border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm tracking-[0.3em] text-surface-100 focus:border-acento focus:outline-hidden" />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -150,8 +151,7 @@ function SponsorsTab() {
           <div key={sp._id} className={`border ${sp.isActive ? "border-surface-700" : "border-surface-800 opacity-60"} bg-surface-800 px-5 py-4 flex items-center gap-4`}>
             {sp.logoUrl ? (
               <div className="relative h-10 w-20 shrink-0 flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={sp.logoUrl} alt={sp.sponsorName} className="h-full w-full object-contain" />
+                <Foto src={sp.logoUrl} alt={sp.sponsorName} width={80} height={40} sizes="80px" className="h-full w-full object-contain" />
               </div>
             ) : (
               <div className="h-10 w-20 shrink-0 flex items-center justify-center bg-surface-700">

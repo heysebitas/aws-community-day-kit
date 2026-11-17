@@ -2,15 +2,12 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { VolunteerSubmission } from "@/models/volunteer-submission";
+import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  try {
-    await requireAccess("volunteers", "ver", ["admin", "organizer", "volunteer"]);
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export const GET = ruta(async () => {
+  await requireAccess("volunteers", "ver", ["admin", "organizer", "volunteer"]);
 
   await connectDB();
   const submissions = await VolunteerSubmission.find({ approved: true })
@@ -28,4 +25,4 @@ export async function GET() {
   volunteers.sort((a, b) => a.firstName.localeCompare(b.firstName, "es"));
 
   return NextResponse.json({ volunteers });
-}
+});

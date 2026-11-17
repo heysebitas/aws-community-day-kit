@@ -6,6 +6,7 @@ import { VolunteerSubmission } from "@/models/volunteer-submission";
 import { SpeakerProfile } from "@/models/speaker-profile";
 import { Passport } from "@/models/passport";
 import { User } from "@/models/user";
+import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -23,92 +24,86 @@ type Row = {
   photo?: string;
 };
 
-export async function GET(req: NextRequest) {
-  try {
-    await requireAuth(["admin"]);
-    await connectDB();
+export const GET = ruta(async (req: NextRequest) => {
+  await requireAuth(["admin"]);
+  await connectDB();
 
-    const q = (req.nextUrl.searchParams.get("q") ?? "").trim();
+  const q = (req.nextUrl.searchParams.get("q") ?? "").trim();
 
-    // ── Resumen ──
-    const [
-      attendees, inPerson, online, checkedIn, confirmed,
-      volunteers, volunteersApproved,
-      speakers, speakersAccepted,
-      passports, users,
-    ] = await Promise.all([
-      Registration.countDocuments({}),
-      Registration.countDocuments({ attendance: "in-person" }),
-      Registration.countDocuments({ attendance: "online" }),
-      Registration.countDocuments({ checkedIn: true }),
-      Registration.countDocuments({ "confirmation.confirmed": true }),
-      VolunteerSubmission.countDocuments({}),
-      VolunteerSubmission.countDocuments({ approved: true }),
-      SpeakerProfile.countDocuments({}),
-      SpeakerProfile.countDocuments({ status: "accepted" }),
-      Passport.countDocuments({}),
-      User.countDocuments({}),
-    ]);
+  // ── Resumen ──
+  const [
+    attendees, inPerson, online, checkedIn, confirmed,
+    volunteers, volunteersApproved,
+    speakers, speakersAccepted,
+    passports, users,
+  ] = await Promise.all([
+    Registration.countDocuments({}),
+    Registration.countDocuments({ attendance: "in-person" }),
+    Registration.countDocuments({ attendance: "online" }),
+    Registration.countDocuments({ checkedIn: true }),
+    Registration.countDocuments({ "confirmation.confirmed": true }),
+    VolunteerSubmission.countDocuments({}),
+    VolunteerSubmission.countDocuments({ approved: true }),
+    SpeakerProfile.countDocuments({}),
+    SpeakerProfile.countDocuments({ status: "accepted" }),
+    Passport.countDocuments({}),
+    User.countDocuments({}),
+  ]);
 
-    const summary = {
-      attendees, inPerson, online, checkedIn, confirmed,
-      volunteers, volunteersApproved,
-      speakers, speakersAccepted,
-      passports, users,
-    };
+  const summary = {
+    attendees, inPerson, online, checkedIn, confirmed,
+    volunteers, volunteersApproved,
+    speakers, speakersAccepted,
+    passports, users,
+  };
 
-    if (!q) return Response.json({ summary, results: [] });
+  if (!q) return Response.json({ summary, results: [] });
 
-    // ── Búsqueda ──
-    // Se escapa lo que llega: sin esto, un punto o un paréntesis en el texto
-    // cambiarían la expresión y devolverían cualquier cosa.
-    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const rx = { $regex: safe, $options: "i" };
+  // ── Búsqueda ──
+  // Se escapa lo que llega: sin esto, un punto o un paréntesis en el texto
+  // cambiarían la expresión y devolverían cualquier cosa.
+  const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const rx = { $regex: safe, $options: "i" };
 
-    const [regs, vols, spks] = await Promise.all([
-      Registration.find({
-        $or: [{ firstName: rx }, { lastName: rx }, { email: rx }, { documentNumber: rx }, { qrCode: rx }],
-      }).select("firstName lastName email attendance checkedIn qrCode").limit(15).lean(),
-      VolunteerSubmission.find({
-        $or: [{ firstName: rx }, { lastName: rx }, { email: rx }, { documentNumber: rx }],
-      }).select("firstName lastName email approved").limit(15).lean(),
-      SpeakerProfile.find({
-        $or: [{ name: rx }, { firstName: rx }, { lastName: rx }, { email: rx }],
-      }).select("name email status photo").limit(15).lean(),
-    ]);
+  const [regs, vols, spks] = await Promise.all([
+    Registration.find({
+      $or: [{ firstName: rx }, { lastName: rx }, { email: rx }, { documentNumber: rx }, { qrCode: rx }],
+    }).select("firstName lastName email attendance checkedIn qrCode").limit(15).lean(),
+    VolunteerSubmission.find({
+      $or: [{ firstName: rx }, { lastName: rx }, { email: rx }, { documentNumber: rx }],
+    }).select("firstName lastName email approved").limit(15).lean(),
+    SpeakerProfile.find({
+      $or: [{ name: rx }, { firstName: rx }, { lastName: rx }, { email: rx }],
+    }).select("name email status photo").limit(15).lean(),
+  ]);
 
-    const results: Row[] = [
-      ...regs.map((r) => ({
-        kind: "attendee" as const,
-        id: String(r._id),
-        name: `${r.firstName} ${r.lastName}`.trim(),
-        email: r.email,
-        detail: `${r.attendance === "online" ? "Online" : "Presencial"}${r.checkedIn ? " · con check-in" : ""}`,
-        seed: r.qrCode,
-      })),
-      ...vols.map((v) => ({
-        kind: "volunteer" as const,
-        id: String(v._id),
-        name: `${v.firstName} ${v.lastName}`.trim(),
-        email: v.email,
-        detail: v.approved ? "Aprobado" : "Pendiente",
-        seed: v.email,
-      })),
-      ...spks.map((s) => ({
-        kind: "speaker" as const,
-        id: String(s._id),
-        name: s.name,
-        email: s.email,
-        detail: s.status,
-        seed: s.email,
-        photo: s.photo || undefined,
-      })),
-    ];
+  const results: Row[] = [
+    ...regs.map((r) => ({
+      kind: "attendee" as const,
+      id: String(r._id),
+      name: `${r.firstName} ${r.lastName}`.trim(),
+      email: r.email,
+      detail: `${r.attendance === "online" ? "Online" : "Presencial"}${r.checkedIn ? " · con check-in" : ""}`,
+      seed: r.qrCode,
+    })),
+    ...vols.map((v) => ({
+      kind: "volunteer" as const,
+      id: String(v._id),
+      name: `${v.firstName} ${v.lastName}`.trim(),
+      email: v.email,
+      detail: v.approved ? "Aprobado" : "Pendiente",
+      seed: v.email,
+    })),
+    ...spks.map((s) => ({
+      kind: "speaker" as const,
+      id: String(s._id),
+      name: s.name,
+      email: s.email,
+      detail: s.status,
+      seed: s.email,
+      photo: s.photo || undefined,
+    })),
+  ];
 
-    return Response.json({ summary, results });
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    return Response.json({ error: msg }, { status: 403 });
-  }
-}
+  return Response.json({ summary, results });
+});

@@ -52,7 +52,7 @@ const ROLE_TONE: Record<string, "accent" | "good" | "warn" | "neutral"> = {
 
 const selectCls =
   "border-2 border-surface-500 bg-surface-800 px-3 py-2.5 font-mono text-xs text-surface-50 " +
-  "outline-none transition-colors focus:border-acento";
+  "outline-hidden transition-colors focus:border-acento";
 
 function LogsAdminPageInner() {
   const { values, set } = useUrlFilters(FILTROS);

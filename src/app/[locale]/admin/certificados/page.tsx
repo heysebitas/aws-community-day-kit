@@ -142,7 +142,7 @@ export default function CertificadosPage() {
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-surface-300" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o correo…"
-            className="w-full border-2 border-surface-600 bg-surface-700/40 py-2 pl-8 pr-8 font-mono text-xs text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none" />
+            className="w-full border-2 border-surface-600 bg-surface-700/40 py-2 pl-8 pr-8 font-mono text-xs text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden" />
           {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-300"><X className="h-3.5 w-3.5" /></button>}
         </div>
         <button onClick={toggleAll} className="flex items-center gap-1.5 font-mono text-xs text-surface-400 hover:text-surface-200 transition-colors">
@@ -221,7 +221,7 @@ export default function CertificadosPage() {
                 onChange={(e) => setTestEmail(e.target.value)}
                 placeholder="correo@para-probar.com"
                 onKeyDown={(e) => { if (e.key === "Enter") sendTest(preview.id); }}
-                className="flex-1 min-w-[180px] border-2 border-surface-600 bg-surface-900 px-3 py-1.5 font-mono text-xs text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none"
+                className="flex-1 min-w-[180px] border-2 border-surface-600 bg-surface-900 px-3 py-1.5 font-mono text-xs text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden"
               />
               <button onClick={() => sendTest(preview.id)} disabled={sendingTest}
                 className="inline-flex items-center gap-1.5 border-2 border-surface-600 bg-surface-800 px-3 py-1.5 font-mono text-xs font-semibold text-surface-200 hover:bg-surface-700 disabled:opacity-50">
@@ -252,7 +252,7 @@ export default function CertificadosPage() {
             </p>
             <input value={editName} onChange={(e) => setEditName(e.target.value)} autoFocus
               onKeyDown={(e) => { if (e.key === "Enter") saveName(); }}
-              className="border-2 border-surface-600 bg-surface-900 px-3 py-2.5 font-mono text-sm text-surface-100 focus:border-acento focus:outline-none" />
+              className="border-2 border-surface-600 bg-surface-900 px-3 py-2.5 font-mono text-sm text-surface-100 focus:border-acento focus:outline-hidden" />
             <p className="font-mono text-[10px] text-surface-300">Se imprime en MAYÚSCULAS en el certificado. Deja el nombre igual al del form para quitar el override.</p>
             <div className="flex justify-end gap-2">
               <button onClick={() => setEditing(null)} className="border-2 border-surface-600 bg-surface-800 px-4 py-2 font-mono text-xs text-surface-300 hover:bg-surface-700">Cancelar</button>

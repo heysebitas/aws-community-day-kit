@@ -19,7 +19,7 @@ export function Marca({
   soloLogoEnMovil?: boolean;
   className?: string;
 }) {
-  const { logo, alt, lineas } = EVENTO.marca;
+  const { logo, alt, lineas, logoTamano } = EVENTO.marca;
   const texto = tono === "tinta" ? "text-tinta" : "text-surface-50";
 
   return (
@@ -28,6 +28,9 @@ export function Marca({
       <img
         src={`${basePath}${logo}`}
         alt={alt}
+        // Reserva el espacio antes de que cargue el logo; `w-auto` lo ajusta a `alto`.
+        width={logoTamano?.ancho ?? 304}
+        height={logoTamano?.alto ?? 182}
         loading="eager"
         className={cn(alto, "w-auto shrink-0", tono === "tinta" && "brightness-0")}
       />

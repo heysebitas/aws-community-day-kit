@@ -204,7 +204,7 @@ export function RegistrationDetail({
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="Correo correcto…"
-                className="w-full max-w-sm border-2 border-surface-500 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-50 outline-none placeholder:text-surface-400 focus:border-acento"
+                className="w-full max-w-sm border-2 border-surface-500 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-50 outline-hidden placeholder:text-surface-400 focus:border-acento"
               />
             )}
             <HardButton

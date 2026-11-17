@@ -15,6 +15,7 @@ import { registrarTramo } from "@/models/envios-masivos";
 import { tomarCerrojo, soltarCerrojo } from "@/models/email-cerrojo";
 import { createLog } from "@/lib/log";
 import { SLUG } from "@/config";
+import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 // Armar y mandar cuatrocientos correos no entra en los 15 s por defecto.
@@ -33,7 +34,7 @@ const LIMITE_MS = 240_000;
 /** Debe superar `maxDuration`: si la función muere sin soltarlo, caduca solo. */
 const CADUCA_CERROJO_MS = 6 * 60_000;
 
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   let cerrojo: string | null = null;
   try {
     const actor = await requireAccess("correos", "editar", ["admin", "organizer"]);
@@ -250,13 +251,7 @@ export async function POST(request: NextRequest) {
       totalAudiencia: todos.length,
       motivos: [...motivos].slice(0, 5),
     });
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    if (msg === "Forbidden") return Response.json({ error: msg }, { status: 403 });
-    console.error("[campanas/enviar]", e);
-    return Response.json({ error: "Error interno" }, { status: 500 });
   } finally {
     if (cerrojo) await soltarCerrojo(cerrojo).catch(() => {});
   }
-}
+}, { etiqueta: "[campanas/enviar]" });

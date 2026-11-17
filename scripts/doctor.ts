@@ -116,6 +116,27 @@ async function main() {
     } else aviso(h.texto);
   }
 
+  console.log("\nBucket (caché de las fotos)");
+  const { configBucket, crearCliente, hayCredenciales, revisar } = await import("./cache-control-bucket.mjs");
+  const bucket = configBucket(process.env);
+  if (!bucket.bucket) aviso("Falta AWS_S3_BUCKET: el script de la cabecera no sabe a qué bucket aplicársela.");
+  if (!bucket.publicUrl) aviso("Falta AWS_S3_PUBLIC_URL: sin ella las fotos no pasan por el optimizador de imágenes (next.config.ts la lee en el build) y no se conoce la URL pública del bucket.");
+  if (bucket.bucket && bucket.publicUrl && hayCredenciales(process.env)) {
+    try {
+      // El bucket puede estar en otra red: no se queda esperando forever.
+      const { total, cambios } = await Promise.race([
+        revisar(crearCliente(bucket), bucket),
+        new Promise<never>((_, rechazar) => setTimeout(() => rechazar(new Error("el bucket no respondió a tiempo")), 15000)),
+      ]);
+      if (cambios.length) aviso(`${cambios.length} de ${total} objeto(s) sin la cabecera de caché: node scripts/cache-control-bucket.mjs --aplicar`);
+      else ok(`Los ${total} objeto(s) del bucket llevan la cabecera de caché`);
+    } catch (e) {
+      aviso(`No se pudo revisar el bucket: ${(e as Error).message}`);
+    }
+  } else if (bucket.bucket) {
+    aviso("Sin credenciales de AWS: no se comprueba el bucket ni se puede aplicar la cabecera. Ver docs/bucket.md.");
+  }
+
   console.log("\nBase de datos");
   if (!process.env.MONGODB_URI) aviso("Sin MONGODB_URI: no se buscan correos duplicados.");
   else {

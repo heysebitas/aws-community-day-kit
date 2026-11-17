@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { prepararImagen, ponerCabeceras } from "@/lib/imagen-cliente";
 
 // ── Iconos sociales ───────────────────────────────────────────────────────────
 export function LinkedInIcon({ className }: { className?: string }) {
@@ -60,7 +61,7 @@ export function TextInput({ value, onChange, onBlur, placeholder, maxLength, cla
         name={name}
         autoComplete={autoComplete}
         spellCheck={false}
-        className={cn("w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all", className)}
+        className={cn("w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-hidden focus:ring-1 focus:ring-acento/30 transition-all", className)}
       />
       {maxLength && value.length > maxLength * 0.8 && (
         <span className="absolute right-3 top-3 font-mono text-xs text-tinta/70">{value.length}/{maxLength}</span>
@@ -79,7 +80,7 @@ export function Textarea({ value, onChange, placeholder, maxLength, rows = 4 }: 
         placeholder={placeholder}
         maxLength={maxLength}
         rows={rows}
-        className="w-full resize-none border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-none focus:ring-1 focus:ring-acento/30 transition-all"
+        className="w-full resize-none border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta placeholder:text-tinta/70 focus:border-tinta focus:outline-hidden focus:ring-1 focus:ring-acento/30 transition-all"
       />
       {maxLength && (
         <span className={cn("absolute right-3 bottom-3 font-mono text-xs", value.length > maxLength * 0.9 ? "text-acento-profundo" : "text-tinta/70")}>
@@ -97,20 +98,21 @@ export function PhotoUpload({ value, onChange, className }: { value: string; onC
   const [progress, setProgress] = useState(0);
   const [err, setErr] = useState<string | null>(null);
 
-  const upload = async (file: File) => {
-    if (file.size > 8 * 1024 * 1024) { setErr("Máximo 8 MB"); return; }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) { setErr("Solo JPG, PNG o WEBP"); return; }
+  const upload = async (original: File) => {
+    if (original.size > 8 * 1024 * 1024) { setErr("Máximo 8 MB"); return; }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(original.type)) { setErr("Solo JPG, PNG o WEBP"); return; }
     setErr(null); setUploading(true); setProgress(0);
     try {
+      const file = await prepararImagen(original);
       const res = await fetch("/api/upload/public-presign", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentType: file.type, size: file.size }) });
       if (!res.ok) throw new Error("Error al obtener URL");
-      const { uploadUrl, publicUrl } = await res.json() as { uploadUrl: string; publicUrl: string };
+      const { uploadUrl, publicUrl, headers } = await res.json() as { uploadUrl: string; publicUrl: string; headers: Record<string, string> };
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.upload.addEventListener("progress", (e) => { if (e.lengthComputable) setProgress(Math.round(e.loaded / e.total * 100)); });
         xhr.addEventListener("load", () => { if (xhr.status < 300) resolve(); else reject(new Error("S3 error")); });
         xhr.addEventListener("error", () => reject(new Error("Error de red")));
-        xhr.open("PUT", uploadUrl); xhr.setRequestHeader("Content-Type", file.type); xhr.send(file);
+        xhr.open("PUT", uploadUrl); ponerCabeceras(xhr, headers); xhr.send(file);
       });
       onChange(publicUrl);
     } catch (e) { setErr((e as Error).message); }

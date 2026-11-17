@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { getIp, isBlocked, recordFail } from "@/lib/rate-limit";
 import { Passport } from "@/models/passport";
 import { SponsorPin } from "@/models/sponsor-pin";
+import { leerCuerpo } from "@/lib/cuerpo";
 
 const LIMITE = 8;
 const VENTANA = 15 * 60 * 1000;
@@ -15,7 +16,7 @@ const VENTANA = 15 * 60 * 1000;
 export async function POST(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
   try {
     const { shortId } = await params;
-    const { pin } = (await req.json()) as { pin?: unknown };
+    const { pin } = await leerCuerpo(req);
     if (!pin || typeof pin !== "string") return Response.json({ error: "PIN requerido" }, { status: 400 });
 
     const claves = [`sello:${getIp(req)}`, `sello:*:${shortId}`];

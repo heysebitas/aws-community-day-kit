@@ -1,8 +1,10 @@
 "use client";
+import { Foto } from "@/components/ui/foto";
 
 import Link from "next/link";
 
 import { useState, useEffect, use, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { avatarUrl } from "@/lib/avatar";
 import {
   Settings, Loader2,
@@ -52,7 +54,7 @@ const SOCIAL_PLATFORMS = [
   {
     id: "builderCenter" as const,
     label: "Builder Center", bg: "#232F3E",
-    placeholder: "tu-usuario", atSign: true,
+    placeholder: "user_ph", atSign: true,
     domains: ["builder.aws.com"], prefix: "builder.aws.com/community/@",
     urlFn: (u: string) => `https://builder.aws.com/community/@${u}`,
     icon: (
@@ -63,7 +65,7 @@ const SOCIAL_PLATFORMS = [
   {
     id: "linkedin" as const,
     label: "LinkedIn", bg: "#0077B5",
-    placeholder: "tu-usuario", atSign: false,
+    placeholder: "user_ph", atSign: false,
     domains: ["linkedin.com"], prefix: "linkedin.com/in/",
     urlFn: (u: string) => `https://linkedin.com/in/${u}`,
     icon: <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>,
@@ -71,7 +73,7 @@ const SOCIAL_PLATFORMS = [
   {
     id: "instagram" as const,
     label: "Instagram", bg: "#E1306C",
-    placeholder: "tu.usuario", atSign: true,
+    placeholder: "user_ph_dot", atSign: true,
     domains: ["instagram.com"], prefix: "instagram.com/",
     urlFn: (u: string) => `https://instagram.com/${u}`,
     icon: <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>,
@@ -79,7 +81,7 @@ const SOCIAL_PLATFORMS = [
   {
     id: "x" as const,
     label: "X / Twitter", bg: "#14171A",
-    placeholder: "tu_usuario", atSign: false,
+    placeholder: "user_ph_underscore", atSign: false,
     domains: ["x.com", "twitter.com"], prefix: "x.com/",
     urlFn: (u: string) => `https://x.com/${u}`,
     icon: <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
@@ -87,7 +89,7 @@ const SOCIAL_PLATFORMS = [
   {
     id: "github" as const,
     label: "GitHub", bg: "#24292f",
-    placeholder: "tu-usuario", atSign: false,
+    placeholder: "user_ph", atSign: false,
     domains: ["github.com"], prefix: "github.com/",
     urlFn: (u: string) => `https://github.com/${u}`,
     icon: <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>,
@@ -95,7 +97,7 @@ const SOCIAL_PLATFORMS = [
   {
     id: "tiktok" as const,
     label: "TikTok", bg: "#010101",
-    placeholder: "tu.usuario", atSign: true,
+    placeholder: "user_ph_dot", atSign: true,
     domains: ["tiktok.com"], prefix: "tiktok.com/@",
     urlFn: (u: string) => `https://tiktok.com/@${u}`,
     icon: <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.77 1.52V6.77a4.85 4.85 0 0 1-1-.08z"/></svg>,
@@ -125,9 +127,10 @@ function cleanUsername(raw: string): string | null {
   return /^[A-Za-z0-9._-]{1,60}$/.test(u) ? u : null;
 }
 
+/** El rol se muestra con el texto del idioma; «speaker» se dice igual. */
 const ROLE_LABEL: Record<string, string> = {
-  attendee: "Asistente", speaker: "Speaker",
-  volunteer: "Voluntario", organizer: "Organizador",
+  attendee: "role_attendee", speaker: "role_speaker",
+  volunteer: "role_volunteer", organizer: "role_organizer",
 };
 const ROLE_STYLE: Record<string, { bg: string; text: string; border: string }> = {
   attendee:  { bg: "rgba(14,165,233,.12)",  text: "#7dd3fc", border: "rgba(14,165,233,.3)"  },
@@ -175,8 +178,7 @@ function StampItem({ sponsor, collected }: { sponsor: Sponsor; collected: boolea
         transition: "all .5s cubic-bezier(.34,1.56,.64,1)",
       }}>
         {sponsor.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={sponsor.logoUrl} alt={sponsor.sponsorName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          <Foto src={sponsor.logoUrl} alt={sponsor.sponsorName} width={120} height={120} sizes="120px" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         ) : (
           <span style={{ fontFamily: "monospace", fontSize: 8, color: "#6b7280", textAlign: "center", lineHeight: 1.2 }}>
             {sponsor.sponsorName}
@@ -216,7 +218,7 @@ function PinDigits({ digits, onChange, hasError, disabled }: {
           style={{
             width: 52, height: 56, textAlign: "center",
             fontFamily: "monospace", fontSize: 22, fontWeight: 700,
-            color: "#f9fafb", borderRadius: 14,
+            color: "var(--color-surface-50)", borderRadius: 14,
             border: hasError ? "1.5px solid rgba(239,68,68,.5)" : d ? "1.5px solid rgb(var(--tema-acento-rgb) / .7)" : "1.5px solid rgba(255,255,255,.12)",
             background: hasError ? "rgba(239,68,68,.05)" : d ? "rgb(var(--tema-acento-rgb) / .06)" : "rgba(255,255,255,.04)",
             outline: "none", transition: "all .2s",
@@ -231,6 +233,7 @@ function PinDigits({ digits, onChange, hasError, disabled }: {
 /* ══════ MAIN PAGE ══════ */
 export default function PasaportePage({ params }: { params: Promise<{ shortId: string }> }) {
   const { shortId } = use(params);
+  const t = useTranslations("Passport");
 
   const [passport, setPassport]   = useState<PassportData | null>(null);
   const [sponsors, setSponsors]   = useState<Sponsor[]>([]);
@@ -283,7 +286,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
           setSocialDraft({ builderCenter: s.builderCenter ?? "", linkedin: s.linkedin ?? "", instagram: s.instagram ?? "", x: s.x ?? "", github: s.github ?? "", tiktok: s.tiktok ?? "" });
         }
       }
-      if (res.status === 429 || data.rateLimited) { setPinBlocked(true); setPinError(data.error ?? "Demasiados intentos."); }
+      if (res.status === 429 || data.rateLimited) { setPinBlocked(true); setPinError(data.error ?? t("too_many")); }
       else if (withPin && !data.isOwner && data.pinError) { setPinError(data.pinError); if (data.rateLimited) { setPinBlocked(true); clearOwnerCookie(); } }
     } catch { setNotFound(true); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -343,14 +346,14 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
       const res  = await fetch(`/api/passport/${shortId}/stamp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pin }) });
       const data = await res.json();
       if (res.ok) {
-        setStampResult({ ok: true, msg: `¡Sello de ${data.sponsorName} añadido!` });
+        setStampResult({ ok: true, msg: t("stamp_added", { sponsor: data.sponsorName }) });
         const sv = readOwnerCookie(); if (sv) await loadPassport(sv);
         setTimeout(() => { setShowStampModal(false); setStampResult(null); setStampDigits(["","","",""]); }, 2000);
       } else {
         setStampResult({ ok: false, msg: data.error || "PIN incorrecto" });
         setStampDigits(["","","",""]);
       }
-    } catch { setStampResult({ ok: false, msg: "Error de conexión" }); setStampDigits(["","","",""]); }
+    } catch { setStampResult({ ok: false, msg: t("connection_error") }); setStampDigits(["","","",""]); }
     finally { setStamping(false); }
   }
 
@@ -383,9 +386,9 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
     try {
       const res  = await fetch(`/api/passport/${shortId}/stamp`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pin: p }) });
       const data = await res.json();
-      if (res.ok) { setStampResult({ ok: true, msg: `¡Sello de ${data.sponsorName} añadido!` }); setStampDigits(["","","",""]); const sv = readOwnerCookie(); if (sv) await loadPassport(sv); }
-      else        { setStampResult({ ok: false, msg: data.error || "Error al canjear" }); setStampDigits(["","","",""]); }
-    } catch { setStampResult({ ok: false, msg: "Error de conexión" }); }
+      if (res.ok) { setStampResult({ ok: true, msg: t("stamp_added", { sponsor: data.sponsorName }) }); setStampDigits(["","","",""]); const sv = readOwnerCookie(); if (sv) await loadPassport(sv); }
+      else        { setStampResult({ ok: false, msg: data.error || t("redeem_error") }); setStampDigits(["","","",""]); }
+    } catch { setStampResult({ ok: false, msg: t("connection_error") }); }
     finally { setStamping(false); }
   }
 
@@ -420,10 +423,10 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
     let username: string | null;
     if (addMode === "link") {
       username = usernameFromLink(plat, addInput);
-      if (!username) { setAddError(`Ese enlace no parece de ${plat.label}.`); return; }
+      if (!username) { setAddError(t("bad_link", { platform: plat.label })); return; }
     } else {
       username = cleanUsername(addInput);
-      if (!username) { setAddError("Usuario inválido — sin espacios ni @, solo letras/números . _ -"); return; }
+      if (!username) { setAddError(t("bad_user")); return; }
     }
     setSocialDraft((d) => ({ ...d, [addingPlatform]: username! }));
     setAddingPlatform(null);
@@ -433,10 +436,10 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
   if (loading) return (
     <>
       <style>{ANIM_CSS}</style>
-      <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080a0f" }}>
+      <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-surface-900)" }}>
         <div style={{ textAlign: "center" }}>
           <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid transparent", borderTopColor: "var(--color-acento)", animation: "spin 1s linear infinite", margin: "0 auto 14px" }} />
-          <p style={{ fontFamily: "monospace", fontSize: 9, letterSpacing: "0.3em", color: "#374151", textTransform: "uppercase" }}>Cargando pasaporte</p>
+          <p style={{ fontFamily: "monospace", fontSize: 9, letterSpacing: "0.3em", color: "#374151", textTransform: "uppercase" }}>{t("loading")}</p>
         </div>
       </div>
     </>
@@ -445,10 +448,10 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
   if (notFound) return (
     <>
       <style>{ANIM_CSS}</style>
-      <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080a0f" }}>
+      <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-surface-900)" }}>
         <div style={{ textAlign: "center", padding: "0 24px" }}>
-          <p style={{ fontFamily: "monospace", fontSize: 16, fontWeight: 700, color: "#f9fafb", marginBottom: 8 }}>Pasaporte no encontrado</p>
-          <p style={{ fontFamily: "monospace", fontSize: 11, color: "#4b5563" }}>Verifica el código QR de tu escarapela.</p>
+          <p style={{ fontFamily: "monospace", fontSize: 16, fontWeight: 700, color: "var(--color-surface-50)", marginBottom: 8 }}>{t("not_found")}</p>
+          <p style={{ fontFamily: "monospace", fontSize: 11, color: "#4b5563" }}>{t("not_found_hint")}</p>
         </div>
       </div>
     </>
@@ -475,7 +478,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
       <style>{ANIM_CSS}</style>
 
       {/* ═══ PAGE SHELL ═══ */}
-      <main style={{ minHeight: "100svh", background: "#080a0f", overflowX: "hidden", paddingBottom: 64 }}>
+      <main style={{ minHeight: "100svh", background: "var(--color-surface-900)", overflowX: "hidden", paddingBottom: 64 }}>
 
         {/* Ambient glow — orange top */}
         <div style={{ position: "fixed", top: "12%", left: "50%", width: 520, height: 420, pointerEvents: "none", background: "radial-gradient(ellipse at center, rgb(var(--tema-acento-rgb) / .065) 0%, transparent 68%)", animation: "breathe 5s ease-in-out infinite" }} />
@@ -577,7 +580,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                     padding: "8px 14px", borderRadius: 20, cursor: isOwner ? "default" : "pointer",
                     border: isOwner ? "1px solid rgba(52,211,153,.45)" : "1px solid rgba(255,255,255,.3)",
                     background: isOwner ? "rgba(52,211,153,.12)" : "rgba(255,255,255,.1)",
-                    color: isOwner ? "#6ee7b7" : "#f9fafb",
+                    color: isOwner ? "#6ee7b7" : "var(--color-surface-50)",
                     animation: isOwner ? "owner-pulse 2s ease-in-out infinite" : "none",
                     transition: "all .2s",
                   }}
@@ -612,10 +615,10 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
 
               {/* === NAME === */}
               <div style={{ textAlign: "center", padding: "0 20px 8px" }}>
-                <p style={{ fontSize: "clamp(30px,8.5vw,44px)", fontWeight: 900, color: "#f9fafb", letterSpacing: "-0.025em", lineHeight: .92, textTransform: "uppercase", margin: 0 }}>
+                <p style={{ fontSize: "clamp(1.875rem,8.5vw,2.75rem)", fontWeight: 900, color: "var(--color-surface-50)", letterSpacing: "-0.025em", lineHeight: .92, textTransform: "uppercase", margin: 0 }}>
                   {passport.firstName}
                 </p>
-                <p style={{ fontSize: "clamp(30px,8.5vw,44px)", fontWeight: 900, color: "var(--color-acento)", letterSpacing: "-0.025em", lineHeight: .92, textTransform: "uppercase", margin: "1px 0 0", animation: "text-glow 3s ease-in-out infinite" }}>
+                <p style={{ fontSize: "clamp(1.875rem,8.5vw,2.75rem)", fontWeight: 900, color: "var(--color-acento)", letterSpacing: "-0.025em", lineHeight: .92, textTransform: "uppercase", margin: "1px 0 0", animation: "text-glow 3s ease-in-out infinite" }}>
                   {passport.lastName}
                 </p>
 
@@ -633,7 +636,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                     background: roleStyle.bg, color: roleStyle.text,
                     border: `1px solid ${roleStyle.border}`,
                   }}>
-                    {ROLE_LABEL[passport.role] || passport.role}
+                    {ROLE_LABEL[passport.role] ? t(ROLE_LABEL[passport.role]) : passport.role}
                   </span>
                 </div>
               </div>
@@ -644,7 +647,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
               {!isOwner && (
                 <div style={{ padding: "14px 18px" }}>
                   <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#374151", textTransform: "uppercase", margin: "0 0 10px" }}>
-                    Conectar
+                    {t("connect")}
                   </p>
                   {activeSocials.length > 0 ? (
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -665,7 +668,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                     </div>
                   ) : (
                     <p style={{ fontFamily: "monospace", fontSize: 11, color: "#1f2937", textAlign: "center", padding: "6px 0" }}>
-                      Sin redes configuradas aún.
+                      {t("no_social")}
                     </p>
                   )}
                 </div>
@@ -679,15 +682,15 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                     {/* Header con toggle Editar / Ver */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                       <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.3em", color: "rgb(var(--tema-acento-rgb) / .65)", textTransform: "uppercase", margin: 0 }}>
-                        Mis redes sociales
+                        {t("my_social")}
                       </p>
                       {!editingSocial ? (
                         <button onClick={() => setEditingSocial(true)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 8, border: "1px solid rgb(var(--tema-acento-rgb) / .3)", background: "rgb(var(--tema-acento-rgb) / .08)", fontFamily: "monospace", fontSize: 10, fontWeight: 700, color: "var(--color-acento)", cursor: "pointer" }}>
-                          <Pencil style={{ width: 11, height: 11 }} /> Editar
+                          <Pencil style={{ width: 11, height: 11 }} /> {t("edit")}
                         </button>
                       ) : (
                         <button onClick={() => setEditingSocial(false)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", fontFamily: "monospace", fontSize: 10, color: "#6b7280", cursor: "pointer" }}>
-                          <Eye style={{ width: 11, height: 11 }} /> Ver
+                          <Eye style={{ width: 11, height: 11 }} /> {t("view")}
                         </button>
                       )}
                     </div>
@@ -696,8 +699,8 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                     {pendingFields.length > 0 && (
                       <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgb(var(--tema-acento-rgb) / .08)", border: "1px solid rgb(var(--tema-acento-rgb) / .28)" }}>
                         <p style={{ fontFamily: "monospace", fontSize: 10, color: "#FCD34D", margin: 0, lineHeight: 1.55 }}>
-                          Por seguridad, tus cambios en <strong>{pendingFields.join(", ")}</strong> quedaron pendientes.
-                          {pendingEmail ? <> Te enviamos un correo a <strong>{pendingEmail}</strong> para confirmarlos.</> : " Revisa tu correo para confirmarlos."}
+                          {t("pending_lead", { campos: pendingFields.join(", ") })}
+                          {pendingEmail ? ` ${t("pending_mail", { correo: pendingEmail })}` : ` ${t("pending_check_mail")}`}
                         </p>
                       </div>
                     )}
@@ -706,7 +709,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                     {unverified && pendingFields.length === 0 && (
                       <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(148,163,184,.08)", border: "1px solid rgba(148,163,184,.25)" }}>
                         <p style={{ fontFamily: "monospace", fontSize: 10, color: "#cbd5e1", margin: 0, lineHeight: 1.55 }}>
-                          Cambios guardados. No verificamos por correo porque tu pasaporte no tiene un correo asociado.
+                          {t("unverified")}
                         </p>
                       </div>
                     )}
@@ -742,20 +745,20 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                               {val.trim() ? (
                                 <>
                                   <span style={{ flex: 1, fontFamily: "monospace", fontSize: 11, color: "#e5e7eb", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{plat.atSign ? "@" : ""}{val}</span>
-                                  <button onClick={() => openAddSocial(plat.id)} style={{ padding: "5px 9px", borderRadius: 8, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.05)", fontFamily: "monospace", fontSize: 10, color: "#9ca3af", cursor: "pointer", flexShrink: 0 }}>Cambiar</button>
-                                  <button onClick={() => setSocialDraft((d) => ({ ...d, [plat.id]: "" }))} title="Quitar" style={{ display: "flex", padding: 5, borderRadius: 8, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#fca5a5", cursor: "pointer", flexShrink: 0 }}><X style={{ width: 12, height: 12 }} /></button>
+                                  <button onClick={() => openAddSocial(plat.id)} style={{ padding: "5px 9px", borderRadius: 8, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.05)", fontFamily: "monospace", fontSize: 10, color: "#9ca3af", cursor: "pointer", flexShrink: 0 }}>{t("change")}</button>
+                                  <button onClick={() => setSocialDraft((d) => ({ ...d, [plat.id]: "" }))} title={t("remove")} style={{ display: "flex", padding: 5, borderRadius: 8, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#fca5a5", cursor: "pointer", flexShrink: 0 }}><X style={{ width: 12, height: 12 }} /></button>
                                 </>
                               ) : (
                                 <>
                                   <span style={{ flex: 1, fontFamily: "monospace", fontSize: 11, color: "#4b5563" }}>{plat.label}</span>
-                                  <button onClick={() => openAddSocial(plat.id)} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgb(var(--tema-acento-rgb) / .3)", background: "rgb(var(--tema-acento-rgb) / .08)", fontFamily: "monospace", fontSize: 10, fontWeight: 700, color: "var(--color-acento)", cursor: "pointer", flexShrink: 0 }}>+ Agregar</button>
+                                  <button onClick={() => openAddSocial(plat.id)} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgb(var(--tema-acento-rgb) / .3)", background: "rgb(var(--tema-acento-rgb) / .08)", fontFamily: "monospace", fontSize: 10, fontWeight: 700, color: "var(--color-acento)", cursor: "pointer", flexShrink: 0 }}>{t("add")}</button>
                                 </>
                               )}
                             </div>
                           );
                         })}
-                        <button onClick={() => { void handleSaveSocial(); }} disabled={savingSocial} style={{ marginTop: 4, padding: "10px 0", borderRadius: 12, border: "none", background: "var(--color-acento)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "#080a0f", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: savingSocial ? .6 : 1, transition: "opacity .2s" }}>
-                          {savingSocial ? <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} /> : socialSaved ? <><Check style={{ width: 14, height: 14 }} />Guardado</> : "Guardar cambios"}
+                        <button onClick={() => { void handleSaveSocial(); }} disabled={savingSocial} style={{ marginTop: 4, padding: "10px 0", borderRadius: 12, border: "none", background: "var(--color-acento)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-surface-900)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: savingSocial ? .6 : 1, transition: "opacity .2s" }}>
+                          {savingSocial ? <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} /> : socialSaved ? <><Check style={{ width: 14, height: 14 }} />{t("saved")}</> : t("save")}
                         </button>
                       </div>
                     )}
@@ -772,7 +775,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                       onClick={() => { setShowStampModal(true); setStampDigits(["","","",""]); setStampResult(null); }}
                       style={{ width: "100%", padding: "11px 0", borderRadius: 12, border: "1px solid rgb(var(--tema-acento-rgb) / .3)", background: "rgb(var(--tema-acento-rgb) / .08)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-acento)", cursor: "pointer", letterSpacing: "0.08em" }}
                     >
-                      Canjear sello
+                      {t("redeem")}
                     </button>
                   </div>
                 </>
@@ -784,7 +787,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                   <Perf />
                   <div style={{ padding: "14px 18px" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                      <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#374151", textTransform: "uppercase", margin: 0 }}>Sellos</p>
+                      <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#374151", textTransform: "uppercase", margin: 0 }}>{t("stamps")}</p>
                       <span style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: "var(--color-acento)" }}>
                         {totalCollected}<span style={{ color: "#1f2937", fontWeight: 400 }}> / {totalSponsors}</span>
                       </span>
@@ -854,7 +857,7 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
             <div style={{ height: 2, background: "linear-gradient(90deg,var(--color-acento),#FCD34D,var(--color-acento))", backgroundSize: "200% 200%", animation: "gradient-border 3s ease infinite" }} />
             <div style={{ padding: "22px 22px 26px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                <p style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: "var(--color-acento)", letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>Canjear sello</p>
+                <p style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: "var(--color-acento)", letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>{t("redeem")}</p>
                 <button onClick={() => { setShowStampModal(false); setStampDigits(["","","",""]); setStampResult(null); }} style={{ background: "none", border: "none", color: "#4b5563", cursor: "pointer", display: "flex", padding: 4 }}>
                   <X style={{ width: 14, height: 14 }} />
                 </button>
@@ -913,15 +916,15 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                     <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, background: plat.bg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>{plat.icon}</div>
-                    <p style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "#f9fafb", margin: 0 }}>{plat.label}</p>
+                    <p style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-surface-50)", margin: 0 }}>{plat.label}</p>
                   </div>
                   <button onClick={() => setAddingPlatform(null)} style={{ background: "none", border: "none", color: "#4b5563", cursor: "pointer", display: "flex", padding: 4 }}><X style={{ width: 14, height: 14 }} /></button>
                 </div>
 
-                <p style={{ fontFamily: "monospace", fontSize: 10, color: "#6b7280", margin: "0 0 10px" }}>¿Cómo quieres agregarla?</p>
+                <p style={{ fontFamily: "monospace", fontSize: 10, color: "#6b7280", margin: "0 0 10px" }}>{t("add_how")}</p>
                 <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-                  <button onClick={() => { setAddMode("username"); setAddError(null); }} style={modeBtn(addMode === "username")}>Usuario</button>
-                  <button onClick={() => { setAddMode("link"); setAddError(null); }} style={modeBtn(addMode === "link")}>Enlace directo</button>
+                  <button onClick={() => { setAddMode("username"); setAddError(null); }} style={modeBtn(addMode === "username")}>{t("mode_user")}</button>
+                  <button onClick={() => { setAddMode("link"); setAddError(null); }} style={modeBtn(addMode === "link")}>{t("mode_link")}</button>
                 </div>
 
                 {addMode === "username" ? (
@@ -932,12 +935,12 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                         autoFocus value={addInput}
                         onChange={(e) => { setAddInput(e.target.value); setAddError(null); }}
                         onKeyDown={(e) => { if (e.key === "Enter") submitAddSocial(); }}
-                        placeholder={plat.placeholder}
+                        placeholder={t(plat.placeholder)}
                         style={{ flex: 1, padding: plat.atSign ? "9px 12px 9px 4px" : "9px 12px", border: "none", background: "transparent", fontFamily: "monospace", fontSize: 12, color: "#e5e7eb", outline: "none" }}
                       />
                     </div>
                     <p style={{ fontFamily: "monospace", fontSize: 9, color: "#374151", margin: "7px 0 0" }}>
-                      Quedará: {plat.prefix}{plat.atSign ? "" : ""}{addInput.trim() ? cleanUsername(addInput) ?? "…" : (plat.placeholder)}
+                      {t("will_be", { url: `${plat.prefix}${addInput.trim() ? cleanUsername(addInput) ?? "…" : t(plat.placeholder)}` })}
                     </p>
                   </>
                 ) : (
@@ -946,10 +949,10 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                       autoFocus type="url" value={addInput}
                       onChange={(e) => { setAddInput(e.target.value); setAddError(null); }}
                       onKeyDown={(e) => { if (e.key === "Enter") submitAddSocial(); }}
-                      placeholder={plat.urlFn("tu-usuario")}
+                      placeholder={plat.urlFn(t(plat.placeholder))}
                       style={{ width: "100%", padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", fontFamily: "monospace", fontSize: 11, color: "#e5e7eb", outline: "none" }}
                     />
-                    <p style={{ fontFamily: "monospace", fontSize: 9, color: "#374151", margin: "7px 0 0" }}>Pega el enlace de tu perfil de {plat.label}.</p>
+                    <p style={{ fontFamily: "monospace", fontSize: 9, color: "#374151", margin: "7px 0 0" }}>{t("paste_link", { plataforma: plat.label })}</p>
                   </>
                 )}
 
@@ -958,9 +961,9 @@ export default function PasaportePage({ params }: { params: Promise<{ shortId: s
                 <button
                   onClick={submitAddSocial}
                   disabled={!addInput.trim()}
-                  style={{ width: "100%", marginTop: 16, padding: "11px 0", borderRadius: 12, border: "none", background: "var(--color-acento)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "#080a0f", cursor: "pointer", opacity: addInput.trim() ? 1 : .4, transition: "opacity .2s" }}
+                  style={{ width: "100%", marginTop: 16, padding: "11px 0", borderRadius: 12, border: "none", background: "var(--color-acento)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-surface-900)", cursor: "pointer", opacity: addInput.trim() ? 1 : .4, transition: "opacity .2s" }}
                 >
-                  {addMode === "link" ? "Validar y agregar" : "Agregar"}
+                  {addMode === "link" ? t("validate_add") : t("add_short")}
                 </button>
               </div>
             </div>

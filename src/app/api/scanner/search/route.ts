@@ -3,18 +3,15 @@ import { connectDB } from "@/lib/db";
 import { requireAnyAccess } from "@/lib/auth";
 import { Passport } from "@/models/passport";
 import { Registration, filtroDeBusqueda } from "@/models/registration";
+import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 // Búsqueda de respaldo para los escáneres (salas / almuerzos / badges): busca
 // pasaportes por nombre, apellido, empresa o cualquier dato del registro
 // (p. ej. número de documento). Devuelve el shortId para registrar manualmente.
-export async function GET(req: NextRequest) {
-  try {
-    await requireAnyAccess(["checkin", "escaner_checkin", "escaner_salas", "escaner_almuerzos", "escaner_badges"], "ver", ["admin", "organizer", "volunteer"]);
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export const GET = ruta(async (req: NextRequest) => {
+  await requireAnyAccess(["checkin", "escaner_checkin", "escaner_salas", "escaner_almuerzos", "escaner_badges"], "ver", ["admin", "organizer", "volunteer"]);
 
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) return NextResponse.json({ results: [] });
@@ -39,4 +36,4 @@ export async function GET(req: NextRequest) {
   }));
 
   return NextResponse.json({ results });
-}
+});

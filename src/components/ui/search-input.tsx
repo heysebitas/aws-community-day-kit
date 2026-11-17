@@ -21,7 +21,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           className={cn(
             "min-h-11 w-full border-2 border-surface-600 bg-surface-800 py-2.5 pl-10 pr-3",
             "font-mono text-sm text-surface-100 placeholder:text-surface-400",
-            "outline-none transition-colors focus:border-acento",
+            "outline-hidden transition-colors focus:border-acento",
           )}
           onChange={(e) => {
             onChange?.(e);

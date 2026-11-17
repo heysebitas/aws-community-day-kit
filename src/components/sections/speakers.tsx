@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { esTrack, trackCorto, trackPublico } from "@/data/session-tracks";
 import Link from "next/link";
-import Image from "next/image";
+import { Foto } from "@/components/ui/foto";
 import { motion } from "motion/react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
@@ -105,7 +105,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
         <Link href={href} className="mx-6 mt-6 block shrink-0">
           <div className="relative aspect-square overflow-hidden border-2 border-surface-600">
             {profile.photo ? (
-              <Image
+              <Foto
                 src={profile.photo}
                 alt={profile.name}
                 fill
@@ -134,10 +134,11 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
           {/* Company logo OR track badge — always same height */}
           <Link href={href} className="mt-3 flex shrink-0 min-h-[56px] items-center justify-center">
             {profile.companyLogo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Foto
                 src={profile.companyLogo}
                 alt="Company"
+                width={140}
+                height={48}
                 className="max-h-[48px] w-auto max-w-[140px] object-contain opacity-60 transition-opacity duration-300 group-hover:opacity-100"
               />
             ) : esTrack(profile.track) ? (

@@ -106,7 +106,7 @@ export function SuccessScreen({
   };
 
   return (
-    <main className="form-block flex min-h-screen flex-col bg-acento pt-28">
+    <main className="form-block flex min-h-svh flex-col bg-acento pt-28">
       <div className="mx-auto w-full max-w-5xl flex-1 px-5 pb-20">
         {/* El avión entra girando: es lo primero que se mueve al cargar, y
             sigue el ratón de arriba abajo. */}

@@ -43,7 +43,7 @@ export function NotFoundScreen({ textos }: { textos: TextosNoEncontrado }) {
   const cinta = `404 · ${EVENTO.nombre} ${EVENTO.anio} ·`;
 
   return (
-    <main className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-surface-900">
+    <main className="relative flex min-h-svh flex-col justify-center overflow-hidden bg-surface-900">
       <Cinta texto={cinta} className="top-20" />
       <Cinta texto={cinta} invertida className="bottom-16" />
 

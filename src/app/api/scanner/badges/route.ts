@@ -2,18 +2,13 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { SponsorPin } from "@/models/sponsor-pin";
+import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 // Badges (SponsorPin activos) que el usuario actual puede dar. Admin = todos.
-export async function GET() {
-  let user;
-  try {
-    user = await requireAccess("escaner_badges", "ver", ["admin", "organizer", "volunteer", "badges"]);
-  } catch (e) {
-    const msg = (e as Error).message;
-    return NextResponse.json({ error: msg }, { status: msg === "Forbidden" ? 403 : 401 });
-  }
+export const GET = ruta(async () => {
+  const user = await requireAccess("escaner_badges", "ver", ["admin", "organizer", "volunteer", "badges"]);
 
   await connectDB();
   const all = await SponsorPin.find({ isActive: true })
@@ -26,4 +21,4 @@ export async function GET() {
 
   const allowed = new Set((user.allowedBadges ?? []).map(String));
   return NextResponse.json({ badges: list.filter((b) => allowed.has(b.id)) });
-}
+});

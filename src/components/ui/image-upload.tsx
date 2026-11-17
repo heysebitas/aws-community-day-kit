@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Upload, X, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { prepararImagen, ponerCabeceras } from "@/lib/imagen-cliente";
 
 interface ImageUploadProps {
   value: string;
@@ -27,8 +28,9 @@ export function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
 
-  const upload = async (file: File) => {
+  const upload = async (original: File) => {
     setError(null);
+    let file = original;
 
     if (file.size > 5 * 1024 * 1024) {
       setError("Máximo 5 MB");
@@ -45,6 +47,7 @@ export function ImageUpload({
     setProgress(0);
 
     try {
+      file = await prepararImagen(file);
       // 1. Get presigned URL
       const res = await fetch("/api/upload/presign", {
         method: "POST",
@@ -57,7 +60,7 @@ export function ImageUpload({
         throw new Error(d.error || "Error al obtener URL");
       }
 
-      const { uploadUrl, publicUrl } = await res.json();
+      const { uploadUrl, publicUrl, headers } = await res.json();
 
       // 2. Upload directly to S3
       await new Promise<void>((resolve, reject) => {
@@ -71,7 +74,7 @@ export function ImageUpload({
         });
         xhr.addEventListener("error", () => reject(new Error("Error de red")));
         xhr.open("PUT", uploadUrl);
-        xhr.setRequestHeader("Content-Type", file.type);
+        ponerCabeceras(xhr, headers);
         xhr.send(file);
       });
 

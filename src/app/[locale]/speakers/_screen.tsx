@@ -360,14 +360,14 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
   // ── Estado del Call for Speakers (controlado desde el admin) ────────────────
   if (cfsOpen === null) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-surface-900">
+      <main className="flex min-h-svh items-center justify-center bg-surface-900">
         <Loader2 className="h-8 w-8 animate-spin text-acento" />
       </main>
     );
   }
   if (cfsOpen === false) {
     return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface-900 px-6 py-24">
+      <main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-surface-900 px-6 py-24">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,rgb(var(--tema-acento-rgb)_/_0.07),transparent)]" />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -435,7 +435,7 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
     // del formulario llega hasta el final de la página.
     <div
       className={cn(
-        "min-h-screen bg-surface-900",
+        "min-h-svh bg-surface-900",
         // El navbar es fijo y mide 80px. En /speakers arriba va la seccion de
         // bases, cuyo relleno movil es de esos mismos 80px: quedaba separacion
         // cero y el titular se pegaba a la barra, asi que se suman 32px. En
@@ -947,8 +947,8 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                       {/* Code of conduct */}
                       <label className={cn("flex cursor-pointer items-start gap-3 border-2 p-3.5 transition-all", form.codeOfConduct ? "border-tinta bg-tinta/5" : "border-tinta/75 bg-papel/80 hover:border-tinta")}>
                         <div className="relative mt-0.5 shrink-0">
-                          <input type="checkbox" checked={form.codeOfConduct} onChange={(e) => { set("codeOfConduct", e.target.checked); clearErr("codeOfConduct"); }} className="sr-only" />
-                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all", form.codeOfConduct ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
+                          <input type="checkbox" checked={form.codeOfConduct} onChange={(e) => { set("codeOfConduct", e.target.checked); clearErr("codeOfConduct"); }} className="peer sr-only" />
+                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-tinta", form.codeOfConduct ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
                             {form.codeOfConduct && <CheckCircle2 className="h-3 w-3 text-acento" />}
                           </div>
                         </div>
@@ -962,8 +962,8 @@ export function SpeakersScreen({ formOnly = false }: { formOnly?: boolean }) {
                       {/* Privacy */}
                       <label className={cn("flex cursor-pointer items-start gap-3 border-2 p-3.5 transition-all", form.consent ? "border-tinta bg-tinta/5" : "border-tinta/75 bg-papel/80 hover:border-tinta")}>
                         <div className="relative mt-0.5 shrink-0">
-                          <input type="checkbox" checked={form.consent} onChange={(e) => { set("consent", e.target.checked); clearErr("consent"); }} className="sr-only" />
-                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all", form.consent ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
+                          <input type="checkbox" checked={form.consent} onChange={(e) => { set("consent", e.target.checked); clearErr("consent"); }} className="peer sr-only" />
+                          <div className={cn("flex h-5 w-5 items-center justify-center border-2 transition-all peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-tinta", form.consent ? "border-tinta bg-tinta" : "border-tinta/75 bg-papel")}>
                             {form.consent && <CheckCircle2 className="h-3 w-3 text-acento" />}
                           </div>
                         </div>

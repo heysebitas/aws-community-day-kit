@@ -99,7 +99,7 @@ function Caja({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md border-2 border-acento bg-surface-800 shadow-[8px_8px_0_0_var(--color-acento-fuerte)] outline-none"
+        className="w-full max-w-md border-2 border-acento bg-surface-800 shadow-[8px_8px_0_0_var(--color-acento-fuerte)] outline-hidden"
       >
         <div className="flex items-center gap-2 border-b-2 border-acento/60 px-4 py-3">
           <Pencil className="h-4 w-4 shrink-0 text-acento" />
@@ -123,7 +123,7 @@ function Caja({
               // campo que se abre con el foco dentro.
               if (e.key === "Enter") { e.preventDefault(); aceptar(); }
             }}
-            className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-300 outline-none transition-colors focus:border-acento"
+            className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-300 outline-hidden transition-colors focus:border-acento"
           />
 
           {error && <p className="m-0 font-mono text-[11px] text-red-400">{error}</p>}

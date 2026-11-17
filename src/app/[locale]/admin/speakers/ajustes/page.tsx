@@ -76,9 +76,9 @@ export default function AjustesSpeakersPage() {
         body: JSON.stringify({ key, size: file.size }),
       });
       if (!res.ok) throw new Error("No se pudo preparar la subida");
-      const { uploadUrl, publicUrl } = (await res.json()) as { uploadUrl: string; publicUrl: string };
+      const { uploadUrl, publicUrl, headers } = (await res.json()) as { uploadUrl: string; publicUrl: string; headers: Record<string, string> };
       const put = await fetch(uploadUrl, {
-        method: "PUT", headers: { "Content-Type": "application/pdf" }, body: file,
+        method: "PUT", headers, body: file,
       });
       if (!put.ok) throw new Error("No se pudo subir el archivo");
       await fetch("/api/settings", {

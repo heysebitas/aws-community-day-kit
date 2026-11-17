@@ -2,17 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAnyAccess } from "@/lib/auth";
 import { Registration, filtroDeBusqueda } from "@/models/registration";
+import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 // Búsqueda de respaldo para el check-in manual: busca por el inicio de una
 // palabra del nombre, apellido, correo, documento o QR, con el índice `busqueda`.
-export async function GET(req: NextRequest) {
-  try {
-    await requireAnyAccess(["checkin", "escaner_checkin"], "ver", ["admin", "organizer", "volunteer"]);
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export const GET = ruta(async (req: NextRequest) => {
+  await requireAnyAccess(["checkin", "escaner_checkin"], "ver", ["admin", "organizer", "volunteer"]);
 
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) return NextResponse.json({ results: [] });
@@ -45,4 +42,4 @@ export async function GET(req: NextRequest) {
   results.sort((a, b) => Number(a.checkedIn) - Number(b.checkedIn));
 
   return NextResponse.json({ results });
-}
+});

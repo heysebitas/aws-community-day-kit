@@ -6,6 +6,8 @@ import { createLog } from "@/lib/log";
 import { sendEmail, MARKETING_EMAIL_FROM } from "@/lib/correo";
 import { armarCorreo } from "@/lib/email-plantillas";
 import type { ProfileStatus } from "@/models/speaker-profile";
+import { ruta } from "@/lib/api";
+import { leerCuerpo, textoDe } from "@/lib/cuerpo";
 
 /** La marca que impide que la campaña en masa vuelva a escribirle. */
 const CAMPANA_RECHAZO = "speaker_rejection";
@@ -14,21 +16,16 @@ export const dynamic = "force-dynamic";
 
 const ALLOWED: ProfileStatus[] = ["submitted", "reviewing", "waitlisted", "rejected"];
 
-export async function PATCH(
+export const PATCH = ruta(async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
-) {
-  try { await requireAccess("speakers", "editar", ["admin", "organizer"]); }
-  catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    return Response.json({ error: msg }, { status: 403 });
-  }
+) => {
+  await requireAccess("speakers", "editar", ["admin", "organizer"]);
 
   const { id } = await params;
-  const { status } = await request.json() as { status: ProfileStatus };
+  const status = textoDe(await leerCuerpo(request), "status") as ProfileStatus | null;
 
-  if (!ALLOWED.includes(status)) {
+  if (!status || !ALLOWED.includes(status)) {
     return Response.json({ error: "Status inválido. Usa el endpoint /approve para aceptar." }, { status: 400 });
   }
 
@@ -83,4 +80,4 @@ export async function PATCH(
   });
 
   return Response.json({ ok: true, status, correoEnviado, yaAvisado });
-}
+});

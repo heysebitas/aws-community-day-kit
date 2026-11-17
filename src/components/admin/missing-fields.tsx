@@ -8,7 +8,7 @@ import { DOCUMENTOS, ROLES, ENTIDADES } from "@/config";
 
 const inputCls =
   "w-full border-2 border-surface-500 bg-surface-900 px-3 py-2.5 font-mono text-sm " +
-  "text-surface-50 outline-none transition-colors focus:border-acento";
+  "text-surface-50 outline-hidden transition-colors focus:border-acento";
 
 function Campo({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (

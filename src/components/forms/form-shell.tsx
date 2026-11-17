@@ -33,7 +33,7 @@ export function FormShell({
 }) {
   const tCinta = useTranslations("Strip");
   return (
-    <main className="form-block flex min-h-screen flex-col bg-acento pt-28">
+    <main className="form-block flex min-h-svh flex-col bg-acento pt-28">
       <div className={cn("mx-auto w-full max-w-6xl flex-1 px-5", className)}>
         {/* Cabecera */}
         <motion.div

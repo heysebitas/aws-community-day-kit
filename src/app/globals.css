@@ -22,6 +22,8 @@
   --tema-claro: #FFC266;
   --tema-fuerte: #E88B00;
   --tema-profundo: #6B3300;
+  /* Sitio oscuro: controles nativos y barra de desplazamiento también. */
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -196,10 +198,25 @@ body {
   font-family: var(--font-sans), ui-monospace, monospace;
 }
 
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--color-surface-900); }
-::-webkit-scrollbar-thumb { background: var(--color-surface-600); }
-::-webkit-scrollbar-thumb:hover { background: var(--color-surface-500); }
+/* Safari no entiende `scrollbar-color`: ahí queda la barra de webkit. */
+html { scrollbar-color: var(--color-surface-600) var(--color-surface-900); }
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--color-surface-900); }
+  ::-webkit-scrollbar-thumb { background: var(--color-surface-600); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-surface-500); }
+}
+
+/* Foco sólo con teclado; los controles con borde propio lo anulan con `outline-hidden`. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.font-display,
+.dot-matrix { text-wrap: balance; }
 
 ::selection {
   background: rgb(var(--tema-acento-rgb) / 0.3);
@@ -238,6 +255,7 @@ html:not(.js) .scroll-reveal {
    mismas primitivas en oscuro. En vez de un prop `tone` en cada una, todo lo
    que cae dentro de `.form-block` se repinta. */
 .form-block {
+  color-scheme: light;
   color: var(--color-tinta);
 }
 

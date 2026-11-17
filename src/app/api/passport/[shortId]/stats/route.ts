@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Passport } from "@/models/passport";
 import { rateLimit, getIp } from "@/lib/rate-limit";
+import { leerCuerpo } from "@/lib/cuerpo";
 
 const DIA = 24 * 60 * 60 * 1000;
 const HORA = 60 * 60 * 1000;
@@ -13,7 +14,7 @@ const REDES = ["builderCenter", "linkedin", "instagram", "x", "github", "tiktok"
 export async function POST(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
   try {
     const { shortId } = await params;
-    const { event, platform } = (await req.json()) as { event?: unknown; platform?: unknown };
+    const { event, platform } = await leerCuerpo(req);
     const ip = getIp(req);
 
     if (event === "view") {

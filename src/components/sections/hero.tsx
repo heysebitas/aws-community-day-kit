@@ -74,7 +74,7 @@ export function Hero() {
   const confirmada = EVENTO.fecha.confirmada;
 
   return (
-    <section id="home" className="relative flex min-h-screen flex-col overflow-hidden bg-surface-900">
+    <section id="home" className="relative flex min-h-svh flex-col overflow-hidden bg-surface-900">
       <div className="relative z-10 mx-auto grid w-full max-w-[1240px] flex-1 grid-cols-1 items-center gap-8 px-6 pb-10 pt-28 lg:grid-cols-[1.05fr_0.95fr] lg:gap-4">
         <div className="order-2 lg:order-1">
           <motion.p
@@ -92,7 +92,7 @@ export function Hero() {
             initial={{ y: 24 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.08, ease }}
-            className="mt-4 font-display text-[13vw] font-medium lowercase leading-[0.85] tracking-tighter text-surface-50 sm:text-[10vw] lg:text-[6.4vw] xl:text-[86px]"
+            className="mt-4 font-display text-[13vw] font-medium lowercase leading-[0.85] tracking-tighter text-surface-50 sm:text-[10vw] lg:text-[6.4vw] xl:text-[5.375rem]"
           >
             {arriba}
             {abajo && (
@@ -203,8 +203,8 @@ export function Hero() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ scale: 0.94 }}
+          animate={{ scale: 1 }}
           transition={{ duration: 1.1, delay: 0.15, ease }}
           className="order-1 lg:order-2"
         >

@@ -72,7 +72,7 @@ function Caja({ opts, onAnswer }: { opts: ConfirmOptions; onAnswer: (value: bool
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`w-full max-w-md border-2 bg-surface-800 outline-none ${
+        className={`w-full max-w-md border-2 bg-surface-800 outline-hidden ${
           danger ? "border-red-500 shadow-[8px_8px_0_0_rgba(239,68,68,0.35)]" : "border-acento shadow-[8px_8px_0_0_var(--color-acento-fuerte)]"
         }`}
       >

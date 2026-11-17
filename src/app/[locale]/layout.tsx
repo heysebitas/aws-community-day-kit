@@ -19,6 +19,7 @@ import { cfpAbierto } from "@/hooks/cfp-abierto";
 import { EventConfigProvider } from "@/components/providers/event-config-provider";
 import { EventJsonLd } from "@/components/seo/json-ld";
 import { BfcacheReset } from "@/components/effects/bfcache-reset";
+import { reglasEspeculativas } from "@/lib/speculation-rules";
 import { contacto } from "@evento/contacto";
 
 type Props = {
@@ -130,6 +131,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         </a>
         {DEMO && <script dangerouslySetInnerHTML={{ __html: VISTA_PREVIA_TEMA }} />}
         <BfcacheReset />
+        <script type="speculationrules" dangerouslySetInnerHTML={{ __html: JSON.stringify(reglasEspeculativas()) }} />
         <NextIntlClientProvider messages={pick(mensajes, MENSAJES_COMUN)}>
           <EventConfigProvider value={config}>
             <SiteChrome
@@ -137,7 +139,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               footer={<Footer locale={locale} />}
               jsonLd={<EventJsonLd locale={locale} />}
             >
-              <div id="contenido" tabIndex={-1} className="outline-none">
+              <div id="contenido" tabIndex={-1} className="outline-hidden">
                 {children}
               </div>
             </SiteChrome>

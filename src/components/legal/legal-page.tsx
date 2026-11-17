@@ -25,7 +25,7 @@ export async function LegalPage({
   const t = await getTranslations("Forms");
 
   return (
-    <main className="form-block flex min-h-screen flex-col bg-acento pt-28">
+    <main className="form-block flex min-h-svh flex-col bg-acento pt-28">
       <div className="mx-auto w-full max-w-6xl flex-1 px-5 pb-20">
         {/* Cabecera */}
         <header className="mb-12 border-b-2 border-tinta/25 pb-8">

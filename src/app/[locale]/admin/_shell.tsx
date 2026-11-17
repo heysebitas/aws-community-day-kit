@@ -46,12 +46,12 @@ function AdminGate({ children }: { children: React.ReactNode }) {
 
   // Public admin pages (login, create-password) render without sidebar
   if (isPublicPage) {
-    return <div className="min-h-screen bg-surface-900">{children}</div>;
+    return <div className="min-h-svh bg-surface-900">{children}</div>;
   }
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-surface-900 px-5">
+      <div className="flex min-h-svh items-center justify-center bg-surface-900 px-5">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-acento border-t-transparent" />
           <span className="dot-matrix text-lg leading-none text-surface-300">cargando</span>
@@ -66,7 +66,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   if (sinPermiso) return null;
 
   return (
-    <div className="min-h-screen bg-surface-900">
+    <div className="min-h-svh bg-surface-900">
       <Sidebar />
       <main className="lg:pl-64">
         {/* En movil hay que dejar libre el alto de la barra superior (3.5rem);

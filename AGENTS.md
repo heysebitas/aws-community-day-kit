@@ -34,6 +34,23 @@ npm run build
 
 El panel en modo demo: `/admin/login`, `demo@example.com` / `demo-demo-demo`.
 
+## Skills para desarrollar el kit
+
+Para **desarrollar el kit** —no para configurar una edición— sigue el
+procedimiento de la skill que corresponda. Codex, Cursor y otros asistentes
+pueden leer el mismo Markdown:
+
+| Skill | Cuándo usarla | Pasos |
+|---|---|---|
+| `kit-ruta-api` | Crear o revisar una ruta de `src/app/api/` | `.claude/skills/kit-ruta-api/SKILL.md` · `.kiro/steering/kit-ruta-api.md` |
+| `kit-medir` | Medir Lighthouse y el bundle | `.claude/skills/kit-medir/SKILL.md` · `.kiro/steering/kit-medir.md` |
+| `kit-verificar` | Dar por terminado un cambio | `.claude/skills/kit-verificar/SKILL.md` · `.kiro/steering/kit-verificar.md` |
+| `kit-texto` | Añadir o revisar textos del sitio | `.claude/skills/kit-texto/SKILL.md` · `.kiro/steering/kit-texto.md` |
+| `kit-correo` | Añadir o revisar un correo | `.claude/skills/kit-correo/SKILL.md` · `.kiro/steering/kit-correo.md` |
+
+Para revisar un diff sin tocar archivos, usa el subagente
+`.claude/agents/revisor-kit.md`.
+
 ## Mapa del código
 
 ```
@@ -56,6 +73,11 @@ docs/                   la documentación; cada tema en un archivo corto
 - **Next.js 16.** Tiene cambios respecto a versiones anteriores: el middleware
   es `src/proxy.ts` y la documentación de la versión instalada está en
   `node_modules/next/dist/docs/`. Léela antes de usar una API de la que dudes.
+- **Layouts dinámicos**: `connection()` o cualquier API dinámica (`cookies()`,
+  `headers()`) en un layout vuelve dinámico todo lo que cuelga de él; compara
+  fechas en el cliente o usa `revalidate`.
+- **Envíos masivos**: Un envío masivo registra lo enviado por tramos y lleva
+  cerrojo contra envíos simultáneos.
 - **Textos**: van en `src/messages/*.json`, en todos los idiomas a la vez (hay
   una prueba que lo exige). Los datos de la edición se escriben como
   `[[ciudad]]`, `[[fecha]]`, `[[evento]]`…; la lista está en `src/i18n/tokens.ts`.
@@ -70,11 +92,16 @@ docs/                   la documentación; cada tema en un archivo corto
 - **Sin diálogos del navegador**: nada de `alert`, `confirm` ni `prompt`. Usa
   `useToast`, `useConfirm` y `usePrompt`. Hay una prueba que lo comprueba.
 - **Correos**: una plantilla es una lista de bloques guardada en la base, con
-  su texto de fábrica en `src/emails/semilla.ts`. No se añaden correos como TSX.
+  su texto de fábrica en `src/emails/semilla.ts`. Quedan cuatro correos escritos
+  como componentes de React (`invitation`, `speaker-submission-confirmation`,
+  `passport-edit-confirm` y `volunteer-certificate`): no se añaden más, un
+  correo nuevo se hace con bloques.
 - **Seguridad**: toda ruta de `src/app/api/` que no sea pública empieza por
-  `requireAuth` / `requireAccess`. Lo público lleva límite de peticiones y, si
-  escribe, captcha. Las URL que llegan de un formulario se validan
-  (`normalizeLink`, `esDelBucket`). Detalle en `docs/seguridad.md`.
+  `requireAuth` / `requireAccess` / `requireAnyAccess` (basta con tener acceso a
+  una de varias secciones) / `requireDelete` (las que borran). Lo público lleva
+  límite de peticiones y, si escribe, captcha. Las URL que llegan de un
+  formulario se validan (`normalizeLink`, `esDelBucket`). Detalle en
+  `docs/seguridad.md`; los roles y los niveles, en `docs/panel.md`.
 - **Comentarios**: en español, cortos, y sólo para el porqué que el código no
   dice. Sin historia de cómo era antes.
 

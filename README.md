@@ -87,11 +87,17 @@ docs/            la documentación
 | Equipo, keynotes, patrocinadores, tracks | [docs/contenido.md](docs/contenido.md) |
 | Colores | [docs/temas.md](docs/temas.md) |
 | Tu país: documentos, teléfono, ley de datos | [docs/paises.md](docs/paises.md) |
+| El panel: roles, permisos y secciones | [docs/panel.md](docs/panel.md) |
+| Los datos: los modelos y cómo se relacionan | [docs/datos.md](docs/datos.md) |
 | MongoDB Atlas, Amazon DocumentDB, PostgreSQL | [docs/base-de-datos.md](docs/base-de-datos.md) |
 | Resend o Amazon SES | [docs/correo.md](docs/correo.md) |
 | Publicarlo | [docs/despliegue.md](docs/despliegue.md) |
+| El bucket de archivos y sus cabeceras | [docs/bucket.md](docs/bucket.md) |
 | Qué protege el kit y qué te toca a ti | [docs/seguridad.md](docs/seguridad.md) |
 | Cómo funciona por dentro | [docs/arquitectura.md](docs/arquitectura.md) |
+| Correr las pruebas | [docs/pruebas.md](docs/pruebas.md) |
+| Cuando algo falla | [docs/troubleshooting.md](docs/troubleshooting.md) |
+| De una edición a la siguiente, copias y limpieza | [docs/nueva-edicion.md](docs/nueva-edicion.md) |
 
 ## Participar
 

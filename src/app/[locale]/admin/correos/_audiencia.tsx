@@ -172,7 +172,7 @@ export function EditorAudiencia({
               <select
                 value={seg.publico}
                 onChange={(e) => cambiarPublico(i, e.target.value as Publico)}
-                className="min-h-8 border-2 border-surface-600 bg-surface-900 px-2 font-mono text-xs font-bold text-acento outline-none focus:border-acento"
+                className="min-h-8 border-2 border-surface-600 bg-surface-900 px-2 font-mono text-xs font-bold text-acento outline-hidden focus:border-acento"
               >
                 {PUBLICOS.map((p) => (
                   <option key={p.clave} value={p.clave}>{p.nombre}</option>

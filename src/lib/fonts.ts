@@ -26,4 +26,6 @@ export const handjet = Handjet({
   weight: "variable",
   variable: "--font-handjet",
   display: "swap",
+  // Se precarga: pinta el titular de la portada y sin preload el FCP sube unos 300 ms
+  // en móvil (medido con `npm run medir`).
 });

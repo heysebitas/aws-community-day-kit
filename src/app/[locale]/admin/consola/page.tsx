@@ -180,7 +180,7 @@ export default function ConsolaPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Nombre, correo, documento, código…"
-          className="w-full border-2 border-surface-500 bg-surface-800 py-3 pl-11 pr-4 font-mono text-sm text-surface-50 outline-none transition-colors placeholder:text-surface-400 focus:border-acento"
+          className="w-full border-2 border-surface-500 bg-surface-800 py-3 pl-11 pr-4 font-mono text-sm text-surface-50 outline-hidden transition-colors placeholder:text-surface-400 focus:border-acento"
         />
       </div>
 
@@ -293,7 +293,7 @@ export default function ConsolaPage() {
                 onChange={(e) => setWipeText(e.target.value)}
                 autoComplete="off"
                 className={cn(
-                  "w-full border-2 bg-surface-900 px-3 py-2.5 font-mono text-sm text-surface-50 outline-none transition-colors",
+                  "w-full border-2 bg-surface-900 px-3 py-2.5 font-mono text-sm text-surface-50 transition-colors",
                   fraseOk ? "border-red-500" : "border-surface-500 focus:border-surface-400",
                 )}
               />

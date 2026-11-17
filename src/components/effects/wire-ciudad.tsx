@@ -95,7 +95,11 @@ export function WireCiudad({
       encuadrar();
     };
     resize();
-    const observer = new ResizeObserver(resize);
+    // Sin tamaño no se pide fotograma: al medirse, el observador lo reanuda.
+    const observer = new ResizeObserver(() => {
+      resize();
+      if (visible && w && h && !raf) raf = requestAnimationFrame(draw);
+    });
     observer.observe(canvas);
 
     let visible = true;
@@ -111,7 +115,7 @@ export function WireCiudad({
         return;
       }
       if (!w || !h) {
-        raf = requestAnimationFrame(draw);
+        raf = 0;
         return;
       }
       ctx.clearRect(0, 0, w, h);

@@ -120,20 +120,20 @@ export function CallForSpeakers() {
     <BlockSection id="cfp" tone="block">
       {/* Head */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-8">
-        <ScrollReveal>
+        <ScrollReveal inmediato>
           <DotHeading tone="block" variant="inverted" flicker className="mb-6">
             {t("heading")}
           </DotHeading>
           <h2
             className="m-0 max-w-[16ch] font-display font-medium lowercase leading-[1.02] tracking-tight text-tinta"
-            style={{ fontSize: "clamp(28px,4vw,48px)" }}
+            style={{ fontSize: "clamp(1.75rem,4vw,3rem)" }}
           >
             {t("lead_pre")}
             <em className="not-italic text-acento-profundo">{t("lead_em")}</em>
             {t("lead_post")}
           </h2>
         </ScrollReveal>
-        <ScrollReveal delay={0.1}>
+        <ScrollReveal inmediato delay={0.1}>
           <p className="m-0 max-w-[38ch] font-mono text-base leading-relaxed text-tinta/75">
             {t("lead_desc")}
           </p>
@@ -141,7 +141,7 @@ export function CallForSpeakers() {
       </div>
 
       {/* Countdown + CTA */}
-      <ScrollReveal delay={0.15}>
+      <ScrollReveal inmediato delay={0.15}>
         <div className="mb-16 flex flex-col items-start justify-between gap-8 border-2 border-tinta p-6 md:flex-row md:items-center md:p-8">
           <DeadlineCountdown />
           <HardButton

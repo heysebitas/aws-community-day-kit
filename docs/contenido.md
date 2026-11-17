@@ -23,6 +23,11 @@ sección.
 Fotos cuadradas de 600 px o más; logos en SVG o PNG con fondo transparente,
 pensados para verse sobre negro. `npm run doctor` avisa si una ruta no existe.
 
+**Las carpetas que existen y las que creas tú.** En el kit vienen
+`public/evento/comunidades/` y `public/evento/patrocinadores/`, con los logos
+de ejemplo. Las carpetas del equipo y de los keynotes las creas tú, al subir
+la primera foto: que no existan en el repositorio es lo normal, no un error.
+
 **Tracks.** `evento/tracks.ts` es la única lista: la usan la portada, el
 formulario de speakers, la revisión de propuestas y la agenda. El `id` de un
 track queda guardado en cada propuesta, así que no lo cambies con la

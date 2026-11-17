@@ -212,7 +212,7 @@ function BulkPrintTab() {
             <div className="relative flex-1 min-w-[180px]">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-surface-300" />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre…"
-                className="w-full border-2 border-surface-600 bg-surface-700/40 py-2 pl-8 pr-8 font-mono text-xs text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none" />
+                className="w-full border-2 border-surface-600 bg-surface-700/40 py-2 pl-8 pr-8 font-mono text-xs text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden" />
               {q && <button onClick={() => setQ("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-300"><X className="h-3.5 w-3.5" /></button>}
             </div>
           </div>
@@ -225,7 +225,7 @@ function BulkPrintTab() {
               <span className="font-mono text-[11px] text-surface-300">Sin presets — {isAdmin ? "crea uno con Configurar →" : "pide a un admin que configure uno"}</span>
             ) : (
               <select value={configId} onChange={(e) => setConfigId(e.target.value)}
-                className="border-2 border-surface-600 bg-surface-900 px-2 py-1 font-mono text-xs text-surface-100 focus:outline-none">
+                className="border-2 border-surface-600 bg-surface-900 px-2 py-1 font-mono text-xs text-surface-100">
                 {configs.map((c) => <option key={c.id} value={c.id}>{c.name} · {c.widthMm}×{c.heightMm}mm{c.isDefault ? " ★" : ""}</option>)}
               </select>
             )}
@@ -410,7 +410,7 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
       <span className="font-mono text-[10px] uppercase tracking-wider text-surface-400">{label}</span>
       <input type="number" step={step} value={draft[key] as number}
         onChange={(e) => setDraft((d) => ({ ...d, [key]: Number(e.target.value) }))}
-        className="border-2 border-surface-600 bg-surface-900 px-2.5 py-2 font-mono text-sm text-surface-100 focus:border-acento focus:outline-none" />
+        className="border-2 border-surface-600 bg-surface-900 px-2.5 py-2 font-mono text-sm text-surface-100 focus:border-acento focus:outline-hidden" />
     </label>
   );
 
@@ -462,7 +462,7 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
           <label className="flex flex-col gap-1">
             <span className="font-mono text-[10px] uppercase tracking-wider text-surface-400">Nombre del preset</span>
             <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="Dymo 350 — sticker"
-              className="border-2 border-surface-600 bg-surface-900 px-2.5 py-2 font-mono text-sm text-surface-100 focus:border-acento focus:outline-none" />
+              className="border-2 border-surface-600 bg-surface-900 px-2.5 py-2 font-mono text-sm text-surface-100 focus:border-acento focus:outline-hidden" />
           </label>
           <div className="grid grid-cols-2 gap-2">
             {numField("Ancho (mm)", "widthMm", 0.1)}

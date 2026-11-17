@@ -15,6 +15,7 @@ import { PassportEditConfirmEmail } from "@/emails/passport-edit-confirm";
 import { comprobarPin, nuevoPin } from "@/lib/pin";
 import { esDelBucket } from "@/lib/subidas";
 import { maskEmail } from "@/lib/utils";
+import { leerCuerpo } from "@/lib/cuerpo";
 
 /** El pasaporte digital. */
 
@@ -112,7 +113,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
   try {
     const { shortId } = await params;
-    const body = (await req.json()) as Record<string, unknown>;
+    const body = await leerCuerpo(req);
     const { pin, photoUrl } = body;
     const social = body.social as Record<string, unknown> | undefined;
 

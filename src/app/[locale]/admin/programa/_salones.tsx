@@ -17,7 +17,7 @@ type FormSalon = typeof VACIO;
 
 const campoCls =
   "min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-4 py-2.5 font-mono text-sm " +
-  "text-surface-100 placeholder:text-surface-400 outline-none transition-colors focus:border-acento";
+  "text-surface-100 placeholder:text-surface-400 outline-hidden transition-colors focus:border-acento";
 
 const labelCls = "mb-1.5 block font-mono text-xs font-bold uppercase tracking-widest text-surface-200";
 

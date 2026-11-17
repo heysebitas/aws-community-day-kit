@@ -24,7 +24,7 @@ function LinkedinIcon({ className = "" }: { className?: string }) {
 /* ── Body content shared by both card types ── */
 function KeynoteBody({ kn, size = "sm" }: { kn: Keynote; size?: "sm" | "lg" }) {
   const padding   = size === "lg" ? "p-8 md:p-12" : "p-6 md:p-9";
-  const nameSize  = size === "lg" ? "clamp(28px,3.8vw,46px)" : "clamp(22px,3.2vw,38px)";
+  const nameSize  = size === "lg" ? "clamp(1.75rem,3.8vw,2.875rem)" : "clamp(1.375rem,3.2vw,2.375rem)";
   const roleText  = size === "lg" ? "text-base md:text-lg text-surface-300" : "text-sm text-surface-400";
   const talkTitle = size === "lg" ? "text-lg md:text-xl" : "text-base";
 
@@ -125,7 +125,7 @@ function HeadlinerCard({ kn }: { kn: Keynote }) {
             </>
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-surface-700 to-surface-900 flex items-center justify-center">
-              <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(64px,10vw,120px)" }}>
+              <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(4rem,10vw,7.5rem)" }}>
                 {kn.nombre[0]}{kn.apellido[0]}
               </span>
             </div>
@@ -172,7 +172,7 @@ function SecondaryCard({ kn }: { kn: Keynote }) {
             </>
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-surface-700 to-surface-900 flex items-center justify-center">
-              <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(48px,7vw,88px)" }}>
+              <span aria-hidden="true" className="font-mono font-bold text-surface-600 select-none" style={{ fontSize: "clamp(3rem,7vw,5.5rem)" }}>
                 {kn.nombre[0]}{kn.apellido[0]}
               </span>
             </div>
@@ -204,7 +204,7 @@ export function Keynotes() {
           </DotHeading>
           <h2
             className="font-display font-medium lowercase leading-[1.02] tracking-tight max-w-[16ch] m-0"
-            style={{ fontSize: "clamp(28px,4vw,48px)" }}
+            style={{ fontSize: "clamp(1.75rem,4vw,3rem)" }}
           >
             {t("section_pre")}
             <em className="not-italic text-acento">{t("section_em")}</em>
