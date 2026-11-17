@@ -1,0 +1,33 @@
+{
+  "tipo": "scd",
+  "nombre": "AWS Student Community Day",
+  "siglas": "SCD",
+  "pais": "MX",
+  "edicion": "México-CDMX",
+  "anio": 2026,
+  "ciudad": "Ciudad de México",
+  "organiza": "AWS Student Builder Groups México-CDMX",
+  "sitio": "https://studentcommunitydaymexico.com",
+  "inicio": "2026-11-04T09:00",
+  "fin": "2026-11-04T18:00",
+  "sede": {
+    "nombre": "Centro Histórico y Cultural «Juan de Dios Bátiz» — IPN",
+    "direccion": "Manuel Carpio, Agricultura, 11360",
+    "localidad": "Miguel Hidalgo, Ciudad de México",
+    "lat": 19.452,
+    "lon": -99.1718,
+    "mapa": "https://maps.google.com/?q=Centro+Hist%C3%B3rico+y+Cultural+Juan+de+Dios+B%C3%A1tiz+Manuel+Carpio+Agricultura+Miguel+Hidalgo+11360+CDMX",
+    "comoLlegar": "Está en el Casco de Santo Tomás del IPN, en Miguel Hidalgo: llegas en transporte público o en vehículo particular.",
+    "comoLlegarEn": "It is at IPN's Casco de Santo Tomás campus in Miguel Hidalgo: take public transport or drive."
+  },
+  "cupos": 800,
+  "presencial": true,
+  "online": false,
+  "tema": "#C143BC",
+  "idiomas": ["es", "en"],
+  "instagram": "",
+  "linkedin": "",
+  "cfpCierre": "2026-10-22T23:59",
+  "cfpSlides": "2026-11-01T23:59",
+  "contacto": { "general": "contacto@example.com", "privacidad": "privacidad@example.com", "patrocinios": "patrocinios@example.com" }
+}

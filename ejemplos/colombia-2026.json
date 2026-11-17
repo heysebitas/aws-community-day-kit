@@ -1,0 +1,33 @@
+{
+  "tipo": "scd",
+  "nombre": "AWS Student Community Day",
+  "siglas": "SCD",
+  "pais": "CO",
+  "edicion": "Colombia",
+  "anio": 2026,
+  "ciudad": "Bogotá",
+  "organiza": "AWS Student Builder Groups Colombia",
+  "sitio": "https://awsstudentcommunity.day",
+  "inicio": "2026-06-26T07:00",
+  "fin": "2026-06-26T18:00",
+  "sede": {
+    "nombre": "Cámara de Comercio de Bogotá — Sede Calle 26",
+    "direccion": "Av. El Dorado #68d-35",
+    "localidad": "Fontibón, Bogotá",
+    "lat": 4.6567,
+    "lon": -74.1094,
+    "mapa": "https://maps.google.com/?q=C%C3%A1mara+de+Comercio+de+Bogot%C3%A1",
+    "comoLlegar": "Llegas en TransMilenio por la Av. El Dorado o en vehículo particular; hay estacionamiento pago.",
+    "comoLlegarEn": "Take TransMilenio along Av. El Dorado or drive; paid parking is available."
+  },
+  "cupos": 800,
+  "presencial": true,
+  "online": true,
+  "tema": "naranja",
+  "idiomas": ["es", "en"],
+  "instagram": "https://www.instagram.com/scdcolombia",
+  "linkedin": "https://www.linkedin.com/company/aws-student-community-day-colombia",
+  "cfpCierre": "2026-06-13T23:59",
+  "cfpSlides": "2026-06-16T23:59",
+  "contacto": { "general": "contacto@example.com", "privacidad": "privacidad@example.com", "patrocinios": "patrocinios@example.com" }
+}

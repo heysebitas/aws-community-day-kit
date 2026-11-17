@@ -108,4 +108,5 @@ Issues and pull requests are welcome, in Spanish or English:
 and not endorsed by AWS. Trademarks belong to their owners and the kit grants
 no right to use them; see [NOTICE.md](NOTICE.md).
 
-Made by [Sebastián Acuña](https://github.com/heysebitas).
+Made by [Sebastián Acuña](https://github.com/heysebitas), with the improvements by
+[Juan Pablo Bedoya](https://github.com/juan52878911) that made it ready to open up.

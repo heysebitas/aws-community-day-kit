@@ -185,4 +185,5 @@ Este es un proyecto de la comunidad: no es un producto de Amazon Web Services
 ni está respaldado por AWS. Las marcas son de sus dueños y el kit no te da
 permiso para usarlas; ver [NOTICE.md](NOTICE.md).
 
-Hecho por [Sebastián Acuña](https://github.com/heysebitas).
+Hecho por [Sebastián Acuña](https://github.com/heysebitas), con las mejoras de
+[Juan Pablo Bedoya](https://github.com/juan52878911) para abrirlo al público.

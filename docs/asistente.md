@@ -89,8 +89,9 @@ deja como «Por confirmar» y se anota para el final.
 
 ## 3. Escribe la configuración
 
-Arma un `respuestas.json` con la forma de `npm run setup -- --plantilla` (hay
-uno real en `ejemplos/chile-2026.json`) y aplícalo:
+Arma un `respuestas.json` con la forma de `npm run setup -- --plantilla` y
+aplícalo. En `ejemplos/` están los de tres ediciones reales —Colombia, Chile y
+México—: copia el más parecido a lo que te contaron y cambia lo necesario.
 
 ```bash
 npm run setup -- --plantilla        # la forma del archivo
