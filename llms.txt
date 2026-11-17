@@ -1,0 +1,46 @@
+# AWS Community Day Kit
+
+> Sitio, formularios y panel de operación para un AWS Student Community Day o cualquier Community Day en Latinoamérica: registro, Call for Speakers, voluntarios, agenda, check-in con QR, pasaporte digital, correos y certificados. Next.js 16, React 19, Tailwind 4 y una base compatible con MongoDB. Una edición se configura en `evento/` sin tocar `src/`. El código y la documentación están en español. Licencia MIT.
+
+Para probarlo: `npm install && npm run demo` (base en memoria, sin cuentas). Panel en `/admin/login` con `demo@example.com` / `demo-demo-demo`.
+
+Si te piden configurar un evento, lee primero la entrevista de `docs/asistente.md`. Si te piden cambiar el código, lee `AGENTS.md`: tiene las reglas del repo y una tabla de qué leer según la tarea.
+
+## Empezar
+
+- [Guía para asistentes de IA](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/AGENTS.md): reglas del repo, comandos, mapa del código y qué leer según la tarea
+- [Configurar un evento con un asistente](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/asistente.md): la entrevista paso a paso, de las preguntas a la demo funcionando
+- [README](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/README.md): qué trae y cómo probarlo
+
+## Configurar una edición
+
+- [Configuración](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/configuracion.md): cada campo de `evento/config.ts`
+- [Contenido](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/contenido.md): equipo, keynotes, patrocinadores, tracks e imágenes
+- [Temas](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/temas.md): los ocho temas de color o uno propio
+- [Países](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/paises.md): documentos, teléfonos y leyes de datos de 20 países
+- [Correo](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/correo.md): Resend o Amazon SES, plantillas y campañas
+- [El panel](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/panel.md): roles, permisos y secciones
+
+## Publicar
+
+- [Base de datos](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/base-de-datos.md): MongoDB Atlas, Amazon DocumentDB, FerretDB y la demo en memoria
+- [Despliegue](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/despliegue.md): servidor propio, Docker y plataformas
+- [Bucket](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/bucket.md): S3 o compatible, CORS y caché
+- [Seguridad](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/seguridad.md): qué protege el kit y qué queda del lado de quien organiza
+- [Cuando algo falla](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/troubleshooting.md): instalación, captcha, bucket, correos, IP
+
+## Desarrollar el kit
+
+- [Arquitectura](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/arquitectura.md): cómo está armado por dentro
+- [Datos](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/datos.md): los modelos y cómo se relacionan
+- [Pruebas](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/pruebas.md): qué cubren y cómo correrlas
+- [Diseño](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/DESIGN.md): tokens, tipografía y reglas visuales
+- [Cómo participar](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/CONTRIBUTING.md): issues y pull requests
+
+## Optional
+
+- [Galería](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/galeria.md): capturas del sitio y del panel, en escritorio y teléfono
+- [Rendimiento](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/rendimiento.md): mediciones y presupuestos de Lighthouse
+- [CSP](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/csp.md): la política de contenido y por qué
+- [De una edición a la siguiente](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/docs/nueva-edicion.md): copias, limpieza y archivo
+- [Lo que viene](https://raw.githubusercontent.com/heysebitas/aws-community-day-kit/main/ROADMAP.md)

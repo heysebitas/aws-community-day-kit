@@ -6,7 +6,7 @@ El diseño usa un solo color de acento sobre negro. Se elige en `evento/config.t
 tema: "naranja",
 ```
 
-![Los ocho temas](img/temas.png)
+![Los ocho temas](img/temas.webp)
 
 `naranja` · `lavanda` · `platano` · `menta` · `cielo` · `coral` · `rosa` · `lima`
 

@@ -29,7 +29,9 @@ npm run demo        # el sitio en http://localhost:3000, sin configurar nada
 2. Haz el cambio. Las reglas del código caben en una página: [AGENTS.md](AGENTS.md).
 3. `npm run check` y `npm run build` tienen que pasar.
 4. Abre el PR contando **qué cambia y por qué**. Si se ve, pon una captura
-   (`node scripts/captura.mjs http://localhost:3000/ antes.png`).
+   (`node scripts/captura.mjs http://localhost:3000/ antes.png`), y si cambia
+   algo de lo que sale en [docs/galeria.md](docs/galeria.md), rehaz esas
+   capturas con `npm run galeria`.
 
 PR pequeños se revisan rápido. Si es algo grande, abre antes un issue para
 ponernos de acuerdo y no trabajar en vano.

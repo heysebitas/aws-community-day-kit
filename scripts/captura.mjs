@@ -4,6 +4,12 @@
  *
  *   node scripts/captura.mjs <url> <salida.png> [ancho=1440] [alto=900]
  *
+ * Opciones por variables de entorno:
+ *   CAPTURA_COOKIE="nombre=valor"  entra con esa cookie (p. ej. la sesión del panel)
+ *   CAPTURA_SOLO_VISTA=1           sólo lo que cabe en la ventana, no la página entera
+ *   CAPTURA_ESCALA=2               densidad de píxeles (2 = pantalla retina)
+ *   CAPTURA_ESPERA=4500            milisegundos que se espera a que la página pinte
+ *
  * Usa el Chrome instalado (o el de `CHROME=/ruta/al/chrome`) por su puerto de
  * depuración; no hace falta instalar nada. Las animaciones de entrada se
  * desactivan: en una captura no hay scroll que las dispare y el contenido
@@ -88,26 +94,35 @@ try {
   await cdp("Page.enable");
   await cdp("Runtime.enable");
   await cdp("Log.enable");
-  await cdp("Emulation.setDeviceMetricsOverride", { width: Number(ancho), height: Number(alto), deviceScaleFactor: 1, mobile: Number(ancho) < 600 });
+  const escala = Number(process.env.CAPTURA_ESCALA) || 1;
+  await cdp("Emulation.setDeviceMetricsOverride", { width: Number(ancho), height: Number(alto), deviceScaleFactor: escala, mobile: Number(ancho) < 600 });
+  if (process.env.CAPTURA_COOKIE) {
+    const [nombre, ...valor] = process.env.CAPTURA_COOKIE.split("=");
+    await cdp("Network.enable");
+    // Las `__Host-` sólo se aceptan seguras y en `/` (en localhost también, aunque sea http).
+    const segura = /^__(Host|Secure)-/.test(nombre);
+    await cdp("Network.setCookie", { name: nombre, value: valor.join("="), url, path: "/", secure: segura });
+  }
   await cdp("Page.navigate", { url });
-  await esperar(4500);
+  await esperar(Number(process.env.CAPTURA_ESPERA) || 4500);
 
   await cdp("Runtime.evaluate", {
     expression: `(() => {
       const s = document.createElement("style");
       s.textContent = "*,*::before,*::after{animation-play-state:paused!important;transition:none!important}" +
         "[style*='opacity: 0'],[style*='opacity:0']{opacity:1!important;transform:none!important;clip-path:none!important}" +
-        "[style*='clip-path']{clip-path:none!important}";
+        "[style*='clip-path']{clip-path:none!important}" +
+        "nextjs-portal{display:none!important}";
       document.head.appendChild(s);
     })()`,
   });
   await esperar(600);
 
   const { result } = await cdp("Runtime.evaluate", { expression: "document.documentElement.scrollHeight", returnByValue: true });
-  const total = Math.min(Number(result.value) || Number(alto), 16000);
+  const total = process.env.CAPTURA_SOLO_VISTA === "1" ? Number(alto) : Math.min(Number(result.value) || Number(alto), 16000);
   const { data } = await cdp("Page.captureScreenshot", {
     format: "png",
-    captureBeyondViewport: true,
+    captureBeyondViewport: process.env.CAPTURA_SOLO_VISTA !== "1",
     clip: { x: 0, y: 0, width: Number(ancho), height: total, scale: 1 },
   });
   fs.writeFileSync(salida, Buffer.from(data, "base64"));
