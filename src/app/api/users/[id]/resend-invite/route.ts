@@ -1,11 +1,10 @@
 import { NextRequest } from "next/server";
-import { render } from "@react-email/components";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { User } from "@/models/user";
 import { PasswordToken } from "@/models/password-token";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
-import { InvitationEmail } from "@/emails/invitation";
+import { armarInvitacion } from "@/lib/correo-invitacion";
 import { createLog } from "@/lib/log";
 import { SITIO } from "@/config";
 import { ruta } from "@/lib/api";
@@ -33,12 +32,12 @@ export const POST = ruta(async (request: NextRequest, { params }: { params: Prom
   const appUrl = SITIO;
   const createPasswordUrl = `${appUrl}/es/admin/create-password?token=${token}`;
 
-  const html = await render(InvitationEmail({ name: user.name, role: user.role, createPasswordUrl }));
+  const correo = await armarInvitacion(user.name, user.role, createPasswordUrl);
   await sendEmail({
     from: EMAIL_FROM,
     to: user.email,
-    subject: "Invitación — AWS Student Community Day Admin",
-    html,
+    subject: correo.asunto,
+    html: correo.html,
   });
 
   await createLog({

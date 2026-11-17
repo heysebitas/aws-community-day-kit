@@ -157,7 +157,7 @@ export default function DashboardPage() {
   // Crecimiento acumulado.
   const cumulativeData = sortedDates.reduce<{ date: string; Acumulado: number }[]>(
     (acc, date) => {
-      const prev = acc.length > 0 ? acc[acc.length - 1].Acumulado : 0;
+      const prev = acc.length > 0 ? acc[acc.length - 1]!.Acumulado : 0;
       const day = stats?.registrationsByDay?.find((d) => d.date === date)?.count || 0;
       acc.push({ date: date.slice(5), Acumulado: prev + day });
       return acc;

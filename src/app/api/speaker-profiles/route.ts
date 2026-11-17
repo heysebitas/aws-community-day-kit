@@ -6,16 +6,7 @@ import { getPublicSpeakers } from "@/lib/data/speakers";
 import { revalidatePublic, SPEAKERS_TAG, AGENDA_TAG } from "@/lib/data/revalidate";
 import { createLog } from "@/lib/log";
 import { ruta } from "@/lib/api";
-
-function toSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
-}
+import { toSlug } from "@/lib/slug";
 
 async function uniqueSlug(base: string): Promise<string> {
   let slug = base;

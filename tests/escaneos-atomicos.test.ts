@@ -68,9 +68,9 @@ describe("escaneos simultáneos", () => {
     const dup = r.filter((x) => x.status === 409);
     assert.equal(ok.length, 1);
     assert.equal(dup.length, 1);
-    assert.equal(ok[0].body.status, "success");
-    assert.equal(dup[0].body.status, "already_checked_in");
-    assert.equal(dup[0].body.error, "Ya hizo check-in");
+    assert.equal(ok[0]!.body.status, "success");
+    assert.equal(dup[0]!.body.status, "already_checked_in");
+    assert.equal(dup[0]!.body.error, "Ya hizo check-in");
     assert.equal(await Registration.countDocuments({ checkedIn: true }), 1);
 
     const nuevo = await POST(post("/api/check-in/scan", { qrCode: "NO-EXISTE" }));

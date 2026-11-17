@@ -10,7 +10,7 @@ import { NotFoundScreen } from "@/components/not-found-screen";
  */
 export default async function RootNotFound() {
   const crudos = (await import(`../messages/${IDIOMA_BASE}.json`)).default;
-  const t = resolver(crudos.NotFound, tokensDe(IDIOMA_BASE)) as Record<string, string>;
+  const t = resolver(crudos.NotFound, tokensDe(IDIOMA_BASE)) as Record<"lead" | "event" | "home" | "register", string>;
 
   return (
     <html

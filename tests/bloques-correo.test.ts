@@ -55,7 +55,7 @@ describe("saneado de lo que manda el editor", () => {
       { id: "b", tipo: "script", texto: "no vale" },
     ]);
     assert.equal(r.length, 1);
-    assert.equal(r[0].tipo, "parrafo");
+    assert.equal(r[0]!.tipo, "parrafo");
   });
 
   test("lo que no es una lista no revienta", () => {
@@ -66,10 +66,10 @@ describe("saneado de lo que manda el editor", () => {
 
   test("rellena los campos que faltan en vez de dejar undefined", () => {
     const r = sanearBloques([{ tipo: "boton" }]) as Extract<Bloque, { tipo: "boton" }>[];
-    assert.equal(r[0].texto, "");
-    assert.equal(r[0].enlace, "");
-    assert.equal(r[0].contorno, false);
-    assert.ok(r[0].id, "se le inventa un id si no trae");
+    assert.equal(r[0]!.texto, "");
+    assert.equal(r[0]!.enlace, "");
+    assert.equal(r[0]!.contorno, false);
+    assert.ok(r[0]!.id, "se le inventa un id si no trae");
   });
 
   test("recorta los textos largos", () => {
@@ -81,13 +81,13 @@ describe("saneado de lo que manda el editor", () => {
     const r = sanearBloques([
       { tipo: "datos", filas: [{ etiqueta: "Fecha", valor: "24 oct" }, null, "basura", { etiqueta: "Lugar" }] },
     ]) as Extract<Bloque, { tipo: "datos" }>[];
-    assert.equal(r[0].filas.length, 2);
-    assert.deepEqual(r[0].filas[1], { etiqueta: "Lugar", valor: "" });
+    assert.equal(r[0]!.filas.length, 2);
+    assert.deepEqual(r[0]!.filas[1], { etiqueta: "Lugar", valor: "" });
   });
 
   test("quita los pasos vacíos", () => {
     const r = sanearBloques([{ tipo: "pasos", items: ["uno", "", null, "dos"] }]) as Extract<Bloque, { tipo: "pasos" }>[];
-    assert.deepEqual(r[0].items, ["uno", "dos"]);
+    assert.deepEqual(r[0]!.items, ["uno", "dos"]);
   });
 
   test("pone techo al número de bloques", () => {

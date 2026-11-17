@@ -70,7 +70,7 @@ type Pieza = { data: Buffer; info: { width: number; height: number } };
 function centrada(pieza: Pieza, caja: number, cy: number) {
   return {
     input: pieza.data,
-    left: Math.round(CAJAS[caja] + (CAJA_W - pieza.info.width) / 2),
+    left: Math.round(CAJAS[caja]! + (CAJA_W - pieza.info.width) / 2),
     top: Math.round(cy - pieza.info.height / 2),
   };
 }
@@ -126,17 +126,17 @@ export async function componerGif(ahora: number): Promise<Buffer> {
 
     const capas = valores.flatMap((v, caja) => {
       const [a, b] = pad2(v).split("");
-      const izq = cifras[Number(a)];
-      const der = cifras[Number(b)];
+      const izq = cifras[Number(a)]!;
+      const der = cifras[Number(b)]!;
       // Las dos cifras se colocan como un bloque, para que el par quede
       // centrado en la caja y no cada cifra por su cuenta.
       const ancho = izq.info.width + der.info.width;
-      const x0 = CAJAS[caja] + (CAJA_W - ancho) / 2;
+      const x0 = CAJAS[caja]! + (CAJA_W - ancho) / 2;
       const yCifra = 50;
       return [
         { input: izq.data, left: Math.round(x0), top: Math.round(yCifra - izq.info.height / 2) },
         { input: der.data, left: Math.round(x0 + izq.info.width), top: Math.round(yCifra - der.info.height / 2) },
-        centrada(etiquetas[caja], caja, 100),
+        centrada(etiquetas[caja]!, caja, 100),
       ];
     });
 
@@ -145,7 +145,7 @@ export async function componerGif(ahora: number): Promise<Buffer> {
   }
 
   // Una paleta para todos los cuadros: los colores no cambian entre ellos.
-  const palette = quantize(pixelArrays[0], 256);
+  const palette = quantize(pixelArrays[0]!, 256);
 
   const gif = GIFEncoder();
   for (const pixels of pixelArrays) {

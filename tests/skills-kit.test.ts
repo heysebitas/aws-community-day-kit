@@ -22,14 +22,14 @@ function frontmatter(texto: string): Frontmatter {
   for (const linea of bloque.split(/\r?\n/)) {
     const m = linea.match(/^([A-Za-z][\w-]*):\s*(.*)$/);
     if (!m) continue;
-    let valor = m[2].trim();
+    let valor = m[2]!.trim();
     if (
       valor.length >= 2 &&
       ((valor.startsWith('"') && valor.endsWith('"')) || (valor.startsWith("'") && valor.endsWith("'")))
     ) {
       valor = valor.slice(1, -1);
     }
-    salida[m[1]] = valor;
+    salida[m[1]!] = valor;
   }
   return salida;
 }
@@ -88,8 +88,8 @@ function pareceFichero(candidato: string): boolean {
 
 function ficherosCitados(texto: string): string[] {
   const candidatos: string[] = [];
-  for (const m of texto.matchAll(/`([^`\n]+)`/g)) candidatos.push(m[1].trim());
-  for (const m of texto.matchAll(/\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) candidatos.push(m[1].trim());
+  for (const m of texto.matchAll(/`([^`\n]+)`/g)) candidatos.push(m[1]!.trim());
+  for (const m of texto.matchAll(/\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) candidatos.push(m[1]!.trim());
   return [...new Set(candidatos.filter(pareceFichero))];
 }
 
@@ -133,7 +133,7 @@ describe("skills para desarrollar el kit", () => {
 
     for (const documento of documentos) {
       for (const m of leer(documento).matchAll(/\bnpm\s+run\s+([A-Za-z0-9:_-]+)/g)) {
-        if (!(m[1] in scripts)) fallos.push(`${documento}: npm run ${m[1]}`);
+        if (!(m[1]! in scripts)) fallos.push(`${documento}: npm run ${m[1]}`);
       }
     }
     assert.deepEqual(fallos, []);

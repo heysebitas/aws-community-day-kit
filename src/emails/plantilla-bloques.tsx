@@ -2,7 +2,7 @@ import {
   BigStat, Callout, DetailBox, Divider, EmailLayout, HardButton,
   Heading, Kicker, Paragraph, Steps,
 } from "./_kit";
-import { aplicarVariables, bloquesVisibles, type Bloque } from "./bloques";
+import { aplicarVariables, bloquesVisibles, textoConAlternativa, type Bloque } from "./bloques";
 import { SITIO } from "@/config";
 
 
@@ -38,10 +38,10 @@ export function PlantillaBloques({
             return <Kicker key={b.id}>{v(b.texto)}</Kicker>;
 
           case "titulo":
-            return <Heading key={b.id}>{v(b.texto)}</Heading>;
+            return <Heading key={b.id}>{textoConAlternativa(b.texto, b.siVacio, valores)}</Heading>;
 
           case "parrafo":
-            return <Paragraph key={b.id} muted={b.apagado}>{v(b.texto)}</Paragraph>;
+            return <Paragraph key={b.id} muted={b.apagado}>{textoConAlternativa(b.texto, b.siVacio, valores)}</Paragraph>;
 
           case "boton": {
             /** Un botón sin enlace no sale. Pasa cuando su enlace es una variable que todavía no tiene valor. */
@@ -61,13 +61,14 @@ export function PlantillaBloques({
               </Callout>
             );
 
-          case "datos":
-            return (
-              <DetailBox
-                key={b.id}
-                rows={b.filas.map((f) => ({ label: v(f.etiqueta), value: v(f.valor) }))}
-              />
-            );
+          case "datos": {
+            /* Una fila sin valor no sale: una variable opcional no deja la etiqueta suelta. */
+            const filas = b.filas
+              .map((f) => ({ label: v(f.etiqueta), value: v(f.valor) }))
+              .filter((f) => f.value.trim());
+            if (!filas.length) return null;
+            return <DetailBox key={b.id} rows={filas} />;
+          }
 
           case "pasos":
             return <Steps key={b.id} items={b.items.map((i) => v(i))} />;
@@ -83,7 +84,6 @@ export function PlantillaBloques({
                 <tbody>
                   <tr>
                     <td align="center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={`${SITIO}/api/countdown`}
                         alt="Cuenta regresiva hasta la apertura de puertas"
@@ -99,7 +99,6 @@ export function PlantillaBloques({
           case "imagen": {
             if (!b.url) return null; // sin URL no hay nada que enseñar
             const img = (
-              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={v(b.url)}
                 alt={v(b.alt)}

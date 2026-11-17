@@ -31,9 +31,9 @@ describe("email-map", () => {
     const r = await mapa(pedir("https://x.test/api/email-map?q=otra-cosa", "203.0.113.1"));
     assert.equal(r.status, 200);
     assert.equal(llamadas.length, 1);
-    const u = new URL(llamadas[0]);
+    const u = new URL(llamadas[0]!);
     assert.equal(u.searchParams.get("center"), `${lat},${lon}`);
-    assert.ok(!llamadas[0].includes("otra-cosa"));
+    assert.ok(!llamadas[0]!.includes("otra-cosa"));
   });
 
   test("devuelve 429 al pasar el límite y deja de llamar a Google", async () => {

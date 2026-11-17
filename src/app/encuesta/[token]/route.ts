@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 /** Registra el clic del destinatario y lo lleva a la encuesta de AWS. */
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
-  let destino = SEMILLA_ENLACES.encuestaPulse;
+  let destino = SEMILLA_ENLACES.encuestaPulse!;
 
   try {
     const { token } = await params;

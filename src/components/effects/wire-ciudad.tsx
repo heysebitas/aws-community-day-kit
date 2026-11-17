@@ -104,7 +104,7 @@ export function WireCiudad({
 
     let visible = true;
     const centinela = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
+      visible = e!.isIntersecting;
       if (visible && !raf) raf = requestAnimationFrame(draw);
     }, { rootMargin: "100px" });
     centinela.observe(canvas);
@@ -128,15 +128,15 @@ export function WireCiudad({
 
       // Las aristas lejanas primero y más tenues: eso da la profundidad.
       const orden = edges
-        .map((e, i) => ({ i, d: (proj[e[0]].depth + proj[e[1]].depth) / 2 }))
+        .map((e, i) => ({ i, d: (proj[e[0]]!.depth + proj[e[1]]!.depth) / 2 }))
         .sort((a, b) => a.d - b.d);
 
       for (const { i, d } of orden) {
-        const [a, b] = edges[i];
+        const [a, b] = edges[i]!;
         const alpha = 0.16 + Math.max(0, (d + 2.6) / 5.2) * 0.7;
         ctx.beginPath();
-        ctx.moveTo(proj[a].x, proj[a].y);
-        ctx.lineTo(proj[b].x, proj[b].y);
+        ctx.moveTo(proj[a]!.x, proj[a]!.y);
+        ctx.lineTo(proj[b]!.x, proj[b]!.y);
         ctx.strokeStyle = `rgba(${ACENTO},${Math.min(alpha, 0.9)})`;
         ctx.lineWidth = d > 0 ? 1.3 : 0.8;
         ctx.stroke();

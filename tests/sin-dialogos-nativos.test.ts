@@ -24,7 +24,7 @@ function loDeclara(codigo: string, nombre: string): boolean {
 function esNativa(m: RegExpMatchArray, codigo: string): boolean {
   if (m[1]) return true;                        // window.confirm(…): siempre
   if (m[3] === "{") return false;               // confirm({ … }): el nuestro
-  return !loDeclara(codigo, m[2]);              // si no es suyo, es el del navegador
+  return !loDeclara(codigo, m[2]!);              // si no es suyo, es el del navegador
 }
 
 function archivos(dir: string): string[] {

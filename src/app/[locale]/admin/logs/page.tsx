@@ -143,7 +143,7 @@ function LogsAdminPageInner() {
           {ACTIONS_BY_GROUP.map(({ group, actions }) => (
             <optgroup key={group} label={GROUP_LABELS[group]}>
               {actions.map((a) => (
-                <option key={a} value={a}>{LOG_ACTIONS[a].label}</option>
+                <option key={a} value={a}>{LOG_ACTIONS[a]!.label}</option>
               ))}
             </optgroup>
           ))}

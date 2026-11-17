@@ -20,5 +20,10 @@ export default async function LoginPage({
     redirect(localePath(locale, "/admin"));
   }
 
-  return <LoginForm />;
+  return (
+    <>
+      <link rel="preconnect" href="https://challenges.cloudflare.com" crossOrigin="" />
+      <LoginForm />
+    </>
+  );
 }

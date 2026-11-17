@@ -37,7 +37,7 @@ export const TRACKS: SessionTrack[] = tracks.map((t, i) => ({
   value: t.id,
   label: t.titulo.label,
   corto: t.corto,
-  ...PALETA[i % PALETA.length],
+  ...PALETA[i % PALETA.length]!,
 }));
 
 const POR_VALOR = new Map(TRACKS.map((t) => [t.value, t]));

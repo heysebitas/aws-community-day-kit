@@ -11,7 +11,7 @@ test("la vista previa usa srcdoc y un sandbox sin allow-scripts", () => {
   assert.match(iframe, /srcDoc=\{html\}/);
   const sandbox = /sandbox="([^"]*)"/.exec(iframe);
   assert.ok(sandbox, "el iframe lleva sandbox");
-  assert.doesNotMatch(sandbox[1], /allow-scripts/);
+  assert.doesNotMatch(sandbox[1]!, /allow-scripts/);
   assert.doesNotMatch(src, /doc\.write|document\.write/);
 });
 
@@ -23,7 +23,7 @@ test("next.config declara COOP en todo y CORP en /api salvo marca y og", async (
 
   const api = reglas.find((r) => r.headers.some((h) => h.key === "Cross-Origin-Resource-Policy"));
   assert.ok(api);
-  assert.equal(api.headers[0].value, "same-origin");
+  assert.equal(api.headers[0]!.value, "same-origin");
   const m = /^(\/api\/):ruta\((.*)\)$/.exec(api.source);
   assert.ok(m, "patrón de /api");
   const re = new RegExp(`^${m[2]}$`);

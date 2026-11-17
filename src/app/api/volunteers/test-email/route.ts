@@ -20,7 +20,7 @@ export const POST = ruta(async (request: NextRequest) => {
   const name = typeof body.name === "string" && body.name.trim() ? body.name.trim().slice(0, 80) : "Voluntario de Prueba";
 
   await connectDB();
-  const correo = await armarCorreo("voluntario_aprobado", { nombre: name.split(" ")[0], nombreCompleto: name, correo: to });
+  const correo = await armarCorreo("voluntario_aprobado", { nombre: name.split(" ")[0]!, nombreCompleto: name, correo: to });
   if (!correo) return Response.json({ error: "La plantilla está desactivada" }, { status: 409 });
 
   const pdf = await generateVolunteerPDF(name);

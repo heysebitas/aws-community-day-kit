@@ -150,7 +150,7 @@ async function llamar(e: Entrada, metodo: string, consulta = "") {
   const mod = (await import(e.archivo)) as Record<string, Manejador>;
   const params: Record<string, string> = {};
   const valor = (n: string) => PARAMS[n] ?? "000000000000000000000000";
-  for (const m of e.ruta.matchAll(/\[(\w+)\]/g)) params[m[1]] = valor(m[1]);
+  for (const m of e.ruta.matchAll(/\[(\w+)\]/g)) params[m[1]!] = valor(m[1]!);
   const url = "http://prueba.test/api" + e.ruta.replace(/\[(\w+)\]/g, (_, n) => valor(n)) + consulta;
   // Cuerpo vacío válido: varias rutas leen el JSON antes de comprobar la sesión.
   const r = new NextRequest(url, {
@@ -158,7 +158,7 @@ async function llamar(e: Entrada, metodo: string, consulta = "") {
     headers: { "x-forwarded-for": `203.0.113.${++ip % 250}`, "content-type": "application/json" },
     ...(metodo === "GET" ? {} : { body: "{}" }),
   });
-  return mod[metodo](r, { params: Promise.resolve(params) });
+  return mod[metodo]!(r, { params: Promise.resolve(params) });
 }
 
 async function metodosDe(e: Entrada) {
@@ -183,8 +183,8 @@ describe("clasificación de rutas", () => {
     for (const [k, v] of Object.entries(PUBLICAS)) {
       const [metodo, ruta] = k.split(" ");
       const e = TABLA.find((x) => x.ruta === ruta)!;
-      if (LECTURA.has(metodo) && !v.marca) continue;
-      if (!LECTURA.has(metodo)) assert.ok(v.marca, `«${k}» escribe y es pública: debe declarar límite`);
+      if (LECTURA.has(metodo!) && !v.marca) continue;
+      if (!LECTURA.has(metodo!)) assert.ok(v.marca, `«${k}» escribe y es pública: debe declarar límite`);
       assert.ok(e.fuente.includes(v.marca!), `«${k}» no contiene ${v.marca}`);
     }
   });
@@ -222,7 +222,7 @@ describe("permisos por ruta", () => {
           const sin = await estado(e, m, "", q);
           if (sin !== (esperado.sinSesion ?? 401)) fallos.push(`${k}${q}: sin sesión dio ${sin}`);
           const actor = SOLO_ROL.has(k) ? "badges" : "sinPermiso";
-          const r = await estado(e, m, cookies[actor], q);
+          const r = await estado(e, m, cookies[actor]!, q);
           if (r !== (esperado.sinPermiso ?? 403)) fallos.push(`${k}${q}: ${actor} dio ${r}`);
         }
       }

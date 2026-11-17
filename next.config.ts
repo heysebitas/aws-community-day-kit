@@ -39,8 +39,13 @@ const csp = [
   "object-src 'none'",
 ].join("; ");
 
+// Trusted Types sólo informa (no bloquea): sin endpoint de reportes, las violaciones se ven en la consola del navegador.
+// Detalle y plan en docs/csp.md.
+const cspSoloInforme = "require-trusted-types-for 'script'";
+
 const seguridad = [
   { key: "Content-Security-Policy", value: csp },
+  { key: "Content-Security-Policy-Report-Only", value: cspSoloInforme },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

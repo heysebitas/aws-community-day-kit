@@ -53,9 +53,11 @@ export function bloquesEnConflicto(bloques: BloqueHorario[]): Set<string> {
   const malos = new Set<string>();
   for (let i = 0; i < bloques.length; i++) {
     for (let j = i + 1; j < bloques.length; j++) {
-      if (sePisan(bloques[i], bloques[j])) {
-        malos.add(bloques[i]._id);
-        malos.add(bloques[j]._id);
+      const a = bloques[i]!;
+      const b = bloques[j]!;
+      if (sePisan(a, b)) {
+        malos.add(a._id);
+        malos.add(b._id);
       }
     }
   }

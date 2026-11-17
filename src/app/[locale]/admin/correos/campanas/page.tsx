@@ -30,7 +30,7 @@ export default function CampanasPage() {
   const actual = useMemo(() => plantillas.find((p) => p.slug === slug) ?? null, [plantillas, slug]);
 
   useEffect(() => {
-    if (!slug && plantillas.length) setSlug(plantillas[0].slug);
+    if (!slug && plantillas.length) setSlug(plantillas[0]!.slug);
   }, [plantillas, slug]);
 
   useEffect(() => { if (error) toast("No se pudieron cargar las plantillas", "error"); }, [error, toast]);
@@ -45,7 +45,7 @@ export default function CampanasPage() {
 
   useEffect(() => {
     setAudiencia(actual?.audiencia ?? []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- solo cambiar de plantilla reinicia la audiencia editada
   }, [actual?.slug]);
 
   useEffect(() => {

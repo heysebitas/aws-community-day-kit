@@ -1,12 +1,11 @@
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
-import { render } from "@react-email/components";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { User } from "@/models/user";
 import { PasswordToken } from "@/models/password-token";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
-import { InvitationEmail } from "@/emails/invitation";
+import { armarInvitacion } from "@/lib/correo-invitacion";
 import { createLog } from "@/lib/log";
 import { sanearPermisos } from "@/lib/permisos";
 import { SITIO } from "@/config";
@@ -93,12 +92,12 @@ export const POST = ruta(async (request: NextRequest) => {
   const createPasswordUrl = `${appUrl}/es/admin/create-password?token=${token}`;
 
   try {
-    const html = await render(InvitationEmail({ name, role, createPasswordUrl }));
+    const correo = await armarInvitacion(name, role, createPasswordUrl);
     await sendEmail({
       from: EMAIL_FROM,
       to: email,
-      subject: "Invitación — AWS Student Community Day Admin",
-      html,
+      subject: correo.asunto,
+      html: correo.html,
     });
   } catch {
     // Email send failed — user still created

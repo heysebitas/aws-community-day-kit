@@ -149,7 +149,7 @@ describe("login", () => {
       assert.equal(r.status, 401, JSON.stringify(await r.clone().json()));
       assert.equal(sync, 0);
       assert.equal(comparados.length, 1);
-      assert.match(comparados[0], /^\$2[aby]\$12\$/);
+      assert.match(comparados[0]!, /^\$2[aby]\$12\$/);
     } finally {
       bcrypt.hashSync = hashSync;
       bcrypt.compare = compare;

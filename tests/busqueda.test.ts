@@ -130,13 +130,13 @@ describe("búsqueda indexada", () => {
     const ms: number[] = [];
     for (let i = 0; i < 50; i++) {
       const t = performance.now();
-      await buscar(i % 2 ? "check-in" : "scanner", consultas[i % consultas.length]);
+      await buscar(i % 2 ? "check-in" : "scanner", consultas[i % consultas.length]!);
       ms.push(performance.now() - t);
     }
     ms.sort((a, b) => a - b);
     const p95 = ms[Math.ceil(ms.length * 0.95) - 1];
-    console.log(`p95 de 50 búsquedas con 5000 registros: ${p95.toFixed(1)} ms (mediana ${ms[24].toFixed(1)} ms)`);
-    assert.ok(p95 < 300, `p95 ${p95} ms`);
+    console.log(`p95 de 50 búsquedas con 5000 registros: ${p95!.toFixed(1)} ms (mediana ${ms[24]!.toFixed(1)} ms)`);
+    assert.ok(p95! < 300, `p95 ${p95} ms`);
   });
 });
 

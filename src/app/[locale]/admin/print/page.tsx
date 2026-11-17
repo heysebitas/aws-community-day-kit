@@ -126,7 +126,7 @@ function BulkPrintTab() {
     } finally { setLoading(false); }
   }, [values.rol]);
 
-  useEffect(() => { if (loaded) load(); }, [values.rol]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (loaded) load(); }, [values.rol]); // eslint-disable-line react-hooks/exhaustive-deps -- recarga solo al cambiar el rol; load cambia en cada render
 
   const filtered = q
     ? people.filter((p) => {

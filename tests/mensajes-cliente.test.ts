@@ -36,7 +36,7 @@ function alcanzables(entradas: string[]): Set<string> {
     vistos.add(f);
     const src = readFileSync(f, "utf8");
     for (const m of src.matchAll(/(?:from|import)\s*\(?\s*["']([^"']+)["']/g)) {
-      const r = resolver(f, m[1]);
+      const r = resolver(f, m[1]!);
       if (r) pila.push(r);
     }
   }
@@ -51,7 +51,7 @@ function usadosEnCliente(fs: Iterable<string>): Map<string, string[]> {
     if (!/^\s*["']use client["']/.test(src)) continue;
     for (const m of src.matchAll(/useTranslations\(\s*(?:["']([^"']+)["'])?\s*\)/g)) {
       // Sin namespace pediría el catálogo entero: no es verificable.
-      const ns = (m[1] ?? "").split(".")[0];
+      const ns = (m[1] ?? "").split(".")[0]!;
       usados.set(ns, [...(usados.get(ns) ?? []), path.relative(RAIZ, f)]);
     }
   }

@@ -18,9 +18,11 @@ const PERSONALES: Record<string, Record<string, string>> = {
   "src/app/[locale]/registro/_form.tsx": {
     "f-name": "given-name", "f-last": "family-name", "f-mail": "email", "f-entn": "organization",
   },
-  "src/app/[locale]/voluntarios/_form.tsx": {
+  "src/app/[locale]/voluntarios/_bloque-persona.tsx": {
     "v-name": "given-name", "v-last": "family-name", "v-mail": "email", "v-entn": "organization",
   },
+  "src/app/[locale]/voluntarios/_bloque-evento.tsx": {},
+  "src/app/[locale]/voluntarios/_bloque-cierre.tsx": {},
 };
 
 describe("autocomplete de los datos personales", () => {
@@ -45,7 +47,7 @@ describe("autocomplete de los datos personales", () => {
     const src = leer("src/components/forms/phone-input.tsx");
     assert.match(src, /autoComplete = "tel-national"/);
     assert.match(src, /autoComplete=\{autoComplete\}/);
-    const vol = leer("src/app/[locale]/voluntarios/_form.tsx");
+    const vol = leer("src/app/[locale]/voluntarios/_bloque-evento.tsx");
     assert.match(vol, /<PhoneInput\s+label=\{t\.emergencyPhone\}\s+autoComplete="off"/);
   });
 

@@ -111,8 +111,8 @@ export const ACTIONS_BY_GROUP: { group: LogGroup; actions: string[] }[] = (
 ).map((group) => ({
   group,
   actions: Object.keys(LOG_ACTIONS)
-    .filter((a) => LOG_ACTIONS[a].group === group)
-    .sort((a, b) => LOG_ACTIONS[a].label.localeCompare(LOG_ACTIONS[b].label, "es")),
+    .filter((a) => LOG_ACTIONS[a]!.group === group)
+    .sort((a, b) => LOG_ACTIONS[a]!.label.localeCompare(LOG_ACTIONS[b]!.label, "es")),
 }));
 
 /** Los roles que un registro puede llevar. */

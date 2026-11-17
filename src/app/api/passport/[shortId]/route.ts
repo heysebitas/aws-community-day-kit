@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { nanoid } from "nanoid";
-import { render } from "@react-email/components";
-import { EVENTO, SITIO } from "@/config";
+import { SITIO } from "@/config";
 import { connectDB } from "@/lib/db";
 import { Passport, type IPassport } from "@/models/passport";
 import { SponsorPin } from "@/models/sponsor-pin";
@@ -11,7 +10,7 @@ import { SpeakerProfile } from "@/models/speaker-profile";
 import { User } from "@/models/user";
 import { PassportEditToken } from "@/models/passport-edit-token";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
-import { PassportEditConfirmEmail } from "@/emails/passport-edit-confirm";
+import { armarCorreoObligatorio } from "@/lib/email-plantillas";
 import { comprobarPin, nuevoPin } from "@/lib/pin";
 import { esDelBucket } from "@/lib/subidas";
 import { maskEmail } from "@/lib/utils";
@@ -144,7 +143,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sh
         if (cur === "" && next !== "") addSocial[key] = next;
         else {
           editSocial[key] = next;
-          editList.push({ label: FIELD_LABELS[key], value: next || "(eliminar)" });
+          editList.push({ label: FIELD_LABELS[key]!, value: next || "(eliminar)" });
         }
       }
     }
@@ -173,7 +172,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sh
       passport.markModified("social");
       if (addPhoto !== undefined) passport.photoUrl = addPhoto;
       await passport.save();
-      applied.push(...Object.keys(addSocial).map((k) => FIELD_LABELS[k]));
+      applied.push(...Object.keys(addSocial).map((k) => FIELD_LABELS[k] ?? k));
       if (addPhoto !== undefined) applied.push("Foto");
     }
 
@@ -217,13 +216,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sh
     await PassportEditToken.create({ shortId, token, changes, expiresAt: new Date(Date.now() + 24 * 3600 * 1000) });
 
     const fullList: { label: string; value: string }[] = [
-      ...SOCIAL_KEYS.filter((k) => k in mergedSocial).map((k) => ({ label: FIELD_LABELS[k], value: mergedSocial[k] || "(eliminar)" })),
+      ...SOCIAL_KEYS.filter((k) => k in mergedSocial).map((k) => ({ label: FIELD_LABELS[k]!, value: mergedSocial[k] || "(eliminar)" })),
       ...(mergedPhoto !== undefined ? [{ label: "Foto", value: mergedPhoto ? "actualizada" : "(eliminar)" }] : []),
     ];
 
     try {
-      const html = await render(PassportEditConfirmEmail({ name, confirmUrl: `${SITIO}/confirmar-cambios/${token}`, changes: fullList }));
-      await sendEmail({ from: EMAIL_FROM, to: email, subject: `Confirma los cambios en tu pasaporte — ${EVENTO.nombreCompleto}`, html });
+      const porCampo = Object.fromEntries(Object.entries(FIELD_LABELS).map(([k, label]) => [k, fullList.find((c) => c.label === label)?.value ?? ""]));
+      // Sin este correo nadie puede confirmar los cambios: no depende de que la plantilla esté activa.
+      const correo = await armarCorreoObligatorio("pasaporte_confirmar", {
+        nombre: name ? name.split(" ")[0]! : "",
+        nombreCompleto: name,
+        enlaceConfirmar: `${SITIO}/confirmar-cambios/${token}`,
+        ...porCampo,
+        foto: porCampo.photo ?? "",
+      });
+      await sendEmail({ from: EMAIL_FROM, to: email, subject: correo.asunto, html: correo.html });
     } catch {
       /* el correo no es fatal */
     }

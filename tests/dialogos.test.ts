@@ -149,7 +149,7 @@ describe("saltar al contenido", () => {
   });
 
   test("el pasaporte tiene <main>", () => {
-    assert.match(leer("src/app/[locale]/pasaporte/[shortId]/page.tsx"), /<main\b[\s\S]*<\/main>/);
+    assert.match(leer("src/app/[locale]/pasaporte/[shortId]/_vista.tsx"), /<main\b[\s\S]*<\/main>/);
   });
 
   test("el texto del enlace existe en todos los idiomas", () => {

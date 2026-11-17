@@ -153,7 +153,7 @@ describe("certificados de voluntariado", () => {
       const r = await enviar(ids);
       assert.deepEqual([r.body.sentCount, r.body.failedCount], [1, 1]);
     } finally { globalThis.fetch = fetchOriginal; delete process.env.RESEND_API_KEY; process.env.CORREO_PROVEEDOR = "consola"; }
-    assert.match(adjuntosVistos[0], /^certificado-.*\.pdf$/);
+    assert.match(adjuntosVistos[0]!, /^certificado-.*\.pdf$/);
     const { VolunteerSubmission } = await import("@/models/volunteer-submission");
     assert.equal(!!(await VolunteerSubmission.findOne({ email: "uno@ejemplo.test" }).lean())?.certSentAt, false);
     assert.equal(!!(await VolunteerSubmission.findOne({ email: "dos@ejemplo.test" }).lean())?.certSentAt, true);

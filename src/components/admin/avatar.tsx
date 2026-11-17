@@ -20,13 +20,13 @@ const TONOS = [
 function tonoDe(seed: string) {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  return TONOS[h % TONOS.length];
+  return TONOS[h % TONOS.length]!;
 }
 
 function iniciales(name: string, email: string): string {
   const partes = name.trim().split(/\s+/).filter(Boolean);
-  if (partes.length >= 2) return (partes[0][0] + partes[1][0]).toUpperCase();
-  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+  if (partes.length >= 2) return (partes[0]![0]! + partes[1]![0]!).toUpperCase();
+  if (partes.length === 1) return partes[0]!.slice(0, 2).toUpperCase();
   return (email.trim()[0] ?? "?").toUpperCase();
 }
 
@@ -74,7 +74,6 @@ export function Avatar({
         // Plano y no `next/image`: son SVG y el dominio no está en
         // `remotePatterns` a propósito (ver src/lib/avatar.ts). Mientras carga
         // se ve el bloque de color, no un hueco.
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={avatarUrl(semilla)}
           alt=""

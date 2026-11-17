@@ -78,7 +78,7 @@ describe("caché de las APIs públicas", () => {
     const cuerpo = await res.json() as { events: { title: string }[] };
     assert.equal(find.mock.calls.length, 0);
     assert.equal(res.headers.get("Cache-Control"), CACHE);
-    assert.equal(cuerpo.events[0].title, "Charla");
+    assert.equal(cuerpo.events[0]!.title, "Charla");
     find.mock.restore();
   });
 

@@ -23,6 +23,13 @@ la base, y se edita en **Panel → Correos → Plantillas** con vista previa.
 - Las **de sistema** las dispara el código, a una persona a la vez:
   confirmación de registro, propuesta recibida, aceptación, invitación al
   panel… Se puede cambiar su contenido, no su destinatario.
+- No hay correos escritos como componentes de React: la invitación al panel
+  (`invitacion_panel`), la confirmación de cambios del pasaporte
+  (`pasaporte_confirmar`), la propuesta recibida (`speaker_postulacion`, con su
+  copia incluida) y el certificado de voluntariado (`voluntario_certificado`)
+  también se editan desde el panel. Los datos que cambian en cada envío, como el
+  enlace de un solo uso o las filas del pasaporte, entran como variables
+  (grupo «Del envío»); una fila de una ficha de datos sin valor no sale.
 - Las **propias** las creas tú y se envían a una audiencia desde **Campañas**.
 
 Encabezado y pie se generan con tu tema y tu logo; no hay imágenes que rehacer.

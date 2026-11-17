@@ -27,8 +27,8 @@ const post = (body: unknown) =>
 const doc = DOCUMENTOS[0];
 const base = {
   firstName: "Ana", lastName: "Prueba", email: "ana@ejemplo.test",
-  documentType: doc.value, documentNumber: "12345678",
-  role: ROLES[0].value, entityType: ENTIDADES.find((e) => e.value === "none")?.value ?? ENTIDADES[0].value,
+  documentType: doc!.value, documentNumber: "12345678",
+  role: ROLES[0]!.value, entityType: ENTIDADES.find((e) => e.value === "none")?.value ?? ENTIDADES[0]!.value,
   entityName: "Entidad de prueba", acceptCoc: true, acceptPrivacy: true,
 };
 
@@ -72,8 +72,8 @@ describe("un correo, una inscripción", () => {
   test("voluntarios: uno 201 y otro 409 con el mensaje de siempre", async () => {
     const data = {
       ...base, email: "vol@ejemplo.test",
-      availability: AVAILABILITY[0].value, interestAreas: [INTEREST_AREAS[0].value],
-      shirtSize: SHIRT_SIZES[0].value, emergencyName: "Contacto", emergencyPhone: "3000000",
+      availability: AVAILABILITY[0]!.value, interestAreas: [INTEREST_AREAS[0]!.value],
+      shirtSize: SHIRT_SIZES[0]!.value, emergencyName: "Contacto", emergencyPhone: "3000000",
     };
     const r = await doble(() => postVoluntario(post({ data })));
     assert.deepEqual(r.map((x) => x.status).sort(), [201, 409]);

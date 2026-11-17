@@ -41,7 +41,7 @@ const languageLabels: Record<string, string> = {
 /** "H:mm" / "HH:mm" → minutes since midnight (robust to non-padded hours). */
 function slotMin(t: string): number {
   const [h, m] = (t || "").split(":").map((n) => parseInt(n, 10) || 0);
-  return h * 60 + m;
+  return h! * 60 + m!;
 }
 
 /** Renders text with URLs turned into clickable, bold links. */
@@ -165,7 +165,6 @@ function EventModal({ event, onClose }: { event: AgendaEvent; onClose: () => voi
               onClick={() => setCardOpen(true)}
               className="group relative mx-auto block w-full max-w-[320px] overflow-hidden rounded-xl shadow-lg ring-1 ring-white/10 transition-all hover:ring-acento/50 hover:shadow-[0_0_24px_rgb(var(--tema-acento-rgb)_/_0.15)]"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cardUrl} alt={`${event.speaker} — speaker card`} className="w-full block" loading="lazy" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
                 <span className="translate-y-1 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100 font-mono text-xs font-semibold text-white bg-black/60 px-3 py-1.5 rounded-none">
@@ -234,7 +233,6 @@ function EventModal({ event, onClose }: { event: AgendaEvent; onClose: () => voi
           className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4 cursor-zoom-out"
           onClick={() => setCardOpen(false)}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cardUrl}
             alt={event.speaker || "Speaker card"}
@@ -321,6 +319,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
     let dir = 1;
     let pos = el.scrollLeft;
     let hovering = false;
+    let focused = false; // foco de teclado dentro: también pausa
     let userTook = false;
     let started = false;
     const SPEED = 0.045; // px per ms ≈ 45px/s
@@ -330,7 +329,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
       const dt = Math.min(ts - last, 50);
       last = ts;
       const max = el.scrollWidth - el.clientWidth;
-      if (max > 4 && !hovering && !userTook) {
+      if (max > 4 && !hovering && !focused && !userTook) {
         pos += dir * SPEED * dt;
         if (pos >= max) { pos = max; dir = -1; }
         else if (pos <= 0) { pos = 0; dir = 1; }
@@ -344,6 +343,12 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
 
     const onEnter = () => { hovering = true; };
     const onLeave = () => { hovering = false; last = 0; };
+    const onFocusIn = () => { focused = true; };
+    const onFocusOut = (e: FocusEvent) => {
+      if (e.relatedTarget instanceof Node && el.contains(e.relatedTarget)) return;
+      focused = false;
+      last = 0;
+    };
     const onTakeOver = () => { userTook = true; };
 
     const io = new IntersectionObserver((entries) => {
@@ -358,6 +363,8 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
 
     el.addEventListener("pointerenter", onEnter);
     el.addEventListener("pointerleave", onLeave);
+    el.addEventListener("focusin", onFocusIn);
+    el.addEventListener("focusout", onFocusOut);
     el.addEventListener("wheel", onTakeOver, { passive: true });
     el.addEventListener("touchstart", onTakeOver, { passive: true });
     el.addEventListener("mousedown", onTakeOver);
@@ -367,6 +374,8 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
       io.disconnect();
       el.removeEventListener("pointerenter", onEnter);
       el.removeEventListener("pointerleave", onLeave);
+      el.removeEventListener("focusin", onFocusIn);
+      el.removeEventListener("focusout", onFocusOut);
       el.removeEventListener("wheel", onTakeOver);
       el.removeEventListener("touchstart", onTakeOver);
       el.removeEventListener("mousedown", onTakeOver);
@@ -394,7 +403,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
       const end = slotMin(ev.endTime || ev.startTime);
       let span = 0;
       for (let k = i; k < sortedSlots.length; k++) {
-        if (slotMin(sortedSlots[k]) >= end) break;
+        if (slotMin(sortedSlots[k]!) >= end) break;
         span++;
       }
       span = Math.max(1, span);
@@ -445,7 +454,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
                     </thead>
                     <tbody>
                       {sortedSlots.map((slot, i) => {
-                        const slotEvents = timeSlots[slot];
+                        const slotEvents = timeSlots[slot] ?? [];
                         // Varios eventos pueden compartir sala+hora → se apilan en la celda
                         const eventsByRoom: Record<string, AgendaEvent[]> = {};
                         slotEvents.forEach((e) => { (eventsByRoom[e.room] ??= []).push(e); });
@@ -476,7 +485,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
                                 >
                                   {cellEvents.length === 1 ? (
                                     // Un solo evento: la card llena la celda (mantiene el span por duración)
-                                    <EventCard event={cellEvents[0]} onClick={() => setSelected(cellEvents[0])} />
+                                    <EventCard event={cellEvents[0]!} onClick={() => setSelected(cellEvents[0]!)} />
                                   ) : (
                                     // Varios en la misma sala+hora: se apilan a su altura natural
                                     <div className="flex flex-col gap-2">
@@ -507,7 +516,7 @@ export function AgendaView({ events }: { events: AgendaEvent[] }) {
                     <div className="flex-1 h-px bg-surface-700" />
                   </div>
                   <div className="flex flex-col gap-2.5">
-                    {timeSlots[slot]
+                    {(timeSlots[slot] ?? [])
                       .sort((a, b) => a.room.localeCompare(b.room))
                       .map((event) => (
                         <div key={event._id}>

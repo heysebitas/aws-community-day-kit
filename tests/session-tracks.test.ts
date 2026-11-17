@@ -72,6 +72,6 @@ describe("resolver un valor guardado", () => {
 describe("el desplegable del panel", () => {
   test("ofrece «sin track» primero y luego los demás", () => {
     assert.equal(TRACKS_CON_VACIO.length, TRACKS.length + 1);
-    assert.equal(TRACKS_CON_VACIO[0].value, SIN_TRACK);
+    assert.equal(TRACKS_CON_VACIO[0]!.value, SIN_TRACK);
   });
 });

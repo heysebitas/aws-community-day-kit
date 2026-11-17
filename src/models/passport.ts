@@ -135,4 +135,4 @@ PassportSchema.pre("validate", function () {
 mantenerBusqueda(PassportSchema, CAMPOS_BUSQUEDA);
 
 export const Passport =
-  mongoose.models.Passport || mongoose.model<IPassport>("Passport", PassportSchema);
+  mongoose.models.Passport! || mongoose.model<IPassport>("Passport", PassportSchema);

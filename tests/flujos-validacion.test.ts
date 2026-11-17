@@ -56,7 +56,7 @@ describe("CURP mexicana", () => {
       assert.equal(normalizeDocument(mal, rule).ok, false, mal);
     }
   });
-  test("dígito verificador equivocado se rechaza", { skip: "FALLO REAL: normalizeDocument (src/lib/normalize.ts:238) solo comprueba el formato de la CURP, no el dígito verificador que pide la issue #35" }, () => {
+  test("dígito verificador equivocado se rechaza", () => {
     const mala = buena.slice(0, 17) + String((Number(buena[17]) + 1) % 10);
     assert.equal(normalizeDocument(mala, rule).ok, false);
   });
@@ -115,11 +115,11 @@ describe("normalizeEmail", () => {
 });
 
 const doc = DOCUMENTOS.find((d) => d.rule.kind === "digits") ?? DOCUMENTOS[0];
-const numeroOk = doc.rule.kind === "digits" ? "1".repeat(doc.rule.min) : "12345678";
+const numeroOk = doc!.rule.kind === "digits" ? "1".repeat(doc!.rule.min) : "12345678";
 const baseAsistente = () => ({
   firstName: "Ana", lastName: "Prueba", email: "ana@ejemplo.test", attendance: "in-person",
-  documentType: doc.value, documentNumber: numeroOk,
-  role: ROLES[0].value, entityType: "none", acceptCoc: true, acceptPrivacy: true,
+  documentType: doc!.value, documentNumber: numeroOk,
+  role: ROLES[0]!.value, entityType: "none", acceptCoc: true, acceptPrivacy: true,
 });
 
 describe("parseRegistrationInput", () => {

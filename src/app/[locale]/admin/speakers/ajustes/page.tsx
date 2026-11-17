@@ -171,7 +171,7 @@ export default function AjustesSpeakersPage() {
     const lista = [...publicos];
     const j = hacia === "up" ? i - 1 : i + 1;
     if (j < 0 || j >= lista.length) return;
-    [lista[i], lista[j]] = [lista[j], lista[i]];
+    [lista[i], lista[j]] = [lista[j]!, lista[i]!];
     const nuevo = lista.map((s, k) => ({ ...s, sortOrder: k }));
     setPublicos(nuevo);
     try {

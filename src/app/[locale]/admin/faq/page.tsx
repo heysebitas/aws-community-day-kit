@@ -71,7 +71,7 @@ export default function FAQAdminPage() {
 
   useEffect(() => {
     fetchFaqs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- carga única al montar
   }, []);
 
   const openCreate = () => {
@@ -190,6 +190,7 @@ export default function FAQAdminPage() {
     if (swapIndex < 0 || swapIndex >= sorted.length) return;
 
     const other = sorted[swapIndex];
+    if (!other) return;
     const faqOrder = faq.order;
     const otherOrder = other.order;
 
@@ -410,7 +411,7 @@ export default function FAQAdminPage() {
                   type="text"
                   placeholder="Texto ES"
                   value={btn.labelEs}
-                  onChange={(e) => { const next = [...form.buttons]; next[i] = { ...next[i], labelEs: e.target.value }; setForm({ ...form, buttons: next }); }}
+                  onChange={(e) => { const next = [...form.buttons]; next[i] = { ...btn, labelEs: e.target.value }; setForm({ ...form, buttons: next }); }}
                   className="min-w-0 flex-1 bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400"
                 />
                 <span className="shrink-0 text-surface-600 font-mono text-xs">|</span>
@@ -418,7 +419,7 @@ export default function FAQAdminPage() {
                   type="text"
                   placeholder="Text EN"
                   value={btn.labelEn}
-                  onChange={(e) => { const next = [...form.buttons]; next[i] = { ...next[i], labelEn: e.target.value }; setForm({ ...form, buttons: next }); }}
+                  onChange={(e) => { const next = [...form.buttons]; next[i] = { ...btn, labelEn: e.target.value }; setForm({ ...form, buttons: next }); }}
                   className="min-w-0 flex-1 bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400"
                 />
                 <span className="shrink-0 text-surface-600 font-mono text-xs">|</span>
@@ -426,7 +427,7 @@ export default function FAQAdminPage() {
                   type="url"
                   placeholder="https://..."
                   value={btn.url}
-                  onChange={(e) => { const next = [...form.buttons]; next[i] = { ...next[i], url: e.target.value }; setForm({ ...form, buttons: next }); }}
+                  onChange={(e) => { const next = [...form.buttons]; next[i] = { ...btn, url: e.target.value }; setForm({ ...form, buttons: next }); }}
                   className="min-w-0 flex-[2] bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400"
                 />
                 <button

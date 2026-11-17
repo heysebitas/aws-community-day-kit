@@ -97,3 +97,44 @@ test("el nivel de una sección", () => {
   evento de prueba, no en una prueba automática.
 - El rendimiento con carga real: eso se mide en el entorno del evento, con el
   sitio ya montado.
+
+## e2e y accesibilidad (Playwright + axe)
+
+Las pruebas de `tests/e2e/*.spec.mjs` miran la demo en producción con axe
+(0 violaciones *serious* o *critical* en portada, registro, login del panel,
+check-in y pasaporte). **No** están en `npm test` ni en `package.json`: Playwright
+se instala sólo cuando se quiere correrlas.
+
+```bash
+npm i --no-save @playwright/test @axe-core/playwright
+npx playwright install --with-deps chromium
+npm run build
+MODO_DEMO=1 JWT_SECRET=$(openssl rand -base64 48) npx next start -p 3000 &
+PRUEBA_URL=http://localhost:3000 npx playwright test
+```
+
+## Medición en local
+
+```bash
+npm run medir -- --url http://localhost:3000 --comparar   # Lighthouse contra medidas/linea-base.json
+node scripts/presupuesto-bundle.mjs --salida medidas/bundle.json
+node scripts/presupuesto-bundle.mjs --base medidas/bundle.json --umbral 10   # compara con otra medida
+```
+
+`npm run medir` necesita `lighthouse` y Chromium (ver `docs/rendimiento.md`). Para el
+bundle, `--next otra-carpeta/.next` mide otro checkout.
+
+## Qué corre la CI
+
+Sólo en `pull_request` (y respetando el `paths-ignore` de documentación), además de
+`check` + `build` en Node 20.12 y 22 (el mínimo de `engines`):
+
+| Job | Qué hace | Si falla |
+|---|---|---|
+| `e2e` | axe + Playwright sobre `next start` con `MODO_DEMO=1` | Falla el PR |
+| `lighthouse` | `npm run medir --comparar` y presupuestos de la fase 2 (portada móvil ≥ 95, LCP < 2,5 s, TBT < 100 ms, accesibilidad ≥ 96) | Sólo aviso |
+| `bundle` | JS de primera carga por ruta pública contra el build de la rama base; avisa si sube > 10 % | Sólo aviso |
+
+La línea base de Lighthouse es `medidas/linea-base.json`, medida en un Mac: en los
+runners los tiempos serán distintos, así que se trata como orientación hasta que se
+regenere con `npm run medir -- --url … --guardar-base` desde el propio runner.

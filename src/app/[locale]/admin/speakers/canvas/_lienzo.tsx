@@ -111,11 +111,13 @@ export function Lienzo({
         setAsa(null);
         window.removeEventListener("pointermove", mover);
         window.removeEventListener("pointerup", soltar);
+        window.removeEventListener("pointercancel", soltar);
         onSoltar?.();
       };
 
       window.addEventListener("pointermove", mover);
       window.addEventListener("pointerup", soltar);
+      window.addEventListener("pointercancel", soltar);
     },
     [ajustes, escala, onChange, onSoltar],
   );

@@ -195,6 +195,12 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
   const active = PLATFORMS.find((p) => p.key === activePlatform)!;
   const url = shareUrl(activePlatform);
 
+  // Con la hoja de compartir del sistema, el botón principal la usa.
+  const puedeNativo = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  const compartirNativo = () => {
+    navigator.share({ title: talkTitle || name, text: texts[activePlatform], url: profileUrl }).catch(() => {});
+  };
+
   useScrollLock(true);
   const idTitulo = useId();
   const ref = useDialogo(onClose);
@@ -226,7 +232,6 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
           {/* Card preview */}
           <div className="p-4 pb-3">
             <div className="overflow-hidden border-2 border-surface-600">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cardUrl} alt={`Tarjeta de ${name}`} className="w-full" />
             </div>
             <div className="mt-2.5 flex items-center gap-2">
@@ -303,7 +308,16 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
                 </span>
                 <div className="flex items-center gap-2 ml-auto">
                   <CopyButton text={texts[activePlatform]} />
-                  {url && (
+                  {puedeNativo ? (
+                    <button
+                      type="button"
+                      onClick={compartirNativo}
+                      className={cn("flex items-center gap-1.5 border-2 px-3 py-1.5 font-mono text-xs font-semibold transition-all", active.color)}
+                    >
+                      <Share2 className="h-3 w-3" />
+                      Compartir
+                    </button>
+                  ) : url && (
                     <a
                       href={url}
                       target="_blank"

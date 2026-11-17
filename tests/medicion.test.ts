@@ -51,9 +51,9 @@ describe("medición", () => {
     const filas = comparar(peor, base);
     const por = Object.fromEntries(filas.map((f) => [f.metrica, f]));
     assert.equal(filas.length, 3, "las páginas que no están en la base se ignoran");
-    assert.equal(por.rendimiento.regresion, true);
-    assert.equal(por.lcp.regresion, false, "100 ms está dentro de la tolerancia");
-    assert.equal(por.js.regresion, true);
+    assert.equal(por.rendimiento!.regresion, true);
+    assert.equal(por.lcp!.regresion, false, "100 ms está dentro de la tolerancia");
+    assert.equal(por.js!.regresion, true);
     const mejor = comparar({ paginas: { "/": { rendimiento: 95, lcp: 2000, js: 200 } } }, base);
     assert.ok(mejor.every((f) => !f.regresion));
   });

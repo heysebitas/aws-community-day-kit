@@ -231,7 +231,6 @@ export function RegistrationDetail({
               </p>
             </div>
           ) : qrDataUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img src={qrDataUrl} alt="Código QR" className="h-32 w-32 shrink-0 border-2 border-surface-500" />
           ) : (
             <div className="h-32 w-32 shrink-0 animate-pulse border-2 border-surface-600 bg-surface-700" />

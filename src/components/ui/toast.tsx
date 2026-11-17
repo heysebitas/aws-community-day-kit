@@ -38,7 +38,7 @@ const styles = {
 /** El diálogo modal abierto más reciente: lo de fuera de él es inerte y queda bajo la capa superior. */
 export function dialogoAbierto(doc: Pick<Document, "querySelectorAll">): HTMLElement | null {
   const abiertos = doc.querySelectorAll<HTMLElement>("dialog[open]");
-  return abiertos.length ? abiertos[abiertos.length - 1] : null;
+  return abiertos.length ? abiertos[abiertos.length - 1]! : null;
 }
 
 const DURACION = 4000;

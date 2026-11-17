@@ -29,7 +29,7 @@ export function EditorBloques({
     const j = i + hacia;
     if (j < 0 || j >= bloques.length) return;
     const copia = [...bloques];
-    [copia[i], copia[j]] = [copia[j], copia[i]];
+    [copia[i], copia[j]] = [copia[j]!, copia[i]!];
     onChange(copia);
   };
 

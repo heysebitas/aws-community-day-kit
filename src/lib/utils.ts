@@ -83,5 +83,5 @@ export function badgeNameOptions(first: string, last: string): {
     }
   }
 
-  return { firsts: firstsSafe, lasts: lastsSafe, options, default: options[0] };
+  return { firsts: firstsSafe, lasts: lastsSafe, options, default: options[0]! };
 }

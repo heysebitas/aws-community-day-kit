@@ -331,6 +331,7 @@ export function DetailBox({ rows }: { rows: Detail[] }) {
                 fontSize: "13px",
                 lineHeight: "1.5",
                 color: C.text,
+                whiteSpace: "pre-wrap",
               }}
             >
               {r.value}

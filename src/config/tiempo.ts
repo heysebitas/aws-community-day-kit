@@ -16,7 +16,7 @@ function desfase(zona: string, instante: Date): number {
     hour: "2-digit", minute: "2-digit", second: "2-digit",
   });
   const p = Object.fromEntries(f.formatToParts(instante).map((x) => [x.type, Number(x.value)]));
-  const comoUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+  const comoUtc = Date.UTC(p.year!, p.month! - 1, p.day!, p.hour!, p.minute!, p.second!);
   return Math.round((comoUtc - instante.getTime()) / 60_000);
 }
 
@@ -24,7 +24,7 @@ export function instante(local: string, zona: string): Date {
   const m = PARTES.exec(local);
   if (!m) throw new Error(`evento/config.ts: «${local}» no es una fecha válida. Formato: 2027-10-23T08:30.`);
   const [, a, mes, d, h, min] = m.map(Number);
-  const supuesto = Date.UTC(a, mes - 1, d, h, min);
+  const supuesto = Date.UTC(a!, mes! - 1, d!, h!, min!);
   // Dos pasadas: la primera estima el desfase y la segunda lo corrige si la
   // estimación cayó al otro lado de un cambio de horario.
   let t = supuesto - desfase(zona, new Date(supuesto)) * 60_000;

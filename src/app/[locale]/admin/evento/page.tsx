@@ -56,7 +56,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
   return (
     <div className="border-2 border-surface-600 bg-surface-800 px-3 py-2 shadow-xl">
       {label && <p className="mb-0.5 font-mono text-xs text-surface-300">{label}</p>}
-      <p className="font-mono text-xs text-surface-100">{payload[0].value.toLocaleString(PAIS.locale)}</p>
+      <p className="font-mono text-xs text-surface-100">{payload[0]!.value.toLocaleString(PAIS.locale)}</p>
     </div>
   );
 }

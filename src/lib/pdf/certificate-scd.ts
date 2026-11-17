@@ -78,7 +78,7 @@ export async function certificadoScd(rawName: string): Promise<Buffer> {
   const plantilla = await PDFDocument.load(new Uint8Array(leer(PLANTILLA)));
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
-  const [pagina] = await doc.copyPages(plantilla, [PAGINA]);
+  const pagina = (await doc.copyPages(plantilla, [PAGINA]))[0]!;
   doc.addPage(pagina);
 
   const limpio = vaciar(vaciar(contenidoDe(doc, pagina), MARCA_NOMBRE), MARCA_ENTIDAD);

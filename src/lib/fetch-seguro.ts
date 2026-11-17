@@ -24,7 +24,7 @@ const MAX_SALTOS = 3;
 /** Redes a las que el servidor no tiene por qué pedirle una foto. */
 export function esIpPrivada(ip: string): boolean {
   if (net.isIPv4(ip)) {
-    const [a, b] = ip.split(".").map(Number);
+    const [a = 0, b = 0] = ip.split(".").map(Number);
     return (
       a === 0 || a === 10 || a === 127 ||
       (a === 100 && b >= 64 && b <= 127) ||
@@ -41,7 +41,7 @@ export function esIpPrivada(ip: string): boolean {
   if (v6.startsWith("fc") || v6.startsWith("fd") || v6.startsWith("fe80") || v6.startsWith("ff")) return true;
   // IPv4 mapeada: ::ffff:10.0.0.1
   const mapeada = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(v6);
-  return mapeada ? esIpPrivada(mapeada[1]) : false;
+  return mapeada ? esIpPrivada(mapeada[1]!) : false;
 }
 
 function pedir(url: URL, ip: string, familia: number): Promise<{ estado: number; ubicacion?: string; tipo: string; cuerpo: Buffer | null }> {

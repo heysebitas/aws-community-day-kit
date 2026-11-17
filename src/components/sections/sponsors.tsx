@@ -39,7 +39,6 @@ function LogoRow({
             aria-label={s.nombre}
           >
             {/* `brightness-0` aplana el logo a tinta: todos pesan lo mismo sobre el bloque. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`${basePath}${s.logo}`}
               alt={s.nombre}

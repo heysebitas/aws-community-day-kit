@@ -15,11 +15,7 @@ Decide si el correo es de sistema o de campaña:
 ## Pasos
 
 1. Lee `src/emails/bloques.ts` para conocer los tipos de bloque, sus campos obligatorios, las variables `{nombre}` disponibles y las banderas `mostrarSi`.
-2. **No añadas otro componente React de correo.** Ya existen cuatro excepciones y no se añaden más:
-   - `src/emails/invitation.tsx`
-   - `src/emails/speaker-submission-confirmation.tsx`
-   - `src/emails/passport-edit-confirm.tsx`
-   - `src/emails/volunteer-certificate.tsx`
+2. **No añadas un componente React de correo.** No hay excepciones: todo correo es una plantilla de bloques.
 3. Para un correo nuevo, edita la semilla de `src/emails/semilla.ts`: asunto, vista previa y una lista de `bloques`. Usa bloques del catálogo, conserva la forma de sus datos y no escribas la plantilla como JSX. La semilla es el contenido inicial o de fábrica; la copia ya guardada en la base sigue siendo editable.
 4. Si es de sistema, añade su clave a `SISTEMA` en `src/models/email-template.ts`. Si es de campaña, no la añadas. La semilla debe incluir todas las claves de sistema o el propio módulo falla al arrancar.
 5. Dispara el correo de sistema con `armarCorreo` de `src/lib/email-plantillas.ts`, pasando los valores de la persona y sus banderas. Las variables del evento se añaden solas.
@@ -34,4 +30,4 @@ npm test
 npm run check
 ```
 
-Las pruebas de bloques, plantillas y flujos de correo deben pasar. Comprueba también que la nueva clave aparece una sola vez, que el correo se puede sembrar y que ningún envío nuevo introduce un componente React fuera de las cuatro excepciones.
+Las pruebas de bloques, plantillas y flujos de correo deben pasar. Comprueba también que la nueva clave aparece una sola vez, que el correo se puede sembrar y que ningún envío nuevo introduce un componente React de correo.

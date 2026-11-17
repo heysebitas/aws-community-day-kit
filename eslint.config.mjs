@@ -59,6 +59,12 @@ const eslintConfig = defineConfig([
       "react-hooks/immutability": "warn",
     },
   },
+  {
+    // Las fotos del bucket ya pasan por `Foto` (next/image); los <img> que
+    // quedan son SVG, data URLs, correos e imágenes generadas, donde el
+    // optimizador de Next no aplica.
+    rules: { "@next/next/no-img-element": "off" },
+  },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);
 

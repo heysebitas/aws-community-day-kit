@@ -81,7 +81,7 @@ function SpeakersPageInner() {
   }, [rows, search, values.etapa, values.publicos, values.modalidad]);
 
   const cuenta = (etapa: string) =>
-    etapa === "all" ? rows.length : rows.filter((s) => GRUPOS[etapa].includes(s.status)).length;
+    etapa === "all" ? rows.length : rows.filter((s) => (GRUPOS[etapa] ?? []).includes(s.status)).length;
 
   const publicos = rows.filter((s) => s.isPublic).length;
   const online = rows.filter((s) => s.sessionType === "online").length;

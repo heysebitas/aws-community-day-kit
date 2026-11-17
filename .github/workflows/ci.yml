@@ -1,6 +1,7 @@
 name: CI
 
 # Los cambios que solo tocan documentación no pasan por el build.
+# Los jobs de medición (e2e, Lighthouse, bundle) solo corren en pull_request para no gastar CI en cada push.
 on:
   push:
     branches: [main]
@@ -15,9 +16,35 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  MODO_DEMO: "1"
+
 jobs:
   check:
+    name: check + build (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20.12 es el mínimo que promete `engines` en package.json.
+        node: ["20.12", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+        env:
+          JWT_SECRET: solo-para-compilar-en-ci-no-se-usa-en-ningun-sitio
+
+  e2e:
+    name: e2e + axe (demo en producción)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,8 +52,99 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run check
+      # Playwright y axe solo viven en este job: no están en package.json ni en el lockfile.
+      - run: npm i --no-save @playwright/test @axe-core/playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Clave de sesión solo para este job
+        run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
       - run: npm run build
+      - name: Levantar la demo
+        run: |
+          npx next start -p 3000 > servidor.log 2>&1 &
+          npx --yes wait-on@8 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
+      - run: npx playwright test
         env:
-          MODO_DEMO: "1"
-          JWT_SECRET: solo-para-compilar-en-ci-no-se-usa-en-ningun-sitio
+          PRUEBA_URL: http://localhost:3000
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-informe
+          path: |
+            test-results/
+            servidor.log
+          if-no-files-found: ignore
+
+  lighthouse:
+    name: Lighthouse (aviso)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm i -g lighthouse@12.8.2
+      - name: Clave de sesión solo para este job
+        run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
+      - run: npm run build
+      - name: Levantar la demo
+        run: |
+          npx next start -p 3000 > servidor.log 2>&1 &
+          npx --yes wait-on@8 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
+      # Aviso, no fallo, hasta que se decida si las regresiones bloquean el PR.
+      - name: Comparar con la línea base
+        continue-on-error: true
+        run: npm run medir -- --url http://localhost:3000 --comparar
+      - name: Presupuestos de la fase 2 (portada móvil)
+        run: |
+          node -e '
+            const p = JSON.parse(require("fs").readFileSync("medidas/actual.json", "utf8")).paginas["/"];
+            const reglas = [
+              ["rendimiento", p.rendimiento >= 95, `${p.rendimiento} (mínimo 95)`],
+              ["LCP", p.lcp < 2500, `${p.lcp} ms (máximo 2500)`],
+              ["TBT", p.tbt < 100, `${p.tbt} ms (máximo 100)`],
+              ["accesibilidad", p.accesibilidad >= 96, `${p.accesibilidad} (mínimo 96)`],
+            ];
+            for (const [n, ok, txt] of reglas) if (!ok) console.log(`::warning title=Presupuesto de Lighthouse::${n} en la portada: ${txt}`);
+          '
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: medidas/actual.json
+          if-no-files-found: ignore
+
+  bundle:
+    name: Presupuesto de bundle (aviso)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            base/package-lock.json
+      - name: Clave de sesión solo para este job
+        run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
+      - name: Medir la rama base
+        working-directory: base
+        run: |
+          npm ci
+          npm run build
+          # Se mide con el script de la rama del PR: la base puede no tenerlo.
+          node ../scripts/presupuesto-bundle.mjs --next .next --salida ../bundle-base.json
+      - run: npm ci
+      - run: npm run build
+      - name: Comparar (sube más de 10 % → aviso)
+        run: node scripts/presupuesto-bundle.mjs --base bundle-base.json --umbral 10 --salida medidas/bundle.json

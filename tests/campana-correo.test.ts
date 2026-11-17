@@ -47,7 +47,7 @@ describe("armar el correo de una persona", () => {
       {},
     );
     assert.equal(c.asunto, evento);
-    assert.ok(c.html.includes(sede));
+    assert.ok(c.html.includes(sede!));
   });
 
   test("quien no tiene un dato no recibe la variable cruda", async () => {

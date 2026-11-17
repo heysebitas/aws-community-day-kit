@@ -28,20 +28,14 @@ function icosahedron(): { verts: V3[]; edges: Edge[] } {
   let min = Infinity;
   for (let i = 0; i < verts.length; i++)
     for (let j = i + 1; j < verts.length; j++) {
-      const d = Math.hypot(
-        verts[i][0] - verts[j][0],
-        verts[i][1] - verts[j][1],
-        verts[i][2] - verts[j][2],
-      );
+      const vi = verts[i]!, vj = verts[j]!;
+      const d = Math.hypot(vi[0] - vj[0], vi[1] - vj[1], vi[2] - vj[2]);
       if (d < min) min = d;
     }
   for (let i = 0; i < verts.length; i++)
     for (let j = i + 1; j < verts.length; j++) {
-      const d = Math.hypot(
-        verts[i][0] - verts[j][0],
-        verts[i][1] - verts[j][1],
-        verts[i][2] - verts[j][2],
-      );
+      const vi = verts[i]!, vj = verts[j]!;
+      const d = Math.hypot(vi[0] - vj[0], vi[1] - vj[1], vi[2] - vj[2]);
       if (Math.abs(d - min) < 0.01) edges.push([i, j]);
     }
   return { verts, edges };
@@ -132,7 +126,7 @@ export function WireSolid({
       });
 
       for (const [a, b] of edges) {
-        const pa = proj[a], pb = proj[b];
+        const pa = proj[a]!, pb = proj[b]!;
         const depth = (pa.z + pb.z) / 2;
         ctx.beginPath();
         ctx.moveTo(pa.x, pa.y);

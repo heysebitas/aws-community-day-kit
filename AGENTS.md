@@ -92,10 +92,10 @@ docs/                   la documentación; cada tema en un archivo corto
 - **Sin diálogos del navegador**: nada de `alert`, `confirm` ni `prompt`. Usa
   `useToast`, `useConfirm` y `usePrompt`. Hay una prueba que lo comprueba.
 - **Correos**: una plantilla es una lista de bloques guardada en la base, con
-  su texto de fábrica en `src/emails/semilla.ts`. Quedan cuatro correos escritos
-  como componentes de React (`invitation`, `speaker-submission-confirmation`,
-  `passport-edit-confirm` y `volunteer-certificate`): no se añaden más, un
-  correo nuevo se hace con bloques.
+  su texto de fábrica en `src/emails/semilla.ts`. Todos los correos son
+  bloques, también la invitación al panel, la confirmación del pasaporte, la
+  propuesta recibida y el certificado: no hay componentes de React de correo y
+  un correo nuevo se hace con bloques. No hay excepciones.
 - **Seguridad**: toda ruta de `src/app/api/` que no sea pública empieza por
   `requireAuth` / `requireAccess` / `requireAnyAccess` (basta con tener acceso a
   una de varias secciones) / `requireDelete` (las que borran). Lo público lleva

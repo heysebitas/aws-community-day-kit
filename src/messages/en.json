@@ -15,7 +15,8 @@
     "open_menu": "Open menu",
     "close_menu": "Close menu",
     "menu": "Navigation menu",
-    "skip_to_content": "Skip to content"
+    "skip_to_content": "Skip to content",
+    "back_to_top": "Back to top"
   },
   "Strip": {
     "event": "[[evento]]",
@@ -393,6 +394,7 @@
     "preview_level": "Level {level}",
     "preview_inperson": "In person",
     "phone_label": "Phone number",
+    "photo_remove": "Remove photo",
     "phone_search": "Search country…",
     "phone_search_aria": "Search country",
     "form_error": "Something went wrong",
@@ -452,6 +454,7 @@
     "submit": "Create password"
   },
   "Passport": {
+    "pin_label": "Four-digit PIN",
     "loading": "Loading passport",
     "not_found": "Passport not found",
     "not_found_hint": "Check the QR code on your badge.",

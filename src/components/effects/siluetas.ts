@@ -19,9 +19,9 @@ class Constructor {
     }
     for (const s of inicios) for (let i = 0; i < 4; i++) this.edges.push([s + i, s + ((i + 1) % 4)]);
     for (let l = 0; l < inicios.length - 1; l++) {
-      for (let i = 0; i < 4; i++) this.edges.push([inicios[l] + i, inicios[l + 1] + i]);
+      for (let i = 0; i < 4; i++) this.edges.push([inicios[l]! + i, inicios[l + 1]! + i]);
     }
-    return inicios[inicios.length - 1];
+    return inicios[inicios.length - 1]!;
   }
 
   mastil(x: number, z: number, desde: number, hasta: number): number {

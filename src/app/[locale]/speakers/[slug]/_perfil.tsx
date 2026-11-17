@@ -262,7 +262,6 @@ export function PerfilSpeaker({
             {/* La tarjeta se apoya en un bloque del tema que sobresale, para que se lea como un objeto y no como una imagen más. */}
             <div className="bg-acento p-3">
               <div className="border-2 border-tinta shadow-[6px_6px_0_0_rgba(0,0,0,0.35)]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={cardUrl} alt={`Tarjeta de ${persona.nombre}`} className="block w-full" />
               </div>
             </div>

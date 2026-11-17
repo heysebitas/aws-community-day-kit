@@ -52,7 +52,7 @@ describe("el bloque claro se lee con cualquier tema", () => {
   const error = css.match(/--color-error:\s*(#[0-9A-F]{6})/i)?.[1] ?? "";
   const sobre = (acento: string, alfa: number) => {
     const [r, g, b] = aRgb(acento).map((v) => Math.round(v * (1 - alfa)));
-    return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+    return "#" + [r, g, b].map((v) => v!.toString(16).padStart(2, "0")).join("");
   };
   const temas = [
     ...Object.entries(TEMAS),
@@ -78,7 +78,7 @@ describe("variables -rgb del tema", () => {
   it("todos los temas definen tinta y papel para rgb(var(--x-rgb) / a)", () => {
     for (const t of [...Object.values(TEMAS), derivarTema("#12AB34")]) {
       const v = variablesDeTema(t);
-      assert.match(v["--tema-acento-rgb"], /^\d+ \d+ \d+$/);
+      assert.match(v["--tema-acento-rgb"]!, /^\d+ \d+ \d+$/);
       assert.equal(v["--tinta-rgb"], "0 0 0");
       assert.equal(v["--papel-rgb"], "255 255 255");
     }

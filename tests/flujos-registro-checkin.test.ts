@@ -10,11 +10,11 @@ const fetchOriginal = globalThis.fetch;
 const log = console.log;
 
 const doc = DOCUMENTOS.find((d) => d.rule.kind === "digits") ?? DOCUMENTOS[0];
-const numeroOk = doc.rule.kind === "digits" ? "1".repeat(doc.rule.min) : "12345678";
+const numeroOk = doc!.rule.kind === "digits" ? "1".repeat(doc!.rule.min) : "12345678";
 const datos = (email: string, extra: Record<string, unknown> = {}) => ({
   firstName: "Ana", lastName: "Prueba", email, attendance: "in-person",
-  documentType: doc.value, documentNumber: numeroOk,
-  role: ROLES[0].value, entityType: "none", acceptCoc: true, acceptPrivacy: true, ...extra,
+  documentType: doc!.value, documentNumber: numeroOk,
+  role: ROLES[0]!.value, entityType: "none", acceptCoc: true, acceptPrivacy: true, ...extra,
 });
 const registrar = async (email: string, extra: Record<string, unknown> = {}, cuerpo: Record<string, unknown> = {}) => {
   const { POST } = await import("@/app/api/registrations/route");

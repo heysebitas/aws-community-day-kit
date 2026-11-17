@@ -67,7 +67,6 @@ export function OrganizerCard({ org }: { org: Organizador }) {
           // cuadrícula se sienta uniforme aunque se mezclen los dos casos.
           // Semilla = `org.id`, que es estable y único.
           <div className="flex h-full w-full items-center justify-center bg-surface-800 p-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={avatarUrl(org.id)}
               alt=""
