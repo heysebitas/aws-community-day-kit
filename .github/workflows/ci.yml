@@ -16,9 +16,6 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  MODO_DEMO: "1"
-
 jobs:
   check:
     name: check + build (Node ${{ matrix.node }})
@@ -38,11 +35,15 @@ jobs:
       - run: npm run check
       - run: npm run build
         env:
+          MODO_DEMO: "1"
           JWT_SECRET: solo-para-compilar-en-ci-no-se-usa-en-ningun-sitio
 
   e2e:
     name: e2e + axe (demo en producción)
     if: github.event_name == 'pull_request'
+    # La demo en memoria solo aquí: con MODO_DEMO, `npm test` deja conexiones abiertas y no termina.
+    env:
+      MODO_DEMO: "1"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -77,6 +78,9 @@ jobs:
   lighthouse:
     name: Lighthouse (aviso)
     if: github.event_name == 'pull_request'
+    # La demo en memoria solo aquí: con MODO_DEMO, `npm test` deja conexiones abiertas y no termina.
+    env:
+      MODO_DEMO: "1"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -120,6 +124,9 @@ jobs:
   bundle:
     name: Presupuesto de bundle (aviso)
     if: github.event_name == 'pull_request'
+    # La demo en memoria solo aquí: con MODO_DEMO, `npm test` deja conexiones abiertas y no termina.
+    env:
+      MODO_DEMO: "1"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
