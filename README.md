@@ -10,6 +10,8 @@ resto se adapta.
 
 [English](README.en.md) · [Galería completa](docs/galeria.md) · [Para asistentes de IA](AGENTS.md)
 
+📖 **[Leer el artículo en Builder Center](https://builder.aws.com/content/3MFNZKPLTc1ZpmmkP4orOqqRDvX/la-plataforma-de-los-student-community-days-ahora-es-de-todos)**: la historia de cómo pasó de Colombia a Chile y México, y por qué ahora es de todos.
+
 ![El sitio en escritorio y en el teléfono](docs/img/galeria/presentacion.webp)
 
 ## Pruébalo en dos minutos
@@ -131,6 +133,8 @@ Una línea en la configuración (`tema: "menta"`) o tu propio color
 | AWS Student Community Day México | [studentcommunitydaymexico.com](https://studentcommunitydaymexico.com/) |
 
 ¿Montaste el tuyo con el kit? Abre un PR y súmalo a la lista.
+
+La historia completa, en [Builder Center](https://builder.aws.com/content/3MFNZKPLTc1ZpmmkP4orOqqRDvX/la-plataforma-de-los-student-community-days-ahora-es-de-todos).
 
 ## Cómo está armado
 

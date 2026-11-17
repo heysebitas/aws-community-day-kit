@@ -9,6 +9,8 @@ them: you describe your event in one folder and everything else adapts.
 
 [Español](README.md) · [Full gallery](docs/galeria.md) · [For AI assistants](AGENTS.md) · the code, comments and docs are in Spanish.
 
+📖 **[Read the story on Builder Center](https://builder.aws.com/content/3MFNZKPLTc1ZpmmkP4orOqqRDvX/la-plataforma-de-los-student-community-days-ahora-es-de-todos)** (in Spanish): how it went from Colombia to Chile and Mexico, and why it is now open to everyone.
+
 ![The site on desktop and on a phone](docs/img/galeria/presentacion.webp)
 
 ## Try it in two minutes
