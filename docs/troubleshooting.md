@@ -2,6 +2,20 @@
 
 Los fallos que más se repiten al montar una edición, y qué hacer con cada uno.
 
+## La instalación o la demo no arrancan
+
+- **Node:** hace falta 20.19 o más (`node --version`). Con una versión menor
+  Tailwind falla al compilar con un error de `require()` de un módulo ES.
+- **La primera vez, la demo descarga MongoDB** (unos 100 MB) para la base en
+  memoria. Sin internet, o detrás de un proxy que lo bloquee, se queda
+  esperando. Compruébalo aparte con `npm run db:memoria`.
+- **Puerto ocupado:** `PORT=3001 npm run demo`.
+- **Páginas lentas en la demo:** el modo desarrollo compila cada página la
+  primera vez que se abre. `npm run demo -- --produccion` compila todo al
+  principio y después responde al instante.
+- **«Demasiados intentos» al entrar al panel:** el login admite 10 intentos
+  cada 15 minutos por IP, también en la demo. Espera o reinicia la demo.
+
 ## El captcha no aparece o los formularios rechazan todo
 
 **Síntoma:** el formulario público no deja enviar, o el navegador dice que hay
@@ -38,7 +52,7 @@ by CORS policy`, o la imagen no aparece.
 - Las cabeceras que debe servir el bucket están en
   [bucket.md](bucket.md).
 
-## El límite de peticiones no discriminate
+## El límite de peticiones no distingue a nadie
 
 **Síntoma:** todo el mundo recibe un `429` a la vez, o el límite no se aplica
 a nadie.

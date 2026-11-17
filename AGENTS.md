@@ -1,12 +1,52 @@
 # Guía para asistentes de IA
 
 Este repo es **AWS Community Day Kit**: el sitio, los formularios y el panel de
-operación de un Student Community Day (registro, speakers, voluntarios, agenda,
-check-in con QR, pasaporte digital, correos, escarapelas, certificados). Una edición se configura sin
-tocar el código del kit.
+operación de un AWS Student Community Day o de cualquier Community Day
+(registro, speakers, voluntarios, agenda, check-in con QR, pasaporte digital,
+correos, escarapelas, certificados). Una edición se configura sin tocar el
+código del kit. Todo el repo —código, comentarios y documentación— está en español.
 
-Si alguien te pide **«configura mi evento»**, sigue [`docs/asistente.md`](docs/asistente.md):
-es una entrevista corta y tres comandos.
+## Empieza aquí
+
+```bash
+node --version          # 20.19 o más
+npm install
+npm run demo            # http://localhost:3000 con datos de ejemplo; no necesita cuentas ni llaves
+```
+
+Con la demo corriendo ya puedes ver y probar todo:
+
+| Qué | Dónde |
+|---|---|
+| El sitio | `http://localhost:3000` (inglés en `/en`) |
+| El panel | `/admin/login` → `demo@example.com` / `demo-demo-demo` (rol admin) |
+| Otras cuentas | `organiza@example.com` (organizador) y `puerta@example.com` (voluntario), misma contraseña |
+| Un pasaporte | `/pasaporte/demo00000001`, PIN `1234`; PIN de stand para sellar: `4821` |
+| Lo que lee un LLM | `/llms.txt`, `/llms-full.txt`, `/api/evento` |
+
+Los datos de ejemplo (`src/lib/demo.ts`) son inventados y viven en memoria: se
+pierden al cerrar la demo. Nunca apuntes la demo a una base real.
+
+## Qué te pidieron
+
+| Si te piden… | Lee primero | Y luego |
+|---|---|---|
+| «Configura mi evento» / «monta mi SCD» | [`docs/asistente.md`](docs/asistente.md) | Es una entrevista y tres comandos |
+| Cambiar un texto del sitio | `.claude/skills/kit-texto/SKILL.md` | `src/messages/*.json`, en los dos idiomas |
+| Cambiar o crear un correo | `.claude/skills/kit-correo/SKILL.md` | [`docs/correo.md`](docs/correo.md) |
+| Crear o tocar una ruta de la API | `.claude/skills/kit-ruta-api/SKILL.md` | [`docs/seguridad.md`](docs/seguridad.md) |
+| Colores o un tema nuevo | [`docs/temas.md`](docs/temas.md) | `src/config/temas.ts` |
+| Un país: documentos, teléfono, ley de datos | [`docs/paises.md`](docs/paises.md) | `src/config/paises.ts` |
+| Roles y permisos del panel | [`docs/panel.md`](docs/panel.md) | `src/lib/permisos.ts` |
+| Los modelos y la base | [`docs/datos.md`](docs/datos.md) | [`docs/base-de-datos.md`](docs/base-de-datos.md) |
+| Publicarlo | [`docs/despliegue.md`](docs/despliegue.md) | [`docs/bucket.md`](docs/bucket.md) |
+| Rendimiento o Lighthouse | `.claude/skills/kit-medir/SKILL.md` | [`docs/rendimiento.md`](docs/rendimiento.md) |
+| Algo no funciona | [`docs/troubleshooting.md`](docs/troubleshooting.md) | |
+| Revisar un cambio | `.claude/agents/revisor-kit.md` | `.claude/skills/kit-verificar/SKILL.md` |
+| Rehacer las capturas de la documentación | [`docs/galeria.md`](docs/galeria.md) | `npm run galeria` |
+
+Las skills son Markdown normal: si tu herramienta no las carga sola, ábrelas y
+sigue los pasos. Kiro tiene las mismas en `.kiro/steering/`.
 
 ## La regla que importa
 
@@ -25,31 +65,16 @@ llevándolo a `evento/config.ts`, no dejando el valor fijo.
 
 ```bash
 npm install
-npm run setup      # escribe evento/config.ts (interactivo, o --desde respuestas.json)
-npm run doctor     # dice qué falta en la configuración y en el entorno
-npm run demo       # levanta el sitio con una base en memoria; no necesita ninguna cuenta
-npm run check      # tipos + lint + pruebas: tiene que pasar antes de dar algo por hecho
+npm run demo                  # el sitio con base en memoria y datos de ejemplo
+npm run demo -- --produccion  # lo mismo, compilado: más lento al arrancar, rápido después
+npm run setup                 # escribe evento/config.ts (interactivo, o --desde respuestas.json)
+npm run doctor                # qué falta en la configuración y en el entorno
+npm run check                 # tipos + lint + pruebas: tiene que pasar antes de dar algo por hecho
 npm run build
+npm run galeria               # rehace las capturas de docs/img/galeria (con la demo corriendo)
+npm run medir                 # Lighthouse sobre la demo (ver docs/rendimiento.md)
+npm run crear-admin           # la primera cuenta del panel en una base real
 ```
-
-El panel en modo demo: `/admin/login`, `demo@example.com` / `demo-demo-demo`.
-
-## Skills para desarrollar el kit
-
-Para **desarrollar el kit** —no para configurar una edición— sigue el
-procedimiento de la skill que corresponda. Codex, Cursor y otros asistentes
-pueden leer el mismo Markdown:
-
-| Skill | Cuándo usarla | Pasos |
-|---|---|---|
-| `kit-ruta-api` | Crear o revisar una ruta de `src/app/api/` | `.claude/skills/kit-ruta-api/SKILL.md` · `.kiro/steering/kit-ruta-api.md` |
-| `kit-medir` | Medir Lighthouse y el bundle | `.claude/skills/kit-medir/SKILL.md` · `.kiro/steering/kit-medir.md` |
-| `kit-verificar` | Dar por terminado un cambio | `.claude/skills/kit-verificar/SKILL.md` · `.kiro/steering/kit-verificar.md` |
-| `kit-texto` | Añadir o revisar textos del sitio | `.claude/skills/kit-texto/SKILL.md` · `.kiro/steering/kit-texto.md` |
-| `kit-correo` | Añadir o revisar un correo | `.claude/skills/kit-correo/SKILL.md` · `.kiro/steering/kit-correo.md` |
-
-Para revisar un diff sin tocar archivos, usa el subagente
-`.claude/agents/revisor-kit.md`.
 
 ## Mapa del código
 
@@ -117,8 +142,19 @@ docs/                   la documentación; cada tema en un archivo corto
 
 ## Antes de terminar
 
-`npm run check` y `npm run build` en verde. Si cambiaste algo visible, míralo:
-`npm run demo` y `node scripts/captura.mjs http://localhost:3000/ captura.png`.
+`npm run check` y `npm run build` en verde. Si cambiaste algo visible, míralo
+con tus ojos, no lo des por bueno porque compila:
+
+```bash
+npm run demo -- --produccion        # en otra terminal
+node scripts/captura.mjs http://localhost:3000/ captura.png            # página entera, escritorio
+node scripts/captura.mjs http://localhost:3000/ movil.png 390 844      # teléfono
+CAPTURA_SOLO_VISTA=1 node scripts/captura.mjs http://localhost:3000/registro vista.png
+```
+
+Para una pantalla del panel, `npm run galeria -- --solo panel-inicio` entra con
+la cuenta de la demo. Si el cambio altera algo que sale en
+`docs/img/galeria/`, rehaz esas capturas en el mismo cambio.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

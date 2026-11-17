@@ -1,11 +1,22 @@
 # Configurar un evento con un asistente de IA
 
-Para quien organiza: abre el repo en tu editor con un asistente (Claude Code,
-Kiro, Codex, Cursor, Copilot…) y dile:
+Para quien organiza. Copia uno de estos mensajes en tu asistente (Claude Code,
+Kiro, Codex, Cursor, Copilot, Gemini…) y responde lo que te pregunte.
 
-> Lee `docs/asistente.md` y ayúdame a configurar mi evento.
+**Si ya tienes el repo abierto en tu editor:**
 
-Si todavía no clonaste el repo, también sirve darle la URL de este archivo.
+```text
+Lee docs/asistente.md y AGENTS.md y ayúdame a configurar mi evento.
+```
+
+**Si todavía no lo tienes** (el asistente lo clona por ti):
+
+```text
+Clona https://github.com/heysebitas/aws-community-day-kit, lee su
+docs/asistente.md y AGENTS.md, y ayúdame a configurar mi evento.
+```
+
+En Claude Code también existe el comando `/configurar-evento`.
 
 Lo que sigue son las instrucciones para el asistente.
 
@@ -18,12 +29,26 @@ funcionando en su máquina en modo demo, y decirle con claridad qué le queda
 por hacer. No edites `src/`: una edición se configura sólo en `evento/` y
 `public/evento/` (ver `AGENTS.md`).
 
+Antes de preguntar nada, enséñale cómo se ve: arranca la demo (paso 1) y
+pásale la URL. Ver el sitio funcionando con datos de ejemplo le ayuda a
+responder, y a ti te confirma que el entorno sirve.
+
 ## 1. Prepara el terreno
 
 ```bash
-node --version    # 20.19 o más
+git clone https://github.com/heysebitas/aws-community-day-kit.git   # si no está clonado
+cd aws-community-day-kit
+node --version    # 20.19 o más; si es menor, díselo y para aquí
 npm install
+npm run demo      # http://localhost:3000, con datos de ejemplo
 ```
+
+`npm run demo` se queda corriendo: lánzalo en segundo plano o en otra
+terminal. La primera carga de cada página tarda unos segundos porque compila;
+`npm run demo -- --produccion` compila todo al principio y luego va rápido.
+
+Si `npm install` falla en Windows por permisos o en un Mac por la arquitectura,
+revisa `docs/troubleshooting.md` antes de intentar arreglos por tu cuenta.
 
 ## 2. Pregunta
 
@@ -50,7 +75,7 @@ deja como «Por confirmar» y se anota para el final.
 
 **El formato**
 10. ¿Presencial, online o los dos? ¿Cuántos cupos se anuncian?
-11. ¿Qué tema de color? Muéstrale `docs/img/temas.png`. Opciones: `naranja`,
+11. ¿Qué tema de color? Muéstrale `docs/img/temas.webp`. Opciones: `naranja`,
     `lavanda`, `platano`, `menta`, `cielo`, `coral`, `rosa`, `lima`, o un color propio (`#12AB34`).
 12. ¿En qué idiomas? (`es`, `en`; el primero es el principal)
 

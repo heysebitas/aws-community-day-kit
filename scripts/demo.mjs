@@ -1,6 +1,10 @@
 /**
  * Arranca el kit en modo demo:  npm run demo
  *
+ * Con `npm run demo -- --produccion` compila primero y sirve la versión de
+ * producción: tarda más en arrancar, pero las páginas responden al instante.
+ * Es la que usan las capturas (`npm run galeria`) y las pruebas e2e.
+ *
  * Sin cuentas ni variables de entorno: la base vive en memoria, los correos se
  * escriben en la consola y el captcha está apagado. Los datos se pierden al
  * cerrar. Para un evento real, sigue `docs/despliegue.md`.
@@ -24,5 +28,14 @@ const env = {
 console.log(`\n  Modo demo → http://localhost:${puerto}\n  Panel     → http://localhost:${puerto}/admin/login  (demo@example.com / demo-demo-demo)\n`);
 
 const next = path.join(raiz, "node_modules", "next", "dist", "bin", "next");
-const hijo = spawn(process.execPath, [next, "dev", "-p", puerto], { cwd: raiz, env, stdio: "inherit" });
-hijo.on("exit", (codigo) => process.exit(codigo ?? 0));
+const correr = (args) => spawn(process.execPath, [next, ...args], { cwd: raiz, env, stdio: "inherit" });
+
+if (process.argv.includes("--produccion")) {
+  const build = correr(["build"]);
+  build.on("exit", (codigo) => {
+    if (codigo) process.exit(codigo);
+    correr(["start", "-p", puerto]).on("exit", (c) => process.exit(c ?? 0));
+  });
+} else {
+  correr(["dev", "-p", puerto]).on("exit", (codigo) => process.exit(codigo ?? 0));
+}

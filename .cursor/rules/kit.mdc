@@ -1,0 +1,9 @@
+---
+description: Reglas del AWS Community Day Kit
+alwaysApply: true
+---
+
+Las reglas de este repositorio están en `AGENTS.md`, en la raíz: léelo antes de
+proponer cambios. Si te piden configurar un evento, sigue `docs/asistente.md`.
+
+@AGENTS.md
