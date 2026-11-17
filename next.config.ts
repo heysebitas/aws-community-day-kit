@@ -52,8 +52,12 @@ const seguridad = [
 ];
 
 const nextConfig: NextConfig = {
+  // La imagen de Docker copia sólo `.next/standalone`, sin `node_modules` completos.
+  output: "standalone",
   serverExternalPackages: ["pdfkit", "mongodb-memory-server"],
   poweredByHeader: false,
+  // `experimental.inlineCss` queda apagado: en la portada el HTML pasaba de 24 a 84 KB gzip (+60 KB, tope 25).
+  // Medida y razón en docs/rendimiento.md.
   images: {
     remotePatterns: bucket
       ? [{ protocol: bucket.protocol === "http:" ? "http" : "https", hostname: bucket.hostname, port: bucket.port }]

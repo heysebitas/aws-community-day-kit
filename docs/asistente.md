@@ -120,3 +120,17 @@ Termina con una lista corta y concreta de lo que queda en sus manos:
 
 No hagas commit, no despliegues y no crees cuentas en servicios externos sin
 que te lo pidan.
+
+## Las guías
+
+Para lo que no cabe en esta entrevista:
+
+| Para | Lee |
+|---|---|
+| Cada campo de la configuración y las variables de entorno | `docs/configuracion.md` |
+| El contenido de la edición (equipo, keynotes, patrocinadores, tracks) | `docs/contenido.md` |
+| El panel: roles, permisos y secciones | `docs/panel.md` |
+| Los datos: los modelos y cómo se relacionan | `docs/datos.md` |
+| Correr las pruebas | `docs/pruebas.md` |
+| Cuando algo falla (captcha, bucket, IP) | `docs/troubleshooting.md` |
+| De una edición a la siguiente, copias y limpieza | `docs/nueva-edicion.md` |

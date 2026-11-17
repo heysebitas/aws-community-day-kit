@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --import ./scripts/sin-server-only.mjs --test tests/*.test.ts",
     "check": "npm run typecheck && npm run lint && npm test",
+    "medir": "node scripts/medir.mjs",
     "db:memoria": "node scripts/db-memoria.mjs"
   },
   "dependencies": {

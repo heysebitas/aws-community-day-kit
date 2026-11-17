@@ -3,30 +3,26 @@ import { connectDB } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { SpeakerProfile } from "@/models/speaker-profile";
 import { revalidatePublic, SPEAKERS_TAG } from "@/lib/data/revalidate";
+import { ruta } from "@/lib/api";
+import { leerCuerpo } from "@/lib/cuerpo";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: NextRequest) {
-  try {
-    await requireAccess("speakers", "editar", ["admin", "organizer"]);
-    await connectDB();
+export const POST = ruta(async (request: NextRequest) => {
+  await requireAccess("speakers", "editar", ["admin", "organizer"]);
+  await connectDB();
 
-    const { orders } = await request.json() as { orders: { id: string; sortOrder: number }[] };
-    if (!Array.isArray(orders)) return Response.json({ error: "orders requerido" }, { status: 400 });
+  const { orders } = await leerCuerpo(request);
+  if (!Array.isArray(orders)) return Response.json({ error: "orders requerido" }, { status: 400 });
+  const validos = orders.filter(
+    (o): o is { id: string; sortOrder: number } =>
+      !!o && typeof o.id === "string" && typeof o.sortOrder === "number" && Number.isFinite(o.sortOrder),
+  );
+  if (validos.length !== orders.length) return Response.json({ error: "orders inválido" }, { status: 400 });
 
-    await Promise.all(
-      orders.map(({ id, sortOrder }) =>
-        SpeakerProfile.findByIdAndUpdate(id, { sortOrder })
-      )
-    );
+  await Promise.all(validos.map(({ id, sortOrder }) => SpeakerProfile.findByIdAndUpdate(id, { sortOrder })));
 
-    revalidatePublic(SPEAKERS_TAG);
+  revalidatePublic(SPEAKERS_TAG);
 
-    return Response.json({ ok: true });
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    if (msg === "Forbidden")    return Response.json({ error: msg }, { status: 403 });
-    return Response.json({ error: "Error interno" }, { status: 500 });
-  }
-}
+  return Response.json({ ok: true });
+});

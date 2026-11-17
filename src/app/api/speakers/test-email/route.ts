@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/auth";
+import { AuthError, requireAuth } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
 import { armarCorreo } from "@/lib/email-plantillas";
@@ -7,15 +7,17 @@ import { generateSpeakerPDF } from "@/lib/pdf/speaker";
 import { generateInternationalSpeakerPDF } from "@/lib/pdf/speaker-international";
 import { Setting } from "@/models/setting";
 import { SITIO, SLUG } from "@/config";
+import { ruta } from "@/lib/api";
+import { leerCuerpo } from "@/lib/cuerpo";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   try {
     await requireAuth(["admin"]);
     await connectDB();
 
-    const body = await request.json() as { to?: string; speakerType?: string };
+    const body = await leerCuerpo(request);
     const to = typeof body.to === "string" && body.to.includes("@") ? body.to : null;
     if (!to) return Response.json({ error: "Email destino requerido" }, { status: 400 });
     const speakerType = body.speakerType === "international" ? "international" : "local";
@@ -66,9 +68,8 @@ export async function POST(request: NextRequest) {
 
     return Response.json({ ok: true });
   } catch (e) {
+    if (e instanceof AuthError) throw e;
     console.error("[test-email]", e);
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    return Response.json({ error: msg }, { status: 500 });
+    return Response.json({ error: (e as Error).message }, { status: 500 });
   }
-}
+});

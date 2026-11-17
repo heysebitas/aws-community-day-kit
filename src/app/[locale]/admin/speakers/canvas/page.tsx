@@ -14,6 +14,8 @@ import { usePermiso } from "@/hooks/use-permiso";
 import { tamanoAutoTitulo, type SpeakerEntry } from "@/app/api/og/speaker/[slug]/_tarjeta";
 import { TRACKS } from "@/data/session-tracks";
 import { cn } from "@/lib/utils";
+import { prepararImagen } from "@/lib/imagen-cliente";
+import { Foto } from "@/components/ui/foto";
 import { Lienzo, type Ajustes } from "./_lienzo";
 import { EVENTO, PAIS, DOMINIO, SITIO, TEMA } from "@/config";
 
@@ -83,7 +85,7 @@ function Numero({
         type="number"
         value={value} min={min} max={max} step={step}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-20 shrink-0 border-2 border-surface-600 bg-surface-800 px-2 py-1 text-center font-mono text-xs text-acento focus:border-acento focus:outline-none"
+        className="w-20 shrink-0 border-2 border-surface-600 bg-surface-800 px-2 py-1 text-center font-mono text-xs text-acento focus:border-acento focus:outline-hidden"
       />
       {sufijo && <span className="w-6 shrink-0 font-mono text-[10px] text-surface-300">{sufijo}</span>}
     </label>
@@ -297,18 +299,19 @@ function CanvasEditorInner() {
   }
 
   /** Reemplaza la foto: sube la nueva y borra la anterior del bucket. */
-  async function reemplazarFoto(f: File) {
+  async function reemplazarFoto(original: File) {
     if (!perfil) return;
     setSubiendo(true);
     try {
+      const f = await prepararImagen(original);
       const pre = await fetch("/api/upload/presign", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contentType: f.type, size: f.size, folder: "speakers/photos" }),
       });
       if (!pre.ok) throw new Error("No se pudo preparar la subida");
-      const { uploadUrl, publicUrl } = (await pre.json()) as { uploadUrl: string; publicUrl: string };
+      const { uploadUrl, publicUrl, headers } = (await pre.json()) as { uploadUrl: string; publicUrl: string; headers: Record<string, string> };
 
-      const put = await fetch(uploadUrl, { method: "PUT", body: f, headers: { "Content-Type": f.type } });
+      const put = await fetch(uploadUrl, { method: "PUT", body: f, headers });
       if (!put.ok) throw new Error("No se pudo subir");
 
       const res = await fetch(`/api/speaker-profiles/${perfil.slug}/photo`, {
@@ -636,8 +639,8 @@ function CanvasEditorInner() {
 
           {verS3 && perfil.cardImageUrl ? (
             <div className="border-2 border-surface-600 bg-surface-900 p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${perfil.cardImageUrl}?v=${Date.now()}`} alt="" className="w-full" />
+              {/* El `?v=` salta la caché a propósito, así que va sin optimizar. */}
+              <Foto src={`${perfil.cardImageUrl}?v=${Date.now()}`} alt="" unoptimized width={0} height={0} sizes="100vw" style={{ width: "100%", height: "auto" }} />
               <p className="m-0 mt-2 font-mono text-[11px] text-surface-400">
                 Ésta es la imagen que está en S3, no la vista previa.
               </p>
@@ -676,7 +679,7 @@ function CanvasEditorInner() {
                 value={ajustes.talkTitleCard}
                 onChange={(e) => cambiar({ talkTitleCard: e.target.value })}
                 rows={3}
-                className="w-full resize-y border-2 border-surface-600 bg-surface-800 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none"
+                className="w-full resize-y border-2 border-surface-600 bg-surface-800 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden"
               />
               <span className="font-mono text-[10px] text-surface-300">
                 {ajustes.talkTitleCard.length} caracteres · se dibuja a {tamTitulo}px
@@ -688,7 +691,7 @@ function CanvasEditorInner() {
               <input
                 value={ajustes.roleCard}
                 onChange={(e) => cambiar({ roleCard: e.target.value })}
-                className="w-full border-2 border-surface-600 bg-surface-800 px-3 py-2 font-mono text-sm text-surface-100 focus:border-acento focus:outline-none"
+                className="w-full border-2 border-surface-600 bg-surface-800 px-3 py-2 font-mono text-sm text-surface-100 focus:border-acento focus:outline-hidden"
               />
             </label>
 

@@ -369,7 +369,7 @@ export default function FAQAdminPage() {
               onChange={(e) => setForm({ ...form, answerEs: e.target.value })}
               placeholder="Escribe la respuesta en español..."
               rows={3}
-              className="w-full border-2 border-surface-600 bg-surface-800 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-none transition-all focus:border-acento hover:border-acento resize-none"
+              className="w-full border-2 border-surface-600 bg-surface-800 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-hidden transition-all focus:border-acento hover:border-acento resize-none"
             />
           </div>
           <Input
@@ -389,7 +389,7 @@ export default function FAQAdminPage() {
               onChange={(e) => setForm({ ...form, answerEn: e.target.value })}
               placeholder="Write the answer in English..."
               rows={3}
-              className="w-full border-2 border-surface-600 bg-surface-800 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-none transition-all focus:border-acento hover:border-acento resize-none"
+              className="w-full border-2 border-surface-600 bg-surface-800 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 outline-hidden transition-all focus:border-acento hover:border-acento resize-none"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -411,7 +411,7 @@ export default function FAQAdminPage() {
                   placeholder="Texto ES"
                   value={btn.labelEs}
                   onChange={(e) => { const next = [...form.buttons]; next[i] = { ...next[i], labelEs: e.target.value }; setForm({ ...form, buttons: next }); }}
-                  className="min-w-0 flex-1 bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400 outline-none"
+                  className="min-w-0 flex-1 bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400"
                 />
                 <span className="shrink-0 text-surface-600 font-mono text-xs">|</span>
                 <input
@@ -419,7 +419,7 @@ export default function FAQAdminPage() {
                   placeholder="Text EN"
                   value={btn.labelEn}
                   onChange={(e) => { const next = [...form.buttons]; next[i] = { ...next[i], labelEn: e.target.value }; setForm({ ...form, buttons: next }); }}
-                  className="min-w-0 flex-1 bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400 outline-none"
+                  className="min-w-0 flex-1 bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400"
                 />
                 <span className="shrink-0 text-surface-600 font-mono text-xs">|</span>
                 <input
@@ -427,7 +427,7 @@ export default function FAQAdminPage() {
                   placeholder="https://..."
                   value={btn.url}
                   onChange={(e) => { const next = [...form.buttons]; next[i] = { ...next[i], url: e.target.value }; setForm({ ...form, buttons: next }); }}
-                  className="min-w-0 flex-[2] bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400 outline-none"
+                  className="min-w-0 flex-[2] bg-transparent font-mono text-xs text-surface-100 placeholder:text-surface-400"
                 />
                 <button
                   type="button"

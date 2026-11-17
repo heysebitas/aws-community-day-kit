@@ -35,7 +35,7 @@ const ROLE_BADGE: Record<string, { bg: string; text: string; border: string; lab
 
 async function fireConfetti() {
   const confetti = (await import("canvas-confetti")).default;
-  const colors = ["var(--color-acento)", "#FCD34D", "#34d399", "#818cf8", "#f9fafb"];
+  const colors = ["var(--color-acento)", "#FCD34D", "#34d399", "#818cf8", "var(--color-surface-50)"];
   const end = Date.now() + 900;
   (function frame() {
     confetti({ particleCount: 5, angle: 60, spread: 70, origin: { x: 0 }, colors });
@@ -103,7 +103,7 @@ export default function ConfirmarPage() {
   const isExpiredState = !isConfirmed && (data?.status === "expired" || isExpired);
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh", background: "#080a0f", overflow: "hidden" }}>
+    <div style={{ position: "relative", minHeight: "100svh", background: "var(--color-surface-900)", overflow: "hidden" }}>
       <style>{`
         @keyframes grad-border { 0%,100% { background-position:0% 50% } 50% { background-position:100% 50% } }
         @keyframes breathe { 0%,100% { opacity:.5; transform:translateX(-50%) scale(1) } 50% { opacity:.9; transform:translateX(-50%) scale(1.15) } }
@@ -132,7 +132,7 @@ export default function ConfirmarPage() {
         {!loading && notFound && (
           <div style={{ textAlign: "center", padding: "56px 24px", animation: "fade-up .5s ease both" }}>
             <p style={{ fontSize: 48, margin: 0 }}>🔍</p>
-            <h1 style={{ color: "#f9fafb", fontSize: 22, fontWeight: 800, margin: "12px 0 6px" }}>Enlace no válido</h1>
+            <h1 style={{ color: "var(--color-surface-50)", fontSize: 22, fontWeight: 800, margin: "12px 0 6px" }}>Enlace no válido</h1>
             <p style={{ color: "#9ca3af", fontSize: 14, fontFamily: "monospace", lineHeight: 1.6, maxWidth: 360, margin: "0 auto 24px" }}>
               No encontramos este registro. Revisa que hayas abierto el enlace completo de tu correo.
             </p>
@@ -180,10 +180,10 @@ export default function ConfirmarPage() {
                 <span style={{ display: "inline-block", padding: "4px 13px", borderRadius: 20, fontFamily: "monospace", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", background: role.bg, color: role.text, border: `1px solid ${role.border}` }}>
                   {role.label}
                 </span>
-                <h1 style={{ margin: "16px 0 0", fontSize: "clamp(28px,8vw,40px)", fontWeight: 900, color: "#f9fafb", letterSpacing: "-0.025em", lineHeight: .95, textTransform: "uppercase" }}>
+                <h1 style={{ margin: "16px 0 0", fontSize: "clamp(1.75rem,8vw,2.5rem)", fontWeight: 900, color: "var(--color-surface-50)", letterSpacing: "-0.025em", lineHeight: .95, textTransform: "uppercase" }}>
                   {data.firstName}
                 </h1>
-                <h1 style={{ margin: 0, fontSize: "clamp(28px,8vw,40px)", fontWeight: 900, color: "var(--color-acento)", letterSpacing: "-0.025em", lineHeight: .95, textTransform: "uppercase", animation: "text-glow 3s ease-in-out infinite" }}>
+                <h1 style={{ margin: 0, fontSize: "clamp(1.75rem,8vw,2.5rem)", fontWeight: 900, color: "var(--color-acento)", letterSpacing: "-0.025em", lineHeight: .95, textTransform: "uppercase", animation: "text-glow 3s ease-in-out infinite" }}>
                   {data.lastName}
                 </h1>
                 {(data.jobTitle || data.company) && (
@@ -209,7 +209,7 @@ export default function ConfirmarPage() {
                     Así aparecerá tu nombre en la escarapela:
                   </p>
                   <div style={{ display: "inline-block", padding: "16px 28px", borderRadius: 14, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.3)" }}>
-                    <p style={{ margin: 0, fontSize: 24, fontWeight: 900, color: "#f9fafb", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+                    <p style={{ margin: 0, fontSize: 24, fontWeight: 900, color: "var(--color-surface-50)", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
                       {data.badgeFirstName}
                     </p>
                     <p style={{ margin: 0, fontSize: 24, fontWeight: 900, color: "var(--color-acento)", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
@@ -220,12 +220,12 @@ export default function ConfirmarPage() {
                   <div style={{ marginTop: 24, padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", textAlign: "left" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <Calendar size={17} color="var(--color-acento)" strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                      <span style={{ color: "#f9fafb", fontSize: 13, fontWeight: 600 }}>{fechaConDia(EVENTO.inicio, "es")}, {EVENTO.anio}</span>
+                      <span style={{ color: "var(--color-surface-50)", fontSize: 13, fontWeight: 600 }}>{fechaConDia(EVENTO.inicio, "es")}, {EVENTO.anio}</span>
                     </div>
                     <div style={{ height: 1, background: "rgba(255,255,255,.05)", margin: "12px 0" }} />
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <Clock size={17} color="var(--color-acento)" strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                      <span style={{ color: "#f9fafb", fontSize: 13, fontWeight: 600 }}>{hora(EVENTO.inicio)} · Check-in y escarapela</span>
+                      <span style={{ color: "var(--color-surface-50)", fontSize: 13, fontWeight: 600 }}>{hora(EVENTO.inicio)} · Check-in y escarapela</span>
                     </div>
                     <div style={{ height: 1, background: "rgba(255,255,255,.05)", margin: "12px 0" }} />
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -254,7 +254,7 @@ export default function ConfirmarPage() {
               {isExpiredState && (
                 <div style={{ textAlign: "center", animation: "fade-up .5s ease both" }}>
                   <p style={{ fontSize: 44, margin: 0 }}>⏰</p>
-                  <h2 style={{ color: "#f9fafb", fontSize: 19, fontWeight: 800, margin: "8px 0 8px" }}>
+                  <h2 style={{ color: "var(--color-surface-50)", fontSize: 19, fontWeight: 800, margin: "8px 0 8px" }}>
                     La confirmación de registros terminó
                   </h2>
                   <p style={{ color: "#9ca3af", fontSize: 13, lineHeight: 1.7, fontFamily: "monospace", margin: 0 }}>
@@ -309,7 +309,7 @@ export default function ConfirmarPage() {
                               transition: "all .15s ease",
                             }}
                           >
-                            <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: active ? "#f9fafb" : "#9ca3af", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+                            <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: active ? "var(--color-surface-50)" : "#9ca3af", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
                               {opt.label}
                             </span>
                           </button>
@@ -320,7 +320,7 @@ export default function ConfirmarPage() {
                     /* Single option — just show it, nothing to choose */
                     <div style={{ textAlign: "center", marginBottom: 26 }}>
                       <div style={{ display: "inline-block", padding: "14px 28px", borderRadius: 14, background: "rgb(var(--tema-acento-rgb) / .08)", border: "1.5px solid rgb(var(--tema-acento-rgb) / .3)" }}>
-                        <span style={{ display: "block", fontSize: 20, fontWeight: 900, color: "#f9fafb", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+                        <span style={{ display: "block", fontSize: 20, fontWeight: 900, color: "var(--color-surface-50)", textTransform: "uppercase", letterSpacing: "-0.01em" }}>
                           {selected?.label ?? `${data.firstName} ${data.lastName}`}
                         </span>
                       </div>

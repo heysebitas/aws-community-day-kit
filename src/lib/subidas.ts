@@ -62,5 +62,22 @@ export function validarSubida(
  */
 export function esDelBucket(url: unknown): url is string {
   if (typeof url !== "string" || !S3_PUBLIC_URL) return false;
-  return url.startsWith(`${S3_PUBLIC_URL}/`) && !url.includes("..");
+  if (!url.startsWith(`${S3_PUBLIC_URL}/`)) return false;
+  // El traversal puede venir codificado: `%2e%2e` es «..». Se decodifica dos
+  // veces porque el doble codificado también traversa; si la segunda vuelta
+  // falla se deja la anterior, que ya está revisada.
+  let ruta = url;
+  for (let vuelta = 0; vuelta < 2; vuelta++) {
+    if (!ruta.includes("%")) break;
+    let siguiente: string;
+    try {
+      siguiente = decodeURIComponent(ruta);
+    } catch {
+      if (vuelta === 0) return false;
+      break;
+    }
+    if (siguiente === ruta) break;
+    ruta = siguiente;
+  }
+  return !ruta.includes("..");
 }

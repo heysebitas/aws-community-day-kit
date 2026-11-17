@@ -157,7 +157,7 @@ export function WireSolid({
       }
     };
 
-    const parar = bucleVisible(canvas, draw);
+    const parar = bucleVisible(canvas, draw, reduced);
 
     return () => {
       parar();

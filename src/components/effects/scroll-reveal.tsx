@@ -11,6 +11,8 @@ interface ScrollRevealProps {
   from?: "up" | "left" | "right" | "scale";
   /** Sin efecto, por la misma razón. */
   distance?: number;
+  /** Lo que se ve al cargar no espera al scroll: sin opacity:0 en el HTML. */
+  inmediato?: boolean;
 }
 
 /**
@@ -18,7 +20,8 @@ interface ScrollRevealProps {
  * sin desplazarse. Sin JS o con movimiento reducido el contenido ya está visible
  * (ver `.scroll-reveal` en globals.css).
  */
-export function ScrollReveal({ children, delay = 0, className }: ScrollRevealProps) {
+export function ScrollReveal({ children, delay = 0, className, inmediato }: ScrollRevealProps) {
+  if (inmediato) return <div className={className}>{children}</div>;
   return (
     <motion.div
       initial={{ opacity: 0 }}

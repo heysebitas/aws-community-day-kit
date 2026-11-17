@@ -197,7 +197,7 @@ export function PhoneInput({
           placeholder={"0".repeat(Array.isArray(country.digits) ? country.digits[0] : country.digits)}
           aria-label={label ?? t("phone_label")}
           className={cn(
-            "w-full border-2 px-4 py-3 font-mono text-sm tabular-nums outline-none transition-colors",
+            "w-full border-2 px-4 py-3 font-mono text-sm tabular-nums transition-colors",
             s.campo,
             error ? s.bordeError : s.borde,
           )}
@@ -227,7 +227,7 @@ export function PhoneInput({
                 placeholder={t("phone_search")}
                 aria-label={t("phone_search_aria")}
                 className={cn(
-                  "w-full border-b-2 px-3 py-2.5 font-mono text-sm outline-none",
+                  "w-full border-b-2 px-3 py-2.5 font-mono text-sm",
                   s.buscador,
                 )}
               />

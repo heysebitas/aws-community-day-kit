@@ -396,7 +396,7 @@ export function Toolbar({ children, className }: { children: React.ReactNode; cl
 
 const selectBase =
   "min-h-11 w-full border-2 border-surface-600 bg-surface-800 px-3 py-2 font-mono text-xs text-surface-100 " +
-  "outline-none transition-colors focus:border-acento sm:w-auto";
+  "outline-hidden transition-colors focus:border-acento sm:w-auto";
 
 /** Desplegable de filtro, con el mismo borde duro que todo lo demás. */
 export function Select({

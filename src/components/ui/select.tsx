@@ -114,7 +114,7 @@ export function Select({
           // Caja dura, como los campos: esquina viva, borde de 2px y el foco
           // engordando el borde en vez de un anillo difuminado alrededor.
           "relative flex min-h-11 cursor-pointer items-center justify-between gap-2 border-2 border-surface-600 bg-surface-800 px-4 py-2.5",
-          "font-mono text-sm outline-none transition-colors hover:border-surface-500 focus:border-acento",
+          "font-mono text-sm outline-hidden transition-colors hover:border-surface-500 focus:border-acento",
           open && "border-acento",
           error && "border-red-500",
           disabled && "cursor-not-allowed opacity-50",
@@ -145,7 +145,7 @@ export function Select({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
-                  className="w-full bg-transparent font-mono text-sm text-surface-100 outline-none placeholder:text-surface-400"
+                  className="w-full bg-transparent font-mono text-sm text-surface-100 placeholder:text-surface-400"
                   placeholder="Buscar..."
                   autoFocus
                 />

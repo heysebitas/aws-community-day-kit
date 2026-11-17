@@ -76,7 +76,7 @@ function Tarjeta({ comunidad }: { comunidad: Comunidad }) {
       href={comunidad.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block outline-none focus-visible:ring-2 focus-visible:ring-tinta"
+      className="group block outline-hidden focus-visible:ring-2 focus-visible:ring-tinta"
     >
       {contenido}
     </a>

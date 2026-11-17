@@ -63,7 +63,7 @@ export default async function SpeakerProfilePage({ params }: PageProps) {
   const appUrl = SITIO;
 
   return (
-    <main className="min-h-screen bg-surface-900 px-5 pb-20 pt-24 sm:px-6">
+    <main className="min-h-svh bg-surface-900 px-5 pb-20 pt-24 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <Link
           href={locale === "en" ? "/en/directorio" : "/directorio"}

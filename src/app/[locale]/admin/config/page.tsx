@@ -54,7 +54,7 @@ function UrlField({ label, hint, value, onChange }: {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="https://..."
-          className="w-full border-2 border-surface-600 bg-surface-700/40 py-2.5 pl-9 pr-4 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none"
+          className="w-full border-2 border-surface-600 bg-surface-700/40 py-2.5 pl-9 pr-4 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden"
         />
       </div>
     </div>

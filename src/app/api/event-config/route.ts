@@ -7,6 +7,8 @@ import { requireAuth } from "@/lib/auth";
 import { sanearEnlaces } from "@/data/enlaces";
 import { enlacesActuales } from "@/lib/enlaces";
 import { createLog } from "@/lib/log";
+import { ruta } from "@/lib/api";
+import { leerCuerpo } from "@/lib/cuerpo";
 
 export async function GET() {
   await connectDB();
@@ -49,15 +51,10 @@ function urlWeb(valor: unknown): string {
   }
 }
 
-export async function PATCH(req: Request) {
-  let actor: Awaited<ReturnType<typeof requireAuth>>;
-  try {
-    actor = await requireAuth(["admin"]);
-  } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+export const PATCH = ruta(async (req: Request) => {
+  const actor = await requireAuth(["admin"]);
 
-  const body = await req.json() as Record<string, unknown>;
+  const body = await leerCuerpo(req);
   const updates: Record<string, unknown> = {};
 
   const stringFields = ["trackVirtualUrl", "photosUrl", "recordingsUrl", "notifyUrl"];
@@ -86,15 +83,10 @@ export async function PATCH(req: Request) {
   });
 
   return NextResponse.json({ ok: true });
-}
+});
 
-export async function PUT(req: Request) {
-  let actor: Awaited<ReturnType<typeof requireAuth>>;
-  try {
-    actor = await requireAuth(["admin"]);
-  } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+export const PUT = ruta(async (req: Request) => {
+  const actor = await requireAuth(["admin"]);
 
   const body = await req.json();
   const pick = (k: string) => (typeof body[k] === "string" ? body[k].trim() : "");
@@ -132,4 +124,4 @@ export async function PUT(req: Request) {
     showSponsorsCta:  config.showSponsorsCta,
     showSpeakerCta:   config.showSpeakerCta,
   });
-}
+});

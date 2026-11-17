@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { bucleVisible } from "./bucle-visible";
 import { cn } from "@/lib/utils";
 
 /** Motor para los modelos 3D horneados del sitio. */
@@ -172,7 +173,6 @@ export function LowPoly({
     };
     if (follow) window.addEventListener("pointermove", onMove, { passive: true });
 
-    let raf = 0;
     const tick = () => {
       t += 0.016;
       yaw += spin;
@@ -183,12 +183,12 @@ export function LowPoly({
         pitch = lerp(pitch, 0.12 + Math.sin(t * 0.4) * 0.06, 0.05);
       }
       dibujar();
-      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+    // Fuera de pantalla no se pinta: el bucle arranca al verse y para al salir.
+    const parar = bucleVisible(canvas, tick);
 
     return () => {
-      cancelAnimationFrame(raf);
+      parar();
       if (follow) window.removeEventListener("pointermove", onMove);
     };
   }, [pos, tri, size, ratio, fill, spin, follow, color, reduced]);

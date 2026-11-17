@@ -90,11 +90,12 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
       <div className="relative min-h-[220px] overflow-hidden bg-surface-900">
         {kn.foto ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Foto
               src={`${basePath}${kn.foto}`}
               alt={`${kn.nombre} ${kn.apellido}`}
-              className="h-full w-full object-cover object-[50%_18%] transition-transform duration-500 group-hover:scale-[1.04]"
+              fill
+              sizes="(max-width: 640px) 40vw, 200px"
+              className="object-cover object-[50%_18%] transition-transform duration-500 group-hover:scale-[1.04]"
             />
             <div className="absolute inset-0" style={{
               background: "linear-gradient(105deg, transparent 48%, rgba(12,13,16,0.97) 98%), linear-gradient(0deg, rgba(0,0,0,0.35), transparent 40%)",
@@ -108,8 +109,9 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
 
         {kn.delPrograma && (
           <div className="absolute top-3 left-3 z-[2] pointer-events-none">
+            {/* SVG estático: next/image no lo optimiza; el tamaño reserva el espacio. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${basePath}/images/logos/aws-logo.svg`} alt="AWS" className="h-4 w-auto opacity-90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
+            <img src={`${basePath}/images/logos/aws-logo.svg`} alt="AWS" width={304} height={182} className="h-4 w-auto opacity-90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
           </div>
         )}
       </div>
@@ -122,7 +124,7 @@ export function KeynoteDirectoryCard({ kn }: { kn: Keynote }) {
         <div>
           <h3
             className="font-mono font-bold leading-none tracking-tight text-surface-50 m-0"
-            style={{ fontSize: "clamp(18px,2.2vw,26px)" }}
+            style={{ fontSize: "clamp(1.125rem,2.2vw,1.625rem)" }}
           >
             {kn.nombre}<br />{kn.apellido}
           </h3>

@@ -31,20 +31,40 @@ El idioma principal va sin prefijo (`/registro`); los demás, con él (`/en/regi
 
 ## Datos
 
-Modelos de Mongoose en `src/models/`. Los principales:
+Modelos de Mongoose en `src/models/`. Cada fichero es un esquema; la tabla
+los lista todos, con lo que guardan y qué índices únicos tienen:
 
-| Modelo | Qué guarda |
-|---|---|
-| `Registration` | Asistentes: datos, QR, confirmación, check-in |
-| `SpeakerProfile` | Propuestas del CFP y el perfil público de quien fue aceptado |
-| `VolunteerSubmission` | Postulaciones de voluntariado |
-| `AgendaEvent`, `Room` | Programa y salas |
-| `Passport` | Pasaporte digital y sellos |
-| `EventConfig` | Lo que se cambia desde el panel: formularios abiertos, enlaces |
-| `EmailTemplate`, `EmailCampana`, `EmailEnvio` | Plantillas, campañas y el registro de cada envío |
-| `User`, `Log` | Cuentas del panel y registro de acciones |
+| Fichero | Qué guarda | Índices únicos |
+|---|---|---|
+| `agenda-event` | Un bloque de la agenda: título, ponente, hora, sala, track, nivel, idioma | — |
+| `email-campana` | Una campaña: plantilla, asunto, audiencia, estado y contadores | — |
+| `email-cerrojo` | Un cerrojo con caducidad, para que dos envíos no se pisen (la clave es el identificador) | la clave |
+| `email-envio` | Un envío: a quién, con qué plantilla, en qué estado y con qué identificador del proveedor | — |
+| `email-template` | Una plantilla editable: slug, asunto, bloques, audiencia | slug |
+| `envios-masivos` | No es un modelo: el helper que anota un tramo de envío y marca el «ya lo recibió» | — |
+| `event-config` | Lo que se cambia sobre la marcha: enlaces, llamadas a la acción y carpeta del track | — |
+| `faq` | Las preguntas frecuentes del sitio, en español e inglés, con sus botones | — |
+| `form` | El estado de cada formulario público: abierto, publicado y tope de respuestas | el tipo de formulario |
+| `log` | El registro de acciones del panel: quién, qué y cuándo | — |
+| `passport` | El pasaporte digital: nombre, foto, sellos, salas, comidas y redes | el código corto |
+| `passport-edit-token` | Los cambios pendientes de un pasaporte, con su token de un solo uso | el token |
+| `password-token` | El enlace de un solo uso para que una cuenta nueva elija contraseña | el token |
+| `print-config` | Un preset de impresión de escarapelas: medidas, campos, orientación y alineación | — |
+| `registration` | Los asistentes: datos, documento, QR, check-in, consentimiento y estado del correo | el correo y el código QR |
+| `room` | Las salas: nombre, aforo, enlace virtual y track | — |
+| `session` | Las sesiones del panel: usuario, sesión vigente y caducidad | el identificador de sesión |
+| `setting` | Ajustes sueltos: clave y valor | la clave |
+| `speaker-profile` | Las propuestas y las fichas de speakers: datos, charla, estado y tarjeta | el slug |
+| `sponsor-pin` | Los patrocinadores con su PIN de cuatro dígitos y los sellos que han dado | el PIN |
+| `survey-recipient` | Los destinatarios de la encuesta post-evento y quién la abrió | el token; y el par de origen |
+| `user` | Las cuentas del panel: rol, permisos por sección y badges permitidos | el correo |
+| `volunteer-submission` | Las postulaciones de voluntariado: datos, documento, disponibilidad y contacto de emergencia | el correo |
 
-Los nombres exactos están en la carpeta; cada esquema documenta sus campos.
+Además de los índices únicos, cada esquema lleva sus índices de búsqueda: el
+campo de palabras normalizadas de asistentes y pasaportes sirve para encontrar
+a alguien en la puerta, y hay índices de texto, de fecha y de estado para los
+listados del panel. El diagrama de cómo se relacionan está en
+[datos.md](datos.md).
 
 ## Lo que se genera
 

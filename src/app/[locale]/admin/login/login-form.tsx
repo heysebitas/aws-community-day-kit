@@ -11,11 +11,11 @@ import { DotHeading } from "@/components/ui/dot-heading";
 import { normalizeEmail } from "@/lib/normalize";
 import { cn, idiomaDeRuta } from "@/lib/utils";
 import { localePath } from "@/lib/utils";
-import { EVENTO } from "@/config";
 
 const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
 export function LoginForm() {
+  const t = useTranslations("Login");
   const tf = useTranslations("Forms");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -83,23 +83,23 @@ export function LoginForm() {
 
   const handleCaptchaVerify = useCallback((token: string) => setCaptchaToken(token), []);
   const handleCaptchaError = useCallback(() => {
-    setError("Error de captcha. Intenta de nuevo.");
+    setError(t("captcha_error"));
     setCaptchaToken("");
-  }, []);
+  }, [t]);
 
   const fieldClass =
     "w-full border-2 border-tinta/35 bg-white/55 px-4 py-3 font-mono text-sm text-tinta " +
-    "placeholder:text-tinta/70 outline-none transition-all " +
+    "placeholder:text-tinta/70 transition-all " +
     "focus:-translate-y-px focus:border-tinta focus:bg-white " +
     "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
 
   return (
-    <main className="form-block flex min-h-screen flex-col bg-acento pt-20">
+    <main className="form-block flex min-h-svh flex-col bg-acento pt-20">
       <div className="flex flex-1 items-center justify-center px-5 py-16">
         <div className="w-full max-w-[400px]">
           <div className="mb-8">
             <DotHeading tone="block" variant="inverted">
-              acceso
+              {t("heading")}
             </DotHeading>
           </div>
 
@@ -110,7 +110,7 @@ export function LoginForm() {
           >
             <div className="flex flex-col gap-2">
               <label htmlFor="login-email" className="font-mono text-sm font-semibold text-tinta">
-                Correo <span className="text-acento-profundo">*</span>
+                {t("email_label")} <span className="text-acento-profundo">*</span>
               </label>
               <input
                 id="login-email"
@@ -128,7 +128,7 @@ export function LoginForm() {
                   if (error) setError("");
                 }}
                 onBlur={checkEmail}
-                placeholder="tu@correo.com"
+                placeholder={t("email_ph")}
                 required
                 aria-invalid={!!emailError}
                 aria-describedby={emailError ? "login-email-error" : undefined}
@@ -143,7 +143,7 @@ export function LoginForm() {
 
             <div className="flex flex-col gap-2">
               <label htmlFor="login-password" className="font-mono text-sm font-semibold text-tinta">
-                Contraseña <span className="text-acento-profundo">*</span>
+                {t("password_label")} <span className="text-acento-profundo">*</span>
               </label>
               <div className="relative">
                 <input
@@ -155,7 +155,7 @@ export function LoginForm() {
                     setPassword(e.target.value);
                     if (error) setError("");
                   }}
-                  placeholder="••••••••"
+                  placeholder={t("password_ph")}
                   required
                   className={cn(fieldClass, "pr-12")}
                 />
@@ -165,7 +165,7 @@ export function LoginForm() {
                   // `aria-pressed` en vez de cambiar el nombre del botón: así el
                   // lector de pantalla anuncia el estado sin que la etiqueta baile.
                   aria-pressed={showPassword}
-                  aria-label="Mostrar contraseña"
+                  aria-label={t("show_password")}
                   className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center text-tinta/70 transition-colors hover:text-tinta"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -191,7 +191,7 @@ export function LoginForm() {
             </div>
 
             {error && (
-              <p className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
+              <p role="alert" className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
                 {error}
               </p>
             )}
@@ -209,7 +209,7 @@ export function LoginForm() {
               disabled={!canSubmit}
               className="btn-hard w-full px-6 py-3.5 font-mono text-sm"
             >
-              {loading ? "Verificando…" : "Iniciar sesión"}
+              {loading ? t("submitting") : t("submit")}
             </button>
           </form>
         </div>
@@ -226,7 +226,7 @@ export function LoginForm() {
                 i % 2 === 1 ? "bg-tinta text-acento" : "text-tinta",
               )}
             >
-              {EVENTO.ciudad} · {EVENTO.anio} · acceso
+              {t("marquee")}
             </span>
           ))}
         </div>

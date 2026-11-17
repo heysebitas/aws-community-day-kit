@@ -85,3 +85,52 @@ Sin tocar código, en **Configuración del evento**: abrir y cerrar formularios,
 enlaces de los correos (grupos de WhatsApp, mapa, encuesta), salas y sellos del
 pasaporte. La agenda, los speakers y las preguntas frecuentes también viven en
 la base y se gestionan desde el panel.
+
+## Variables de entorno
+
+Todo lo que el kit lee del entorno está en `.env.example`. Esta es la lista
+completa, con lo que hace cada una y si hace falta:
+
+| Variable | Qué hace | ¿Hace falta? |
+|---|---|---|
+| `NEXT_PUBLIC_APP_URL` | La URL pública: sale en los enlaces de los correos y en los QR | Recomendada; si no, se usa el sitio de la configuración |
+| `NEXT_PUBLIC_BASE_PATH` | Prefijo para servir el sitio bajo un subdirectorio (con barra inicial y sin barra final) | No |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | La llave del captcha, para poder dibujarlo | Sí, en producción: sin ella no hay captcha |
+| `MONGODB_URI` | La conexión a la base | Sí (salvo en modo demo) |
+| `MONGODB_CA_FILE` | El certificado propio de la base (Amazon DocumentDB) | No |
+| `MONGODB_POOL` | Conexiones máximas del pool (10) | No |
+| `MONGODB_TIMEOUT_MS` | Milisegundos que se espera a que la base responda (5000) | No |
+| `HTTP_TIMEOUT_MS` | Milisegundos máximos de las llamadas al correo y al captcha (10000) | No |
+| `JWT_SECRET` | Firma de las sesiones; 32 caracteres o más, distinta en cada despliegue | Sí |
+| `TURNSTILE_SECRET_KEY` | Verifica el captcha en el servidor | Sí, en producción |
+| `CORREO_PROVEEDOR` | `resend`, `ses` o `consola` (si no se dice, es Resend cuando hay llave, y si no, consola) | No |
+| `RESEND_API_KEY` | La llave de Resend | Si usas Resend |
+| `RESEND_WEBHOOK_SECRET` | Verifica el webhook: sin él no se registran entregas ni rebotes | Si usas Resend y quieres el seguimiento |
+| `SES_REGION` | La región de Amazon SES (si no, la de `AWS_REGION`) | No |
+| `SES_CONFIGURATION_SET` | El conjunto de configuración de SES | No |
+| `EMAIL_FROM` | El remitente (por omisión, el nombre del evento en `noreply@` del dominio) | No |
+| `MARKETING_EMAIL_FROM` | El remitente de las campañas masivas (si no, el de `EMAIL_FROM`) | No |
+| `AWS_REGION` | La región del bucket (`us-east-1`) | No |
+| `AWS_S3_BUCKET` | El bucket de los archivos | Sí, para subir fotos o diapositivas |
+| `AWS_S3_PUBLIC_URL` | La URL pública del bucket; tiene que existir **antes del build** | Sí, para servir las fotos |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | Las credenciales del bucket (las lee el SDK de AWS) | Sí, para subir |
+| `S3_ENDPOINT` | Un servicio compatible: Cloudflare R2, MinIO, Garage | No |
+| `S3_PREFIX` | La carpeta dentro del bucket, si se comparte entre ediciones | No |
+| `GOOGLE_MAPS_KEY` | El mapa de la sede en los correos | No |
+| `PROXIES_DE_CONFIANZA` | Cuántos proxies propios hay delante (1) | No |
+| `CABECERA_IP` | La cabecera con la IP real, si tu CDN usa otra (`cf-connecting-ip`) | No |
+| `MODO_DEMO` | Base en memoria, correos a la consola y captcha apagado | No |
+| `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD` | La primera cuenta, para `npm run crear-admin` | No |
+| `PORT` | El puerto del servidor de desarrollo y de la demo (3000) | No |
+| `DB_MEMORIA_PUERTO` | El puerto del MongoDB en memoria de `npm run db:memoria` (27027) | No |
+| `CHROME` | La ruta al Chrome, para `node scripts/captura.mjs` | No |
+| `PRUEBA_URL` | La dirección de un sitio ya levantado, para las pruebas que miran el HTML servido | No |
+| `GUARDAR_PDF` | La carpeta donde las pruebas guardan los PDF que generan | No |
+
+`NODE_ENV` y `NEXT_RUNTIME` los pone Next.js: no se tocan. `NEXT_PUBLIC_BUCKET_HOST`
+tampoco se define: `next.config.ts` la calcula a partir de `AWS_S3_PUBLIC_URL`
+y la usa el optimizador de imágenes.
+
+En producción el servidor **no arranca** si falta `MONGODB_URI`, `JWT_SECRET`
+o `TURNSTILE_SECRET_KEY`: prefiere no levantar a levantar abierto. Lo que
+falla, cómo se ve y qué hacer está en [troubleshooting.md](troubleshooting.md).

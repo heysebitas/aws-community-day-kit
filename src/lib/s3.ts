@@ -25,8 +25,22 @@ export const s3 = new S3Client({
   ...(process.env.S3_ENDPOINT && { endpoint: process.env.S3_ENDPOINT, forcePathStyle: true }),
 });
 
+/** Las keys llevan UUID: la URL nunca cambia de contenido. */
+export const CACHE_INMUTABLE = "public, max-age=31536000, immutable";
+/** Las tarjetas se redibujan con el mismo nombre, así que no pueden ser inmutables. */
+export const CACHE_REVALIDABLE = "public, max-age=86400, stale-while-revalidate=604800";
+
+/** La política de caché de un objeto según su key (ver `docs/bucket.md`). */
+export function cacheControlDe(key: string): string {
+  return key.includes("speaker-cards/") ? CACHE_REVALIDABLE : CACHE_INMUTABLE;
+}
+
 export async function uploadBuffer(key: string, body: Buffer, contentType: string): Promise<string> {
-  await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: body, ContentType: contentType }));
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: BUCKET, Key: key, Body: body, ContentType: contentType, CacheControl: cacheControlDe(key),
+    }),
+  );
   return `${S3_PUBLIC_URL}/${key}`;
 }
 
@@ -52,6 +66,22 @@ export function keyDeUrl(url: string): string | null {
  * no mida exactamente `tamano` bytes, que es lo único que le pone tope.
  */
 export async function presignUpload(key: string, contentType: string, tamano: number): Promise<string> {
-  const cmd = new PutObjectCommand({ Bucket: BUCKET, Key: key, ContentType: contentType, ContentLength: tamano });
-  return getSignedUrl(s3, cmd, { expiresIn: 300, signableHeaders: new Set(["content-length", "content-type"]) });
+  const cmd = new PutObjectCommand({
+    Bucket: BUCKET, Key: key, ContentType: contentType, ContentLength: tamano, CacheControl: cacheControlDe(key),
+  });
+  return getSignedUrl(s3, cmd, {
+    expiresIn: 300,
+    signableHeaders: new Set(["content-length", "content-type", "cache-control"]),
+  });
+}
+
+/**
+ * La URL firmada y las cabeceras que el cliente tiene que mandar en el PUT
+ * tal cual: las que van en la firma y el bucket rechaza (403) si faltan.
+ */
+export async function presignSubida(key: string, contentType: string, tamano: number) {
+  return {
+    uploadUrl: await presignUpload(key, contentType, tamano),
+    headers: { "Content-Type": contentType, "Cache-Control": cacheControlDe(key) } as Record<string, string>,
+  };
 }

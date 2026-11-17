@@ -124,7 +124,7 @@ export function ScanManual({ actionLabel, confirm, disabled, disabledHint }: {
           inputMode="search"
           autoFocus
           placeholder="Buscar por nombre o documento..."
-          className="w-full border-2 border-surface-600 bg-surface-800 py-4 pl-12 pr-11 font-mono text-base text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none"
+          className="w-full border-2 border-surface-600 bg-surface-800 py-4 pl-12 pr-11 font-mono text-base text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden"
         />
         {query && (
           <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-surface-400 hover:bg-surface-700 hover:text-surface-200">

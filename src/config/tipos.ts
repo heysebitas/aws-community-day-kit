@@ -89,6 +89,8 @@ export type ConfigEvento = {
   /** El logotipo: el logo del programa y el nombre partido en renglones a su lado. */
   marca: {
     logo: string;
+    /** Proporción del logo en píxeles, para que la página no se mueva al cargarlo. Por omisión 304×182 (el logo del kit). */
+    logoTamano?: { ancho: number; alto: number };
     /** El mismo logo en PNG, para los PDF (pases, cartas, certificados), que no dibujan SVG. */
     logoPng?: string;
     alt: string;

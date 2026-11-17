@@ -121,7 +121,7 @@ function Field({
 
 const inputCls =
   "w-full border-2 border-tinta/75 bg-papel/80 px-4 py-3 font-mono text-sm text-tinta " +
-  "placeholder:text-tinta/70 outline-none transition-all " +
+  "placeholder:text-tinta/70 transition-all " +
   "focus:-translate-y-px focus:border-tinta focus:bg-white " +
   "focus:shadow-[3px_3px_0_0_rgba(0,0,0,0.3)]";
 
@@ -882,7 +882,7 @@ placeholder={t.emergency_ph}
         )}
 
         {formError && (
-          <p className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
+          <p role="alert" className="m-0 border-2 border-error bg-error/10 px-4 py-3 font-mono text-sm text-error">
             {formError}
           </p>
         )}

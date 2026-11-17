@@ -49,7 +49,7 @@ const ENLACES = [
 
 export function CreditosScreen() {
   return (
-    <main className="form-block flex min-h-screen flex-col overflow-hidden bg-acento pt-28">
+    <main className="form-block flex min-h-svh flex-col overflow-hidden bg-acento pt-28">
       <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center px-5 pb-20 text-center">
         {/* Cómo llegaste acá */}
         <motion.p

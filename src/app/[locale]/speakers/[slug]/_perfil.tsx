@@ -159,7 +159,7 @@ export function PerfilSpeaker({
 
           <NombreTecleado
             texto={persona.nombre}
-            className="font-display text-[11vw] font-medium lowercase leading-[0.85] tracking-tighter text-surface-50 sm:text-[7vw] lg:text-[4.6vw] xl:text-[64px]"
+            className="font-display text-[11vw] font-medium lowercase leading-[0.85] tracking-tighter text-surface-50 sm:text-[7vw] lg:text-[4.6vw] xl:text-[4rem]"
           />
 
           {persona.tagline && (

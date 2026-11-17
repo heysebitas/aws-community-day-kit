@@ -7,6 +7,8 @@ import { SpeakerProfile } from "@/models/speaker-profile";
 import { Passport } from "@/models/passport";
 import { AgendaEvent } from "@/models/agenda-event";
 import { createLog } from "@/lib/log";
+import { ruta } from "@/lib/api";
+import { leerCuerpo, textoDe } from "@/lib/cuerpo";
 
 export const dynamic = "force-dynamic";
 
@@ -75,44 +77,38 @@ function phraseFor(target: WipeTarget): string {
   return `BORRAR ${TARGETS[target].label.toUpperCase()}`;
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const actor = await requireAuth(["admin"]);
-    const { target, confirm } = (await req.json()) as { target?: string; confirm?: string };
+export const POST = ruta(async (req: NextRequest) => {
+  const actor = await requireAuth(["admin"]);
+  const cuerpo = await leerCuerpo(req);
+  const target = textoDe(cuerpo, "target");
+  const confirm = textoDe(cuerpo, "confirm", 200);
 
-    if (!target || !(target in TARGETS)) {
-      return Response.json({ error: "No sé qué lista borrar." }, { status: 400 });
-    }
-    const entry = TARGETS[target as WipeTarget];
-
-    // La comprobación va también en el servidor: la de la pantalla se puede
-    // saltar armando la petición a mano, y esto no se deshace.
-    const phrase = phraseFor(target as WipeTarget);
-    if ((confirm ?? "").trim().toUpperCase() !== phrase) {
-      return Response.json(
-        { error: `Para confirmar hay que escribir exactamente "${phrase}".` },
-        { status: 400 },
-      );
-    }
-
-    await connectDB();
-    const { deleted, extra } = await entry.run();
-
-    await createLog({
-      userId: actor._id.toString(),
-      userName: actor.name,
-      userRole: actor.role,
-      action: "DATA_WIPED",
-      target: entry.label,
-      details: [`${deleted} documento(s)`, extra].filter(Boolean).join(" · "),
-    });
-
-    return Response.json({ ok: true, deleted, extra, label: entry.label });
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    if (msg === "Forbidden") return Response.json({ error: msg }, { status: 403 });
-    console.error("[consola/wipe]", e);
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  if (!target || !(target in TARGETS)) {
+    return Response.json({ error: "No sé qué lista borrar." }, { status: 400 });
   }
-}
+  const entry = TARGETS[target as WipeTarget];
+
+  // La comprobación va también en el servidor: la de la pantalla se puede
+  // saltar armando la petición a mano, y esto no se deshace.
+  const phrase = phraseFor(target as WipeTarget);
+  if ((confirm ?? "").trim().toUpperCase() !== phrase) {
+    return Response.json(
+      { error: `Para confirmar hay que escribir exactamente "${phrase}".` },
+      { status: 400 },
+    );
+  }
+
+  await connectDB();
+  const { deleted, extra } = await entry.run();
+
+  await createLog({
+    userId: actor._id.toString(),
+    userName: actor.name,
+    userRole: actor.role,
+    action: "DATA_WIPED",
+    target: entry.label,
+    details: [`${deleted} documento(s)`, extra].filter(Boolean).join(" · "),
+  });
+
+  return Response.json({ ok: true, deleted, extra, label: entry.label });
+}, { etiqueta: "[consola/wipe]" });

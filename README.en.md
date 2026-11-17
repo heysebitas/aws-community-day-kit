@@ -45,6 +45,9 @@ repo and say:
 
 > Read `docs/asistente.md` and help me set up my event.
 
+It asks about fifteen questions, writes the configuration and walks you
+through it. In Claude Code there is also the `/configurar-evento` command.
+
 **By hand:**
 
 ```bash
@@ -52,8 +55,8 @@ npm run setup     # asks the basics, writes evento/config.ts and .env.local
 npm run doctor    # tells you what is missing
 ```
 
-Everything about your edition lives in `evento/` and `public/evento/`; `src/`
-is the kit. The guides are in [docs/](docs/).
+Then you fill in the content in `evento/` (team, keynotes, sponsors, tracks)
+and you deploy it.
 
 ## Who uses it
 
@@ -65,11 +68,39 @@ is the kit. The guides are in [docs/](docs/).
 
 Running yours on the kit? Open a PR and add it to the list.
 
+## How it's put together
+
+```
+evento/          your edition: the only thing you edit
+public/evento/   your photos and logos
+src/             the kit
+docs/            the documentation
+```
+
+| For | Read |
+|---|---|
+| Every field of the configuration | [docs/configuracion.md](docs/configuracion.md) |
+| Team, keynotes, sponsors, tracks | [docs/contenido.md](docs/contenido.md) |
+| Colours | [docs/temas.md](docs/temas.md) |
+| Your country: documents, phone, data law | [docs/paises.md](docs/paises.md) |
+| The admin panel: roles, permissions, sections | [docs/panel.md](docs/panel.md) |
+| The data: models and how they relate | [docs/datos.md](docs/datos.md) |
+| MongoDB Atlas, Amazon DocumentDB, PostgreSQL | [docs/base-de-datos.md](docs/base-de-datos.md) |
+| Resend or Amazon SES | [docs/correo.md](docs/correo.md) |
+| Publishing it | [docs/despliegue.md](docs/despliegue.md) |
+| The file bucket and its headers | [docs/bucket.md](docs/bucket.md) |
+| What the kit protects and what is up to you | [docs/seguridad.md](docs/seguridad.md) |
+| How it works inside | [docs/arquitectura.md](docs/arquitectura.md) |
+| Running the tests | [docs/pruebas.md](docs/pruebas.md) |
+| When something breaks | [docs/troubleshooting.md](docs/troubleshooting.md) |
+| From one edition to the next, backups, clean-up | [docs/nueva-edicion.md](docs/nueva-edicion.md) |
+
 ## Contributing
 
 Issues and pull requests are welcome, in Spanish or English:
 [CONTRIBUTING.md](CONTRIBUTING.md). Report security problems privately:
-[SECURITY.md](SECURITY.md).
+[SECURITY.md](SECURITY.md). What is coming is in
+[ROADMAP.md](ROADMAP.md).
 
 ## License
 

@@ -80,7 +80,7 @@ export function EditorEnlaces() {
                   value={v}
                   placeholder={e.ejemplo ?? "https://…"}
                   onChange={(ev) => editar(e.clave, ev.target.value)}
-                  className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-300 outline-none transition-colors focus:border-acento"
+                  className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 placeholder:text-surface-300 outline-hidden transition-colors focus:border-acento"
                 />
                 <span className="font-mono text-[10px] leading-relaxed text-surface-400">{e.explica}</span>
                 {raro && (

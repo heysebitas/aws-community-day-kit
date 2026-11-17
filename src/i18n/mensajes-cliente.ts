@@ -32,10 +32,10 @@ export const MENSAJES_RUTA = {
   registro: ["Forms", "Strip"],
   voluntarios: ["Forms", "Strip"],
   speakers: ["Forms", "Strip", "CFP", "Speakers"],
-  pasaporte: [],
+  pasaporte: ["Passport"],
   confirmar: [],
   "confirmar-cambios": [],
-  directorio: ["Speakers"],
+  directorio: ["Speakers", "Directorio"],
   admin: "todo",
 } as const satisfies Record<string, readonly string[] | "todo">;
 

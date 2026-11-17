@@ -21,7 +21,7 @@ const cargar = (Module as unknown as { _load: (...a: unknown[]) => unknown })._l
 (Module as unknown as { _load: unknown })._load = function (this: unknown, pedido: unknown, ...resto: unknown[]) {
   const real = cargar.call(this, pedido, ...resto) as Record<string, unknown>;
   if (typeof pedido === "string" && /(^@\/lib\/auth$|\/lib\/auth(\.ts)?$)/.test(pedido)) {
-    return { ...real, requireAccess: async () => { pedidosDeAcceso += 1; throw new Error("Unauthorized"); } };
+    return { ...real, requireAccess: async () => { pedidosDeAcceso += 1; throw new (real.AuthError as new (s: 401) => Error)(401); } };
   }
   if (pedido !== "next/cache") return real;
   return {

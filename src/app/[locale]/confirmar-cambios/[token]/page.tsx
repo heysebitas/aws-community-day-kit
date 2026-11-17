@@ -37,16 +37,16 @@ export default function ConfirmarCambiosPage({ params }: { params: Promise<{ tok
   const Icon = ui.Icon;
 
   return (
-    <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080a0f", padding: "0 24px" }}>
+    <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-surface-900)", padding: "0 24px" }}>
       <div style={{ width: "100%", maxWidth: 380, textAlign: "center", borderRadius: 24, border: "1px solid rgba(255,255,255,.08)", background: "linear-gradient(160deg, #0d1018 0%, #131824 100%)", padding: "40px 28px", boxShadow: "0 32px 80px rgba(0,0,0,.7)" }}>
         <div style={{ width: 84, height: 84, margin: "0 auto 20px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,.04)", border: `1px solid ${ui.color}33` }}>
           <Icon style={{ width: 44, height: 44, color: ui.color, animation: ui.spin ? "spin 1s linear infinite" : "none" }} />
         </div>
-        <p style={{ fontFamily: "monospace", fontSize: 20, fontWeight: 800, color: "#f9fafb", margin: "0 0 8px" }}>{ui.title}</p>
+        <p style={{ fontFamily: "monospace", fontSize: 20, fontWeight: 800, color: "var(--color-surface-50)", margin: "0 0 8px" }}>{ui.title}</p>
         <p style={{ fontFamily: "monospace", fontSize: 12, color: "#6b7280", lineHeight: 1.6, margin: 0 }}>{ui.sub}</p>
 
         {(state === "used" || state === "expired" || state === "error") && shortId && (
-          <a href={`/pasaporte/${shortId}`} style={{ display: "inline-block", marginTop: 22, padding: "11px 22px", borderRadius: 12, background: "var(--color-acento)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "#080a0f", textDecoration: "none" }}>
+          <a href={`/pasaporte/${shortId}`} style={{ display: "inline-block", marginTop: 22, padding: "11px 22px", borderRadius: 12, background: "var(--color-acento)", fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-surface-900)", textDecoration: "none" }}>
             Ir a mi pasaporte
           </a>
         )}

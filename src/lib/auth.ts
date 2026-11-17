@@ -90,11 +90,19 @@ export async function getAuthUser(): Promise<IUser | null> {
   return usuarioDeSesion(token);
 }
 
-/** Exige sesión y, si se pasan, uno de esos roles. Lanza `Unauthorized` o `Forbidden`. */
+/** Fallo de sesión o de permiso; `ruta()` lo traduce a su código HTTP. */
+export class AuthError extends Error {
+  constructor(readonly status: 401 | 403) {
+    super(status === 401 ? "Unauthorized" : "Forbidden");
+    this.name = "AuthError";
+  }
+}
+
+/** Exige sesión y, si se pasan, uno de esos roles. Lanza `AuthError` (401 o 403). */
 export async function requireAuth(roles?: string[]): Promise<IUser> {
   const user = await getAuthUser();
-  if (!user) throw new Error("Unauthorized");
-  if (roles && !roles.includes(user.role)) throw new Error("Forbidden");
+  if (!user) throw new AuthError(401);
+  if (roles && !roles.includes(user.role)) throw new AuthError(403);
   return user;
 }
 
@@ -125,20 +133,20 @@ export async function createSession(userId: string): Promise<string> {
  */
 export async function requireAccess(seccion: SeccionId, minimo: Nivel, roles?: string[]): Promise<IUser> {
   const user = await requireAuth(roles);
-  if (!alcanza(user, seccion, minimo)) throw new Error("Forbidden");
+  if (!alcanza(user, seccion, minimo)) throw new AuthError(403);
   return user;
 }
 
 /** Igual, para las rutas que borran. */
 export async function requireDelete(seccion: SeccionId, roles?: string[]): Promise<IUser> {
   const user = await requireAuth(roles);
-  if (!puedeEliminar(user, seccion)) throw new Error("Forbidden");
+  if (!puedeEliminar(user, seccion)) throw new AuthError(403);
   return user;
 }
 
 /** Para las rutas que sirven a más de una sección: basta con tener acceso a cualquiera. */
 export async function requireAnyAccess(secciones: SeccionId[], minimo: Nivel, roles?: string[]): Promise<IUser> {
   const user = await requireAuth(roles);
-  if (!secciones.some((s) => alcanza(user, s, minimo))) throw new Error("Forbidden");
+  if (!secciones.some((s) => alcanza(user, s, minimo))) throw new AuthError(403);
   return user;
 }

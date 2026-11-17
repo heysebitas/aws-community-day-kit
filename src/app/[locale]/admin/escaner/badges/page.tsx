@@ -149,7 +149,7 @@ export default function BadgesScannerPage() {
           <select
             value={selectedId}
             onChange={(e) => { setSelectedId(e.target.value); if (scanning) stopScanner(); setResult(null); setLocalCount(0); }}
-            className="w-full border-2 border-surface-600 bg-surface-900 px-3 py-2.5 font-mono text-sm text-surface-100 focus:outline-none"
+            className="w-full border-2 border-surface-600 bg-surface-900 px-3 py-2.5 font-mono text-sm text-surface-100"
           >
             <option value="">— Selecciona un badge —</option>
             {badges.map((b) => <option key={b.id} value={b.id}>{b.sponsorName}</option>)}

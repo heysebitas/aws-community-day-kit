@@ -86,7 +86,11 @@ export function WireGlobe({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-    const observer = new ResizeObserver(resize);
+    // Sin tamaño no se pide fotograma: al medirse, el observador lo reanuda.
+    const observer = new ResizeObserver(() => {
+      resize();
+      if (visible && size && !raf) raf = requestAnimationFrame(draw);
+    });
     observer.observe(canvas);
 
     // Fuera de pantalla no se dibuja.
@@ -103,7 +107,7 @@ export function WireGlobe({
         return;
       }
       if (!size) {
-        raf = requestAnimationFrame(draw);
+        raf = 0;
         return;
       }
       const cx = size / 2;

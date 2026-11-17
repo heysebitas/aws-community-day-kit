@@ -295,7 +295,7 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
                 readOnly
                 value={texts[activePlatform]}
                 rows={4}
-                className="w-full resize-none bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-surface-300 focus:outline-none"
+                className="w-full resize-none bg-transparent px-3 py-2.5 font-mono text-xs leading-relaxed text-surface-300"
               />
               <div className="flex items-center justify-between border-t-2 border-surface-600 px-3 py-2">
                 <span className="font-mono text-xs text-surface-400 hidden sm:block">

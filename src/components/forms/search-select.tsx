@@ -175,7 +175,7 @@ export function SearchSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={cn(
-          "flex w-full items-center justify-between gap-2 border-2 px-4 py-3 text-left font-mono text-sm transition-all focus:outline-none",
+          "flex w-full items-center justify-between gap-2 border-2 px-4 py-3 text-left font-mono text-sm transition-all",
           s.boton,
           invalid ? s.bordeError : s.bordeNormal,
           selected ? s.conValor : s.sinValor,
@@ -216,7 +216,7 @@ export function SearchSelect({
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
                 className={cn(
-                  "w-full border-0 py-2.5 pl-9 pr-3 font-mono text-sm outline-none",
+                  "w-full border-0 py-2.5 pl-9 pr-3 font-mono text-sm",
                   s.buscador,
                 )}
               />

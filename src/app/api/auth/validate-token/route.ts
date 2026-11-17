@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { PasswordToken } from "@/models/password-token";
+import { User } from "@/models/user";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
@@ -30,7 +31,11 @@ export async function GET(request: NextRequest) {
       return Response.json({ valid: false, reason: "expired" });
     }
 
-    return Response.json({ valid: true });
+    // El correo se devuelve para que la página pueda asociar la nueva
+    // contraseña a la cuenta en el gestor de contraseñas.
+    const user = await User.findById(passwordToken.userId).select("email").lean();
+
+    return Response.json({ valid: true, email: user?.email ?? null });
   } catch {
     return Response.json({ error: "Error interno" }, { status: 500 });
   }

@@ -199,7 +199,7 @@ export default function ConvocatoriaVoluntariosPage() {
         rows={8}
         spellCheck={false}
         placeholder={"SBG Universidad A\nSBG Instituto B"}
-        className="mt-4 w-full resize-y border-2 border-surface-600 bg-surface-800 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-none"
+        className="mt-4 w-full resize-y border-2 border-surface-600 bg-surface-800 px-4 py-3 font-mono text-sm text-surface-100 placeholder:text-surface-400 focus:border-acento focus:outline-hidden"
       />
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">

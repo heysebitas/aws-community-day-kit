@@ -42,7 +42,18 @@ docker compose up --build
 
 `compose.yaml` levanta el sitio y un MongoDB. Sirve para un servidor único o
 para probar en local; en producción usa una base administrada y quita ese
-servicio. Las `NEXT_PUBLIC_*` se pasan como argumentos de build.
+servicio.
+
+- **Construir:** `docker build -t community-day-kit --build-arg NEXT_PUBLIC_APP_URL=https://tu-dominio .`
+  Las `NEXT_PUBLIC_*` quedan escritas en el build, por eso son argumentos.
+- **Imagen:** `next.config.ts` usa `output: "standalone"`; la imagen final sólo
+  lleva `.next/standalone`, `.next/static` y `public`, corre sin root y arranca con `node server.js`.
+- **Variables:** el resto (`MONGODB_URI`, `JWT_SECRET`…) se pasan al arrancar:
+  `docker run --env-file .env.local -p 3000:3000 community-day-kit`.
+- **Salud:** `GET /api/health` responde 200 si el proceso vive; con `?db=1`
+  hace un `ping` a Mongo y responde 503 si no hay conexión. El `HEALTHCHECK` de la
+  imagen usa la primera forma (que Mongo caiga no debe reiniciar el sitio); un
+  monitor externo puede usar `?db=1`. No devuelve datos y no se cachea.
 
 No está probado en un evento real: haz un ensayo completo antes.
 
@@ -68,6 +79,11 @@ Amazon S3 o cualquier servicio compatible (Cloudflare R2, MinIO) con `S3_ENDPOIN
 ```json
 [{ "AllowedOrigins": ["https://tu-dominio.com"], "AllowedMethods": ["PUT", "GET"], "AllowedHeaders": ["*"], "MaxAgeSeconds": 3000 }]
 ```
+
+`AWS_S3_PUBLIC_URL` tiene que estar definida **antes del build**: `next.config.ts`
+la lee al compilar y sin ella las fotos del bucket no pasan por el optimizador de
+imágenes. Las cabeceras que tiene que servir el bucket y cómo corregir lo que ya
+estaba subido están en [bucket.md](bucket.md).
 
 ## Captcha
 

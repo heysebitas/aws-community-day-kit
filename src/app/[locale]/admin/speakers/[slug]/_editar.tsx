@@ -5,6 +5,7 @@ import { Copy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { Foto } from "@/components/ui/foto";
 import { useToast } from "@/components/ui/toast";
 import { HardButton, SectionHead } from "@/components/admin/ui";
 import { SOCIAL_FIELDS, TRACKS, type SpeakerRow } from "../_shared";
@@ -13,7 +14,7 @@ import { SOCIAL_FIELDS, TRACKS, type SpeakerRow } from "../_shared";
 
 const areaCls =
   "w-full resize-none border-2 border-surface-600 bg-surface-900 px-3 py-2.5 font-mono text-sm " +
-  "text-surface-100 placeholder:text-surface-400 outline-none transition-colors focus:border-acento";
+  "text-surface-100 placeholder:text-surface-400 outline-hidden transition-colors focus:border-acento";
 
 const labelCls = "mb-1.5 block font-mono text-xs font-medium text-surface-200";
 
@@ -156,7 +157,7 @@ export function EditarPerfil({
                 id="track"
                 value={form.track}
                 onChange={(e) => set("track", e.target.value)}
-                className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 outline-none focus:border-acento"
+                className="min-h-11 w-full border-2 border-surface-600 bg-surface-900 px-3 py-2 font-mono text-sm text-surface-100 outline-hidden focus:border-acento"
               >
                 {TRACKS.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -185,11 +186,15 @@ export function EditarPerfil({
           Tarjeta del sitio
         </p>
         <div className="border-2 border-surface-600 bg-surface-900">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          {/* Imagen generada al vuelo, no del bucket: no pasa por el optimizador. */}
+          <Foto
             src={`/api/og/speaker/${row.slug}`}
             alt=""
-            className="w-full"
+            unoptimized
+            width={0}
+            height={0}
+            sizes="256px"
+            style={{ width: "100%", height: "auto" }}
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
         </div>

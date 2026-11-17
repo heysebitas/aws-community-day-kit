@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { localePath, idiomaDeRuta } from "@/lib/utils";
 export default function CreatePasswordPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-surface-900">
+      <div className="flex min-h-svh items-center justify-center bg-surface-900">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-acento border-t-transparent" />
       </div>
     }>
@@ -21,28 +22,29 @@ export default function CreatePasswordPage() {
 }
 
 /** `href` vacío significa «escribir al buzón de contacto». */
-const REASONS: Record<string, { title: string; message: string; cta: string; href: string }> = {
+const REASONS: Record<string, { titulo: string; mensaje: string; cta: string; href: string }> = {
   not_found: {
-    title: "Enlace no válido",
-    message: "Este enlace no es válido. Verifica que copiaste correctamente el enlace del email.",
-    cta: "Contactar soporte",
+    titulo: "not_found_title",
+    mensaje: "not_found_message",
+    cta: "not_found_cta",
     href: "",
   },
   expired: {
-    title: "Enlace expirado",
-    message: "Este enlace ha expirado — los enlaces son válidos por 24 horas. Contacta al administrador para que te envíe uno nuevo.",
-    cta: "Contactar administrador",
+    titulo: "expired_title",
+    mensaje: "expired_message",
+    cta: "expired_cta",
     href: "",
   },
   used: {
-    title: "Enlace ya utilizado",
-    message: "Este enlace ya fue usado para crear una contraseña. Si ya tienes acceso, inicia sesión normalmente.",
-    cta: "Ir al login",
+    titulo: "used_title",
+    mensaje: "used_message",
+    cta: "used_cta",
     href: "/admin/login",
   },
 };
 
 function CreatePasswordContent() {
+  const t = useTranslations("CreatePassword");
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
@@ -52,6 +54,7 @@ function CreatePasswordContent() {
 
   const [tokenStatus, setTokenStatus] = useState<"checking" | "valid" | "invalid">("checking");
   const [invalidReason, setInvalidReason] = useState<string>("not_found");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -70,6 +73,7 @@ function CreatePasswordContent() {
       .then((data) => {
         if (data.valid) {
           setTokenStatus("valid");
+          setEmail(typeof data.email === "string" ? data.email : "");
         } else {
           setInvalidReason(data.reason ?? "not_found");
           setTokenStatus("invalid");
@@ -85,12 +89,12 @@ function CreatePasswordContent() {
     e.preventDefault();
     setError("");
 
-    if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres");
+    if (password.length < 10) {
+      setError(t("short_password"));
       return;
     }
     if (password !== confirm) {
-      setError("Las contraseñas no coinciden");
+      setError(t("mismatch"));
       return;
     }
 
@@ -114,7 +118,7 @@ function CreatePasswordContent() {
 
   if (tokenStatus === "checking") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-surface-900">
+      <div className="flex min-h-svh items-center justify-center bg-surface-900">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-acento border-t-transparent" />
       </div>
     );
@@ -123,7 +127,7 @@ function CreatePasswordContent() {
   if (tokenStatus === "invalid") {
     const info = REASONS[invalidReason] ?? REASONS.not_found;
     return (
-      <div className="flex min-h-screen items-center justify-center bg-surface-900 px-4">
+      <div className="flex min-h-svh items-center justify-center bg-surface-900 px-4">
         <div className="w-full max-w-sm text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center border border-red-500/30 bg-red-500/10">
             <svg className="h-7 w-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -131,14 +135,14 @@ function CreatePasswordContent() {
             </svg>
           </div>
           <h1 className="dot-matrix m-0 text-2xl leading-none text-surface-50 sm:text-3xl">
-            {info.title}
+            {t(info.titulo)}
           </h1>
-          <p className="mt-2 font-mono text-sm leading-relaxed text-surface-400">{info.message}</p>
+          <p className="mt-2 font-mono text-sm leading-relaxed text-surface-400">{t(info.mensaje)}</p>
           <a
             href={info.href || mailto("general")}
             className="mt-6 inline-flex items-center bg-acento px-6 py-2.5 font-mono text-sm font-bold text-surface-900 transition-all hover:shadow-[0_0_20px_rgb(var(--tema-acento-rgb)_/_0.4)]"
           >
-            {info.cta}
+            {t(info.cta)}
           </a>
         </div>
       </div>
@@ -147,7 +151,7 @@ function CreatePasswordContent() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-surface-900 px-4">
+      <div className="flex min-h-svh items-center justify-center bg-surface-900 px-4">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center bg-acento/10 text-acento">
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -155,16 +159,16 @@ function CreatePasswordContent() {
             </svg>
           </div>
           <h1 className="dot-matrix m-0 text-2xl leading-none text-surface-50 sm:text-3xl">
-            contraseña creada
+            {t("created_title")}
           </h1>
-          <p className="mt-2 font-mono text-sm text-surface-400">Redirigiendo al login...</p>
+          <p className="mt-2 font-mono text-sm text-surface-400">{t("redirecting")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface-900 px-4">
+    <div className="flex min-h-svh items-center justify-center bg-surface-900 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center">
           <Image
@@ -174,37 +178,44 @@ function CreatePasswordContent() {
             height={48}
           />
           <h1 className="dot-matrix m-0 text-2xl leading-none text-surface-50 sm:text-3xl">
-            student community day
+            {t("title")}
           </h1>
           <p className="mt-3 font-mono text-sm text-surface-400">
-            Configura tu contraseña para acceder al panel
+            {t("subtitle")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 border-2 border-surface-600 bg-surface-800 p-6">
+          {/* El gestor de contraseñas necesita saber con qué cuenta asociar
+              la contraseña nueva; el campo no se ve pero sí se guarda. */}
+          <input type="email" name="username" autoComplete="username" hidden readOnly value={email} />
           <Input
-            label="Contraseña"
+            label={t("password_label")}
             type="password"
+            autoComplete="new-password"
+            minLength={10}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 8 caracteres"
+            placeholder={t("password_ph")}
             required
           />
           <Input
-            label="Confirmar contraseña"
+            label={t("confirm_label")}
             type="password"
+            autoComplete="new-password"
+            minLength={10}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Repite la contraseña"
+            placeholder={t("confirm_ph")}
             required
           />
           {error && (
-            <div className="border border-red-500/30 bg-red-500/10 px-4 py-2 font-mono text-sm text-red-400">
+            <div role="alert" className="border border-red-500/30 bg-red-500/10 px-4 py-2 font-mono text-sm text-red-400">
               {error}
             </div>
           )}
           <Button type="submit" disabled={loading} className="mt-2 w-full">
-            {loading ? "Creando..." : "Crear Contraseña"}
+            {loading ? t("submitting") : t("submit")}
           </Button>
         </form>
       </div>

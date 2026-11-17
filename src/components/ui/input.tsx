@@ -34,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             // formularios públicos.
             "min-h-11 w-full border-2 border-surface-600 bg-surface-800 px-4 py-2.5",
             "font-mono text-sm text-surface-100 placeholder:text-surface-400",
-            "outline-none transition-colors hover:border-surface-500 focus:border-acento",
+            "outline-hidden transition-colors hover:border-surface-500 focus:border-acento",
             error && "border-red-500 focus:border-red-500",
             className,
           )}

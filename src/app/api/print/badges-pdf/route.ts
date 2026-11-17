@@ -8,6 +8,8 @@ import { PrintConfig } from "@/models/print-config";
 import { pdfToBuffer } from "@/lib/pdf/common";
 import { resolver, tokensDe } from "@/i18n/tokens";
 import { EVENTO, IDIOMA_BASE, SITIO } from "@/config";
+import { ruta } from "@/lib/api";
+import { leerCuerpo, listaDeTextos } from "@/lib/cuerpo";
 
 const APP_URL = SITIO;
 const MM = 72 / 25.4; // mm → pt
@@ -138,90 +140,85 @@ async function drawBadgeStacked(pdf: InstanceType<typeof PDFDocument>, p: Person
 const MAX_SHORT_IDS = 200;
 
 // Genera un PDF con las escarapelas al tamaño EXACTO de la etiqueta (sin encabezados del navegador).
-export async function POST(req: NextRequest) {
-  try {
-    await requireAccess("print", "editar", ["admin", "organizer", "volunteer"]);
-    const { shortIds, configId } = await req.json() as { shortIds?: string[]; configId?: string };
-    if (!Array.isArray(shortIds) || shortIds.length === 0) {
-      return Response.json({ error: "shortIds requerido" }, { status: 400 });
-    }
-
-    if (shortIds.length > MAX_SHORT_IDS) {
-      return Response.json({ error: `Máximo ${MAX_SHORT_IDS} escarapelas por petición; envíalas por tandas.` }, { status: 400 });
-    }
-
-    await connectDB();
-
-    const cfg = (configId ? await PrintConfig.findById(configId).lean() : null)
-      ?? await PrintConfig.findOne({ isDefault: true }).lean();
-    const widthMm = cfg?.widthMm ?? 101.6, heightMm = cfg?.heightMm ?? 152.4, marginMm = cfg?.marginMm ?? 3;
-    const perLabel = cfg?.perLabel === 2 ? 2 : 1;
-    const rotate = [90, 180, 270].includes(Number(cfg?.rotate)) ? Number(cfg?.rotate) : 0;
-    const al = (v: unknown): Align => (v === "center" || v === "right" ? v : "left");
-    const c: Cfg = {
-      qrPct: cfg?.qrPct ?? 32, fontScale: cfg?.fontScale ?? 1,
-      showQr: cfg?.showQr ?? true, showRole: cfg?.showRole ?? true,
-      showCompany: cfg?.showCompany ?? true, showJobTitle: cfg?.showJobTitle ?? true,
-      alignName: al(cfg?.alignName), alignJobTitle: al(cfg?.alignJobTitle),
-      alignCompany: al(cfg?.alignCompany), alignRole: al(cfg?.alignRole),
-      layout: cfg?.layout === "stacked" ? "stacked" : "side",
-    };
-
-    const docs = await Passport.find({ shortId: { $in: shortIds } })
-      .select("shortId role firstName lastName company jobTitle viewPin badgeFirstName badgeLastName")
-      .lean<Person[]>();
-    const byId = new Map(docs.map((d) => [d.shortId, d]));
-    const people = shortIds.map((id) => byId.get(id)).filter(Boolean) as Person[];
-
-    const W = widthMm * MM, H = heightMm * MM, M = marginMm * MM;
-    // Dimensiones lógicas (donde dibujamos). Con giro 90/270 se intercambian.
-    const swap = rotate === 90 || rotate === 270;
-    const LW = swap ? H : W, LH = swap ? W : H;
-    const pdf = new PDFDocument({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 }, autoFirstPage: false, info: { Title: await tituloDelPdf() } });
-
-    // Abre una página y gira el lienzo si hace falta (el contenido se dibuja en coords lógicas LW×LH).
-    const beginPage = () => {
-      pdf.addPage({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
-      if (rotate) {
-        pdf.save();
-        pdf.translate(W / 2, H / 2);
-        pdf.rotate(rotate);
-        pdf.translate(-LW / 2, -LH / 2);
-      }
-    };
-    const endPage = () => { if (rotate) pdf.restore(); };
-
-    if (perLabel === 2) {
-      // Dos por etiqueta (arriba / abajo) para cortar a la mitad
-      const gap = 4 * MM;
-      const halfH = (LH - 2 * M - gap) / 2;
-      for (let i = 0; i < people.length; i += 2) {
-        beginPage();
-        await drawBadge(pdf, people[i], M, M, LW - 2 * M, halfH, c);
-        if (people[i + 1]) await drawBadge(pdf, people[i + 1], M, M + halfH + gap, LW - 2 * M, halfH, c);
-        // Línea de corte punteada en el centro
-        const cutY = M + halfH + gap / 2;
-        pdf.save();
-        pdf.dash(4, { space: 3 }).moveTo(M, cutY).lineTo(LW - M, cutY).lineWidth(0.5).strokeColor("#bbbbbb").stroke().undash();
-        pdf.restore();
-        endPage();
-      }
-    } else {
-      for (const p of people) {
-        beginPage();
-        await drawBadge(pdf, p, M, M, LW - 2 * M, LH - 2 * M, c);
-        endPage();
-      }
-    }
-
-    const buffer = await pdfToBuffer(pdf);
-    return new Response(new Uint8Array(buffer), {
-      headers: { "Content-Type": "application/pdf", "Content-Disposition": "inline; filename=escarapelas.pdf" },
-    });
-  } catch (e) {
-    const msg = (e as Error).message;
-    if (msg === "Unauthorized") return Response.json({ error: msg }, { status: 401 });
-    if (msg === "Forbidden") return Response.json({ error: msg }, { status: 403 });
-    return Response.json({ error: "Error interno" }, { status: 500 });
+export const POST = ruta(async (req: NextRequest) => {
+  await requireAccess("print", "editar", ["admin", "organizer", "volunteer"]);
+  const { shortIds: crudo, configId: idCrudo } = await leerCuerpo(req);
+  const shortIds = listaDeTextos(crudo);
+  const configId = typeof idCrudo === "string" ? idCrudo : undefined;
+  if (!shortIds || shortIds.length === 0) {
+    return Response.json({ error: "shortIds requerido" }, { status: 400 });
   }
-}
+
+  if (shortIds.length > MAX_SHORT_IDS) {
+    return Response.json({ error: `Máximo ${MAX_SHORT_IDS} escarapelas por petición; envíalas por tandas.` }, { status: 400 });
+  }
+
+  await connectDB();
+
+  const cfg = (configId ? await PrintConfig.findById(configId).lean() : null)
+    ?? await PrintConfig.findOne({ isDefault: true }).lean();
+  const widthMm = cfg?.widthMm ?? 101.6, heightMm = cfg?.heightMm ?? 152.4, marginMm = cfg?.marginMm ?? 3;
+  const perLabel = cfg?.perLabel === 2 ? 2 : 1;
+  const rotate = [90, 180, 270].includes(Number(cfg?.rotate)) ? Number(cfg?.rotate) : 0;
+  const al = (v: unknown): Align => (v === "center" || v === "right" ? v : "left");
+  const c: Cfg = {
+    qrPct: cfg?.qrPct ?? 32, fontScale: cfg?.fontScale ?? 1,
+    showQr: cfg?.showQr ?? true, showRole: cfg?.showRole ?? true,
+    showCompany: cfg?.showCompany ?? true, showJobTitle: cfg?.showJobTitle ?? true,
+    alignName: al(cfg?.alignName), alignJobTitle: al(cfg?.alignJobTitle),
+    alignCompany: al(cfg?.alignCompany), alignRole: al(cfg?.alignRole),
+    layout: cfg?.layout === "stacked" ? "stacked" : "side",
+  };
+
+  const docs = await Passport.find({ shortId: { $in: shortIds } })
+    .select("shortId role firstName lastName company jobTitle viewPin badgeFirstName badgeLastName")
+    .lean<Person[]>();
+  const byId = new Map(docs.map((d) => [d.shortId, d]));
+  const people = shortIds.map((id) => byId.get(id)).filter(Boolean) as Person[];
+
+  const W = widthMm * MM, H = heightMm * MM, M = marginMm * MM;
+  // Dimensiones lógicas (donde dibujamos). Con giro 90/270 se intercambian.
+  const swap = rotate === 90 || rotate === 270;
+  const LW = swap ? H : W, LH = swap ? W : H;
+  const pdf = new PDFDocument({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 }, autoFirstPage: false, info: { Title: await tituloDelPdf() } });
+
+  // Abre una página y gira el lienzo si hace falta (el contenido se dibuja en coords lógicas LW×LH).
+  const beginPage = () => {
+    pdf.addPage({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
+    if (rotate) {
+      pdf.save();
+      pdf.translate(W / 2, H / 2);
+      pdf.rotate(rotate);
+      pdf.translate(-LW / 2, -LH / 2);
+    }
+  };
+  const endPage = () => { if (rotate) pdf.restore(); };
+
+  if (perLabel === 2) {
+    // Dos por etiqueta (arriba / abajo) para cortar a la mitad
+    const gap = 4 * MM;
+    const halfH = (LH - 2 * M - gap) / 2;
+    for (let i = 0; i < people.length; i += 2) {
+      beginPage();
+      await drawBadge(pdf, people[i], M, M, LW - 2 * M, halfH, c);
+      if (people[i + 1]) await drawBadge(pdf, people[i + 1], M, M + halfH + gap, LW - 2 * M, halfH, c);
+      // Línea de corte punteada en el centro
+      const cutY = M + halfH + gap / 2;
+      pdf.save();
+      pdf.dash(4, { space: 3 }).moveTo(M, cutY).lineTo(LW - M, cutY).lineWidth(0.5).strokeColor("#bbbbbb").stroke().undash();
+      pdf.restore();
+      endPage();
+    }
+  } else {
+    for (const p of people) {
+      beginPage();
+      await drawBadge(pdf, p, M, M, LW - 2 * M, LH - 2 * M, c);
+      endPage();
+    }
+  }
+
+  const buffer = await pdfToBuffer(pdf);
+  return new Response(new Uint8Array(buffer), {
+    headers: { "Content-Type": "application/pdf", "Content-Disposition": "inline; filename=escarapelas.pdf" },
+  });
+});
