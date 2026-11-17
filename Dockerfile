@@ -15,7 +15,7 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL \
     NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY \
     NEXT_TELEMETRY_DISABLED=1
 # Para compilar no hace falta una base ni un secreto real.
-RUN MODO_DEMO=1 JWT_SECRET=solo-para-compilar-no-se-usa-en-ningun-sitio npm run build
+RUN NEXT_STANDALONE=1 MODO_DEMO=1 JWT_SECRET=solo-para-compilar-no-se-usa-en-ningun-sitio npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app

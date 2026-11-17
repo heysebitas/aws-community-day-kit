@@ -57,8 +57,9 @@ const seguridad = [
 ];
 
 const nextConfig: NextConfig = {
-  // La imagen de Docker copia sólo `.next/standalone`, sin `node_modules` completos.
-  output: "standalone",
+  // Sólo para la imagen de Docker, que copia `.next/standalone` sin `node_modules`.
+  // `next start` (pm2, el despliegue por SSH) no está soportado con standalone.
+  output: process.env.NEXT_STANDALONE === "1" ? "standalone" : undefined,
   serverExternalPackages: ["pdfkit", "mongodb-memory-server"],
   poweredByHeader: false,
   // `experimental.inlineCss` queda apagado: en la portada el HTML pasaba de 24 a 84 KB gzip (+60 KB, tope 25).

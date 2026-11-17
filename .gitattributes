@@ -1,0 +1,12 @@
+# Finales de línea LF en todos los sistemas: las pruebas comparan archivos byte a byte.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
