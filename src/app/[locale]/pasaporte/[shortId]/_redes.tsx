@@ -116,7 +116,7 @@ export function Redes({ v }: { v: Vista }) {
                         </>
                       ) : (
                         <>
-                          <span style={{ flex: 1, fontFamily: "monospace", fontSize: 11, color: "#4b5563" }}>{plat.label}</span>
+                          <span style={{ flex: 1, fontFamily: "monospace", fontSize: 11, color: "var(--color-surface-400)" }}>{plat.label}</span>
                           <button onClick={() => openAddSocial(plat.id)} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgb(var(--tema-acento-rgb) / .3)", background: "rgb(var(--tema-acento-rgb) / .08)", fontFamily: "monospace", fontSize: 10, fontWeight: 700, color: "var(--color-acento)", cursor: "pointer", flexShrink: 0 }}>{t("add")}</button>
                         </>
                       )}

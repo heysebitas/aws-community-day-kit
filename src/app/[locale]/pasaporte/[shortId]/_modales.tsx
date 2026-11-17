@@ -17,7 +17,7 @@ export function ModalSello({ v }: { v: Vista }) {
         <div style={{ padding: "22px 22px 26px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
             <p style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: "var(--color-acento)", letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>{t("redeem")}</p>
-            <button onClick={() => { setShowStampModal(false); setStampDigits(["","","",""]); setStampResult(null); }} style={{ background: "none", border: "none", color: "#4b5563", cursor: "pointer", display: "flex", padding: 4 }}>
+            <button onClick={() => { setShowStampModal(false); setStampDigits(["","","",""]); setStampResult(null); }} style={{ background: "none", border: "none", color: "var(--color-surface-400)", cursor: "pointer", display: "flex", padding: 4 }}>
               <X style={{ width: 14, height: 14 }} />
             </button>
           </div>
@@ -29,7 +29,7 @@ export function ModalSello({ v }: { v: Vista }) {
                 {stampResult.msg}
               </p>
               {!stampResult.ok && (
-                <p style={{ fontFamily: "monospace", fontSize: 10, color: "#4b5563", marginTop: 10 }}>Intenta otro PIN</p>
+                <p style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-surface-400)", marginTop: 10 }}>Intenta otro PIN</p>
               )}
             </div>
           ) : stamping ? (
@@ -40,7 +40,7 @@ export function ModalSello({ v }: { v: Vista }) {
           ) : (
             /* PIN entry — auto-submits on 4 digits */
             <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
-              <p style={{ fontFamily: "monospace", fontSize: 10, color: "#4b5563", textAlign: "center", margin: 0 }}>
+              <p style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-surface-400)", textAlign: "center", margin: 0 }}>
                 Ingresa el PIN del sponsor para reclamar tu sello
               </p>
               <PinDigits
@@ -84,7 +84,7 @@ export function ModalRedes({ v }: { v: Vista }) {
                 <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, background: plat.bg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>{plat.icon}</div>
                 <p style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-surface-50)", margin: 0 }}>{plat.label}</p>
               </div>
-              <button onClick={() => setAddingPlatform(null)} style={{ background: "none", border: "none", color: "#4b5563", cursor: "pointer", display: "flex", padding: 4 }}><X style={{ width: 14, height: 14 }} /></button>
+              <button onClick={() => setAddingPlatform(null)} style={{ background: "none", border: "none", color: "var(--color-surface-400)", cursor: "pointer", display: "flex", padding: 4 }}><X style={{ width: 14, height: 14 }} /></button>
             </div>
 
             <p style={{ fontFamily: "monospace", fontSize: 10, color: "#6b7280", margin: "0 0 10px" }}>{t("add_how")}</p>

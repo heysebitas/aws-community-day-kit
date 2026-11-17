@@ -191,7 +191,7 @@ export default function ConfirmarPage() {
                   </p>
                 )}
                 {data.email && (
-                  <p style={{ margin: "4px 0 0", fontFamily: "monospace", fontSize: 10, color: "#4b5563" }}>{data.email}</p>
+                  <p style={{ margin: "4px 0 0", fontFamily: "monospace", fontSize: 10, color: "var(--color-surface-400)" }}>{data.email}</p>
                 )}
               </div>
 
@@ -345,7 +345,7 @@ export default function ConfirmarPage() {
                   >
                     {submitting ? "Confirmando…" : "✓ Confirmar mi asistencia"}
                   </button>
-                  <p style={{ color: "#4b5563", fontSize: 10, textAlign: "center", margin: "12px 0 0", fontFamily: "monospace" }}>
+                  <p style={{ color: "var(--color-surface-400)", fontSize: 10, textAlign: "center", margin: "12px 0 0", fontFamily: "monospace" }}>
                     Solo puedes confirmar una vez.
                   </p>
                 </div>

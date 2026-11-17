@@ -261,8 +261,8 @@ export default function CheckInPage() {
                 <Button onClick={scanning ? stopScanner : startScanner} variant={scanning ? "secondary" : "primary"} className="flex-1">
                   {scanning ? (<><CameraOff className="mr-2 h-4 w-4" /> Detener</>) : (<><Camera className="mr-2 h-4 w-4" /> Activar escáner</>)}
                 </Button>
-                <Button variant={showManual ? "secondary" : "ghost"} onClick={() => setShowManual(!showManual)} className="shrink-0">
-                  <Keyboard className="h-4 w-4" />
+                <Button variant={showManual ? "secondary" : "ghost"} onClick={() => setShowManual(!showManual)} className="shrink-0" aria-label="Escribir el código a mano" aria-pressed={showManual}>
+                  <Keyboard className="h-4 w-4" aria-hidden />
                 </Button>
               </div>
 

@@ -45,7 +45,7 @@ export function PinOverlay({ v }: { v: Vista }) {
               </div>
               <button
                 onClick={() => setShowPinSection(false)}
-                style={{ background: "none", border: "none", color: "#4b5563", cursor: "pointer", display: "flex", padding: 4 }}
+                style={{ background: "none", border: "none", color: "var(--color-surface-400)", cursor: "pointer", display: "flex", padding: 4 }}
               >
                 <X style={{ width: 14, height: 14 }} />
               </button>
@@ -135,7 +135,7 @@ export function Cabecera({ v }: { v: Vista }) {
         </p>
 
         {(passport.jobTitle || passport.company) && (
-          <p style={{ fontFamily: "monospace", fontSize: 11, color: "#4b5563", marginTop: 11, lineHeight: 1.5, margin: "11px 0 0" }}>
+          <p style={{ fontFamily: "monospace", fontSize: 11, color: "var(--color-surface-400)", marginTop: 11, lineHeight: 1.5, margin: "11px 0 0" }}>
             {[passport.jobTitle, passport.company].filter(Boolean).join(" · ")}
           </p>
         )}

@@ -32,7 +32,7 @@ export function PasaporteVista({ shortId, inicial }: { shortId: string; inicial?
       <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-surface-900)" }}>
         <div style={{ textAlign: "center", padding: "0 24px" }}>
           <p style={{ fontFamily: "monospace", fontSize: 16, fontWeight: 700, color: "var(--color-surface-50)", marginBottom: 8 }}>{t("not_found")}</p>
-          <p style={{ fontFamily: "monospace", fontSize: 11, color: "#4b5563" }}>{t("not_found_hint")}</p>
+          <p style={{ fontFamily: "monospace", fontSize: 11, color: "var(--color-surface-400)" }}>{t("not_found_hint")}</p>
         </div>
       </div>
     </>
@@ -91,7 +91,7 @@ export function PasaporteVista({ shortId, inicial }: { shortId: string; inicial?
             )}
             <img src="/images/logos/aws-logo.svg" alt="AWS" style={{ height: 32, width: "auto" }} />
             <p style={{ fontFamily: "monospace", fontSize: 10, fontWeight: 700, color: "#9ca3af", margin: 0 }}>{EVENTO.marca.lineas.join(" ")}</p>
-            <p style={{ fontFamily: "monospace", fontSize: 8, letterSpacing: "0.25em", color: "#4b5563", margin: 0 }}>{`${EVENTO.edicion} ${EVENTO.anio}`.toUpperCase()}</p>
+            <p style={{ fontFamily: "monospace", fontSize: 8, letterSpacing: "0.25em", color: "var(--color-surface-400)", margin: 0 }}>{`${EVENTO.edicion} ${EVENTO.anio}`.toUpperCase()}</p>
           </Link>
 
         </div>{/* /card area */}

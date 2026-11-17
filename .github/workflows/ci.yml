@@ -144,6 +144,8 @@ jobs:
           npm run build
           # Se mide con el script de la rama del PR: la base puede no tenerlo.
           node ../scripts/presupuesto-bundle.mjs --next .next --salida ../bundle-base.json
+      # La base vive dentro del repo: si se queda, el typecheck del PR la recorre como código propio.
+      - run: rm -rf base
       - run: npm ci
       - run: npm run build
       - name: Comparar (sube más de 10 % → aviso)
