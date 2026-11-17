@@ -19,7 +19,7 @@ async function cuerpoValido(extra: Record<string, unknown> = {}) {
     firstName: "ana maría", lastName: "pérez", email: "ana@ejemplo.test",
     tagline: "Ingeniera de nube", bio: "Hace nubes.", photo: FOTO,
     talkTitle: "Una charla", talkAbstract: "De qué va.", countryCity: "Ciudad de ejemplo",
-    sessionType: "in-person", audienceLevel: "200", language: "es", track: TRACKS[0].value,
+    sessionType: "in-person", audienceLevel: "200", language: "es", track: TRACKS[0]!.value,
     ...extra,
   };
 }
@@ -73,7 +73,7 @@ describe("parseSpeakerInput", () => {
     assert.ok(r.ok);
     if (!r.ok) return;
     assert.equal(r.value.coSpeakers.length, 2);
-    assert.equal(r.value.coSpeakers[0].social.linkedin, "");
+    assert.equal(r.value.coSpeakers[0]!.social.linkedin, "");
   });
 
   test("los enlaces inválidos se guardan vacíos", async () => {
@@ -86,7 +86,8 @@ describe("parseSpeakerInput", () => {
 
 describe("el slug", () => {
   test("une al speaker con sus co-speakers", async () => {
-    const { toSlug, buildSlugFromNames } = await import("@/lib/speaker-input");
+    const { buildSlugFromNames } = await import("@/lib/speaker-input");
+    const { toSlug } = await import("@/lib/slug");
     assert.equal(toSlug("  Ána Pérez!! "), "ana-perez");
     assert.equal(buildSlugFromNames("Ana", "Pérez", []), "ana-perez");
     assert.equal(

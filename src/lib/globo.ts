@@ -63,7 +63,7 @@ const aPath = (ts: Array<Array<[number, number]>>, cx: number, cy: number) =>
     .join("");
 
 function* arco(a: number[]): Generator<[number, number]> {
-  for (let i = 0; i < a.length; i += 2) yield [a[i + 1], a[i]];
+  for (let i = 0; i < a.length; i += 2) yield [a[i + 1]!, a[i]!];
 }
 
 /** El globo como trazos SVG, encuadrado en un punto. Para dibujarlo sin canvas. */

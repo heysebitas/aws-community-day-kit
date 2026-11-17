@@ -1,5 +1,6 @@
 "use client";
 
+import { enfocarPrimerInvalido } from "@/components/forms/foco";
 import { useMemo, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
@@ -222,7 +223,10 @@ export function RegistroForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      enfocarPrimerInvalido(e.currentTarget);
+      return;
+    }
     // Se envía de una: un paso de revisión intermedio hace creer que ya se envió.
     // El repaso de los datos está en la pantalla de gracias.
     void send();
@@ -265,6 +269,7 @@ export function RegistroForm({
               onChange={(e) => set("firstName", e.target.value)}
               placeholder={t.firstName_ph}
               maxLength={60}
+              aria-invalid={errors.firstName ? true : undefined}
               className={cn(inputCls, errors.firstName && "border-error")}
             />
           </Field>
@@ -277,6 +282,7 @@ export function RegistroForm({
               onChange={(e) => set("lastName", e.target.value)}
               placeholder={t.lastName_ph}
               maxLength={60}
+              aria-invalid={errors.lastName ? true : undefined}
               className={cn(inputCls, errors.lastName && "border-error")}
             />
           </Field>
@@ -297,6 +303,7 @@ export function RegistroForm({
               setErrors((x) => ({ ...x, email: r.ok ? undefined : r.reason }));
             }}
             placeholder={t.email_ph}
+            aria-invalid={errors.email ? true : undefined}
             className={cn(inputCls, errors.email && "border-error")}
           />
         </Field>
@@ -368,6 +375,7 @@ export function RegistroForm({
                     disabled={!v.documentType}
                     placeholder={(locale === "en" ? docExampleEn ?? docExample : docExample) ?? ""}
                     maxLength={24}
+                    aria-invalid={errors.documentNumber ? true : undefined}
                     className={cn(
                       inputCls,
                       errors.documentNumber && "border-error",
@@ -411,6 +419,7 @@ export function RegistroForm({
                   onChange={(e) => set("roleOther", e.target.value)}
                   placeholder={t.which_ph}
                   maxLength={FREE_TEXT_MAX}
+                  aria-invalid={errors.roleOther ? true : undefined}
                   className={cn(inputCls, errors.roleOther && "border-error")}
                 />
               </Field>
@@ -458,6 +467,7 @@ export function RegistroForm({
                   onChange={(e) => set("entityName", e.target.value)}
                   placeholder={t.entityName_ph}
                   maxLength={FREE_TEXT_MAX}
+                  aria-invalid={errors.entityName ? true : undefined}
                   className={cn(inputCls, errors.entityName && "border-error")}
                 />
               </Field>

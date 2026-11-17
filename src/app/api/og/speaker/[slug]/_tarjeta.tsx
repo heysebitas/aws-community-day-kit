@@ -60,7 +60,7 @@ function ajustar(
   const lineas = envolver(texto, min, anchoMax).slice(0, maxLineas);
   const porLinea = Math.max(1, Math.floor(anchoMax / (min * AVANCE)));
   if (lineas.length === maxLineas) {
-    lineas[maxLineas - 1] = `${lineas[maxLineas - 1].slice(0, Math.max(1, porLinea - 1))}…`;
+    lineas[maxLineas - 1] = `${lineas[maxLineas - 1]!.slice(0, Math.max(1, porLinea - 1))}…`;
   }
   return { tamano: min, lineas };
 }
@@ -121,7 +121,6 @@ function PhotoTile({ photo, name, w, h, radius = 16 }: { photo: string; name: st
   return (
     <div style={{ width: w, height: h, borderRadius: radius, overflow: "hidden", display: "flex", border: `4px solid ${PURPLE}70` }}>
       {photo ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={photo} alt="" style={{ width: w, height: h, objectFit: "cover" }} />
       ) : (
         <div style={{ width: w, height: h, background: "#160F26", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -252,8 +251,7 @@ export function TarjetaSpeaker({
           <div style={{ position: "absolute", top: 0, left: 8, width: 490, height: H, display: "flex", overflow: "hidden" }}>
             {/* El zoom agranda la imagen desde el centro y el encuadre elige
                 qué parte del original se ve. Dos mandos independientes: uno
-                acerca, el otro mueve. eslint-disable-next-line @next/next/no-img-element */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+                acerca, el otro mueve. */}
             <img
               src={mainPhoto}
               alt=""
@@ -277,7 +275,6 @@ export function TarjetaSpeaker({
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={awsLogo} alt="" style={{ height: 48, width: 78, objectFit: "contain" }} />
           <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {[...EVENTO.marca.lineas, `${EVENTO.edicion} ${EVENTO.anio}`].map((l) => (
@@ -320,7 +317,7 @@ export function TarjetaSpeaker({
                 <PhotoTile photo={s.photo} name={s.name} w={anchoFicha} h={altoFicha} radius={radioFicha} />
                 <div style={{ height: altoNombres, display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <Lineas
-                    lineas={nombres[i]}
+                    lineas={nombres[i]!}
                     style={{ fontSize: tamNombre, fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: 1.25 }}
                   />
                 </div>
@@ -356,7 +353,6 @@ export function TarjetaSpeaker({
           </div>
 
           {qrDataUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
             <img src={qrDataUrl} alt="" style={{ width: 160, height: 160, marginTop: 24 }} />
           )}
         </div>
@@ -391,13 +387,11 @@ export function TarjetaSpeaker({
 
       {/* ── QR: 2-speaker ── */}
       {isMulti && totalSpeakers === 2 && qrDataUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={qrDataUrl} alt="" style={{ position: "absolute", bottom: 40, left: 68, width: 148, height: 148 }} />
       )}
 
       {/* ── QR: 3 & 4-speaker ── */}
       {isMulti && totalSpeakers >= 3 && qrDataUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={qrDataUrl} alt="" style={{ position: "absolute", bottom: 40, left: 44, width: 195, height: 195 }} />
       )}
 
@@ -422,21 +416,17 @@ export function TarjetaSpeaker({
 
       {/* ── COMPANY LOGO — single speaker only ── */}
       {!isMulti && companyLogo && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={companyLogo} alt="" style={{ position: "absolute", bottom: 16, left: 16, width: 180, height: 72, objectFit: "contain", opacity: 0.9 }} />
       )}
 
       {/* ── EVENT LOGO ── */}
       {eventLogo && !isMulti && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={eventLogo} alt="" style={{ position: "absolute", bottom: 40, right: 44, width: 195, height: 195, objectFit: "contain" }} />
       )}
       {eventLogo && isMulti && totalSpeakers === 2 && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={eventLogo} alt="" style={{ position: "absolute", bottom: 17, right: 44, width: 195, height: 195, objectFit: "contain" }} />
       )}
       {eventLogo && isMulti && totalSpeakers >= 3 && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={eventLogo} alt="" style={{ position: "absolute", bottom: 40, right: 44, width: 240, height: 240, objectFit: "contain" }} />
       )}
 

@@ -64,7 +64,6 @@ export function PassportPreview({
   return (
     <Frame kicker={t("preview_passport")}>
       <div className="flex items-center justify-between border-b-2 border-acento/25 px-4 py-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/logos/aws-logo.svg" alt="AWS" className="h-5 w-auto" />
         <span className="etiqueta text-white/45">{fechaCorta(EVENTO.inicio)}</span>
       </div>
@@ -75,7 +74,6 @@ export function PassportPreview({
           className="h-[104px] w-[104px] rounded-full p-[3px]"
           style={{ background: "linear-gradient(135deg,var(--color-acento),var(--color-acento-claro),var(--color-acento))" }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={avatarUrl(email || `${firstName}${lastName}`)}
             alt=""
@@ -155,7 +153,6 @@ export function SpeakerPreview({
       {/* Foto */}
       <div className="relative aspect-[4/3] w-full overflow-hidden border-b-2 border-acento/25 bg-surface-800">
         {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={photo} alt="" className="h-full w-full object-cover object-top grayscale" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
@@ -232,7 +229,6 @@ export function VolunteerPreview({
 
       <div className="flex items-center gap-4 px-5 py-6">
         <div className="h-[76px] w-[76px] shrink-0 border-2 border-acento/40 bg-surface-800">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={avatarUrl(email || `${firstName}${lastName}`)}
             alt=""

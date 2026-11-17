@@ -102,7 +102,8 @@ IP, y las imágenes de marca se piden en cada visita y desde los proxies de los 
   Los dos mapas tienen un tope de 10 000 claves; al llenarse se descartan las
   más antiguas.
 - La CSP permite scripts en línea (`'unsafe-inline'`): es lo que deja
-  prerenderizar las páginas sin un nonce por petición.
+  prerenderizar las páginas sin un nonce por petición. Medidas y decisión
+  pendiente en [csp.md](csp.md).
 - El código del pasaporte es el mismo que el del QR del pase: quien ve el QR
   de alguien puede abrir su pasaporte. Editarlo sí pide el PIN.
 - No hay segundo factor para el panel.

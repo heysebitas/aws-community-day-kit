@@ -102,7 +102,6 @@ function HeadlinerCard({ kn }: { kn: Keynote }) {
 
         {kn.delPrograma && (
           <div className="absolute top-4 right-4 z-20 pointer-events-none">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logos/aws-logo.svg" alt="AWS" width={304} height={182} loading="lazy" decoding="async" className="h-6 w-auto opacity-90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" />
           </div>
         )}
@@ -149,7 +148,6 @@ function SecondaryCard({ kn }: { kn: Keynote }) {
       >
         {kn.delPrograma && (
           <div className="absolute top-4 right-4 z-20 pointer-events-none">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logos/aws-logo.svg" alt="AWS" width={304} height={182} loading="lazy" decoding="async" className="h-6 w-auto opacity-90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" />
           </div>
         )}
@@ -237,7 +235,7 @@ export function Keynotes() {
         {/* 1 secondary → full width */}
         {rest.length === 1 && (
           <ScrollReveal delay={0.08}>
-            <SecondaryCard kn={rest[0]} />
+            <SecondaryCard kn={rest[0]!} />
           </ScrollReveal>
         )}
 

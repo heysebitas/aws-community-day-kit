@@ -32,8 +32,8 @@ function react19Servidor() {
 const doc = DOCUMENTOS[0];
 const datos = (email: string) => ({
   firstName: "Ana", lastName: "Prueba", email, attendance: "in-person",
-  documentType: doc.value, documentNumber: "12345678",
-  role: ROLES[0].value, entityType: ENTIDADES.find((e) => e.value === "none")?.value ?? ENTIDADES[0].value,
+  documentType: doc!.value, documentNumber: "12345678",
+  role: ROLES[0]!.value, entityType: ENTIDADES.find((e) => e.value === "none")?.value ?? ENTIDADES[0]!.value,
   entityName: "Entidad de prueba", acceptCoc: true, acceptPrivacy: true,
 });
 const post = (email: string) =>

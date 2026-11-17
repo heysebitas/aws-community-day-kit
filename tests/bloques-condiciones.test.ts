@@ -45,13 +45,13 @@ describe("saneado de la condición", () => {
   test("acepta las del catálogo", () => {
     for (const f of BANDERAS) {
       const r = sanearBloques([{ tipo: "parrafo", texto: "x", mostrarSi: f.clave }]);
-      assert.equal(r[0].mostrarSi, f.clave);
+      assert.equal(r[0]!.mostrarSi, f.clave);
     }
   });
 
   test("descarta una bandera inventada en vez de esconder el bloque para siempre", () => {
     const r = sanearBloques([{ tipo: "parrafo", texto: "x", mostrarSi: "jueves" }]);
-    assert.equal(r[0].mostrarSi, undefined);
+    assert.equal(r[0]!.mostrarSi, undefined);
     assert.equal(bloquesVisibles(r, []).length, 1, "debe seguir saliendo");
   });
 });

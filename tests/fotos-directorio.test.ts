@@ -47,15 +47,15 @@ describe("#46 Cache-Control en las subidas", () => {
     } finally {
       (s3 as unknown as { send: unknown }).send = original;
     }
-    assert.equal(enviados[0].input.CacheControl, INMUTABLE);
-    assert.match(enviados[1].input.CacheControl ?? "", /max-age=86400/);
+    assert.equal(enviados[0]!.input.CacheControl, INMUTABLE);
+    assert.match(enviados[1]!.input.CacheControl ?? "", /max-age=86400/);
   });
 
   test("los PUT del cliente usan las cabeceras del servidor, no las suyas", () => {
     for (const f of [
       "src/components/ui/image-upload.tsx",
       "src/app/[locale]/speakers/_components.tsx",
-      "src/app/[locale]/admin/speakers/canvas/page.tsx",
+      "src/app/[locale]/admin/speakers/canvas/_use-canvas.tsx",
       "src/app/[locale]/admin/speakers/ajustes/page.tsx",
     ]) {
       const src = leer(f);
@@ -108,7 +108,7 @@ describe("#47 redimensionar en el cliente", () => {
     for (const f of [
       "src/components/ui/image-upload.tsx",
       "src/app/[locale]/speakers/_components.tsx",
-      "src/app/[locale]/admin/speakers/canvas/page.tsx",
+      "src/app/[locale]/admin/speakers/canvas/_use-canvas.tsx",
     ]) {
       const src = leer(f);
       assert.ok(src.indexOf("prepararImagen(") > -1 && src.indexOf("prepararImagen(") < src.indexOf("/api/upload/"), f);
@@ -119,7 +119,7 @@ describe("#47 redimensionar en el cliente", () => {
 describe("#48 y CLS: imágenes por Foto o con tamaño", () => {
   test("logos del pasaporte, del panel y SpeakerCard usan Foto", () => {
     for (const f of [
-      "src/app/[locale]/pasaporte/[shortId]/page.tsx",
+      "src/app/[locale]/pasaporte/[shortId]/_piezas.tsx",
       "src/app/[locale]/admin/pasaportes/page.tsx",
       "src/components/sections/speakers.tsx",
     ]) {

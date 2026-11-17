@@ -20,7 +20,7 @@ const ft = (s?: string) => (s || "").trim().split(/\s+/)[0] || "";
 async function tituloDelPdf(): Promise<string> {
   const crudos = (await import(`../../../../messages/${IDIOMA_BASE}.json`)).default;
   const m = resolver(crudos, tokensDe(IDIOMA_BASE)) as Record<string, Record<string, string>>;
-  return `${m.Panel.escarapelas} ${EVENTO.nombreCompleto}`;
+  return `${m.Panel!.escarapelas} ${EVENTO.nombreCompleto}`;
 }
 
 type Person = { shortId: string; role: string; firstName: string; lastName: string; company?: string; jobTitle?: string; viewPin?: string; badgeFirstName?: string; badgeLastName?: string };
@@ -200,8 +200,8 @@ export const POST = ruta(async (req: NextRequest) => {
     const halfH = (LH - 2 * M - gap) / 2;
     for (let i = 0; i < people.length; i += 2) {
       beginPage();
-      await drawBadge(pdf, people[i], M, M, LW - 2 * M, halfH, c);
-      if (people[i + 1]) await drawBadge(pdf, people[i + 1], M, M + halfH + gap, LW - 2 * M, halfH, c);
+      await drawBadge(pdf, people[i]!, M, M, LW - 2 * M, halfH, c);
+      if (people[i + 1]) await drawBadge(pdf, people[i + 1]!, M, M + halfH + gap, LW - 2 * M, halfH, c);
       // Línea de corte punteada en el centro
       const cutY = M + halfH + gap / 2;
       pdf.save();

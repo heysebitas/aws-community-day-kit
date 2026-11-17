@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { COUNTRIES, DEFAULT_COUNTRY, digitsOnly, findCountry, type Country } from "@/lib/normalize";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,7 @@ export function PhoneInput({
   const s = ESTILOS[tone];
   const t = useTranslations("Forms");
   const country = findCountry(countryCode);
+  const listId = useId();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -196,6 +197,7 @@ export function PhoneInput({
           }}
           placeholder={"0".repeat(Array.isArray(country.digits) ? country.digits[0] : country.digits)}
           aria-label={label ?? t("phone_label")}
+          aria-invalid={error ? true : undefined}
           className={cn(
             "w-full border-2 px-4 py-3 font-mono text-sm tabular-nums transition-colors",
             s.campo,
@@ -226,18 +228,23 @@ export function PhoneInput({
                 onKeyDown={onKeyDown}
                 placeholder={t("phone_search")}
                 aria-label={t("phone_search_aria")}
+                role="combobox"
+                aria-expanded
+                aria-controls={listId}
+                aria-activedescendant={filtered[active] ? `${listId}-${filtered[active].code}` : undefined}
                 className={cn(
                   "w-full border-b-2 px-3 py-2.5 font-mono text-sm",
                   s.buscador,
                 )}
               />
-              <ul role="listbox" className="max-h-60 overflow-y-auto">
+              <ul id={listId} role="listbox" className="max-h-60 overflow-y-auto">
                 {filtered.length === 0 && (
                   <li className={cn("px-3 py-3 font-mono text-xs", s.tenue)}>{t("phone_no_results")}</li>
                 )}
                 {filtered.map((c, i) => (
                   <li key={c.code}>
                     <button
+                      id={`${listId}-${c.code}`}
                       type="button"
                       role="option"
                       aria-selected={c.code === country.code}

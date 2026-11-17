@@ -143,7 +143,7 @@ export async function sendEmailBatchDetallado(emails: SendEmailOptions[]): Promi
 
   if (proveedor() !== "resend") {
     for (let i = 0; i < emails.length; i++) {
-      salida[i] = await sendEmail(emails[i]);
+      salida[i] = await sendEmail(emails[i]!);
       // SES limita por segundo; el ritmo por omisión de una cuenta nueva es 14/s.
       if (proveedor() === "ses") await sleep(90);
     }
@@ -155,16 +155,16 @@ export async function sendEmailBatchDetallado(emails: SendEmailOptions[]): Promi
   const vaciar = async () => {
     for (let i = 0; i < cola.length; i += 100) {
       const tramo = cola.slice(i, i + 100);
-      const r = await loteResend(tramo.map((k) => emails[k])).catch((e) => tramo.map(() => fallo(e)));
-      tramo.forEach((k, j) => { salida[k] = r[j]; });
+      const r = await loteResend(tramo.map((k) => emails[k]!)).catch((e) => tramo.map(() => fallo(e)));
+      tramo.forEach((k, j) => { salida[k] = r[j]!; });
     }
     cola = [];
   };
 
   for (let i = 0; i < emails.length; i++) {
-    if (emails[i].attachments?.length) {
+    if (emails[i]!.attachments?.length) {
       await vaciar();
-      salida[i] = await sendEmail(emails[i]);
+      salida[i] = await sendEmail(emails[i]!);
       await sleep(550); // Resend admite unas dos peticiones por segundo.
     } else {
       cola.push(i);
@@ -217,7 +217,7 @@ export async function conConcurrencia<T, R>(
     while (siguiente < items.length) {
       const i = siguiente++;
       try {
-        salida[i] = { status: "fulfilled", value: await fn(items[i]) };
+        salida[i] = { status: "fulfilled", value: await fn(items[i]!) };
       } catch (reason) {
         salida[i] = { status: "rejected", reason };
       }

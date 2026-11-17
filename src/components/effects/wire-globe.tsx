@@ -96,8 +96,11 @@ export function WireGlobe({
     // Fuera de pantalla no se dibuja.
     let visible = true;
     const centinela = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      if (visible && !raf) raf = requestAnimationFrame(draw);
+      visible = e!.isIntersecting;
+      if (!visible) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else if (!raf) raf = requestAnimationFrame(draw);
     }, { rootMargin: "100px" });
     centinela.observe(canvas);
 

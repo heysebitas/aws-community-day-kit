@@ -242,7 +242,7 @@ function DuplicatesSection() {
     }
   };
 
-  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps -- carga única al montar
 
   const removeRegistration = async (row: DuplicateRow) => {
     const ok = await confirm({

@@ -109,7 +109,7 @@ export function CountPictogram({
 
   // El label llega como "800+ Asistentes": se separa la cifra para contarla.
   const [num, ...rest] = label.split(" ");
-  const counted = useCountUp(num, inView);
+  const counted = useCountUp(num!, inView);
 
   return (
     <div

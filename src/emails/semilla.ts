@@ -115,6 +115,123 @@ const TODAS: Semilla[] = [
         texto: "El comité lee y evalúa cada propuesta por lo que propone: el título, el nivel y el abstract. Te escribimos por correo con la respuesta, salga como salga.",
       },
       { id: id(), tipo: "datos", filas: [{ etiqueta: "Tu charla", valor: "{charla}" }] },
+      { id: id(), tipo: "separador" },
+      { id: id(), tipo: "kicker", texto: "copia de tu propuesta" },
+      {
+        // Las filas sin valor no salen: así el track, los co-speakers y los requerimientos son opcionales.
+        id: id(), tipo: "datos", filas: [
+          { etiqueta: "Título", valor: "{charla}" },
+          { etiqueta: "Descripción", valor: "{resumen}" },
+          { etiqueta: "Modalidad", valor: "{modalidad}" },
+          { etiqueta: "Nivel", valor: "{nivel}" },
+          { etiqueta: "Track", valor: "{track}" },
+          { etiqueta: "Idioma", valor: "{idioma}" },
+          { etiqueta: "Ciudad", valor: "{ubicacion}" },
+          { etiqueta: "Tu rol", valor: "{cargo}" },
+          { etiqueta: "Co-speakers", valor: "{coSpeakers}" },
+          { etiqueta: "Requerimientos", valor: "{requerimientos}" },
+        ],
+      },
+      {
+        id: id(), tipo: "parrafo", apagado: true,
+        texto: "La propuesta no se puede editar desde el sitio. Si viste algo mal en esta copia, respóndenos este correo antes del cierre y lo corregimos.",
+      },
+      { id: id(), tipo: "separador" },
+      { id: id(), tipo: "boton", texto: "Ver el sitio", enlace: "{sitio}" },
+    ],
+  },
+
+  {
+    slug: "invitacion_panel",
+    nombre: "Invitación al panel",
+    descripcion: "Le da acceso al panel a una persona del equipo, con el enlace para crear su contraseña.",
+    asunto: "Invitación al panel — {evento}",
+    preview: "Tu cuenta del panel está lista — crea tu contraseña",
+    strip: "ACCESO AL PANEL ·",
+    bloques: [
+      { id: id(), tipo: "kicker", texto: "cuenta creada" },
+      { id: id(), tipo: "titulo", texto: "Bienvenido/a, {nombre}.", siVacio: "Tu cuenta está lista." },
+      {
+        id: id(), tipo: "parrafo",
+        texto: "Te creamos una cuenta en el panel del {evento}. Falta un paso: definir tu contraseña.",
+      },
+      { id: id(), tipo: "datos", filas: [
+        { etiqueta: "Nombre", valor: "{nombreCompleto}" },
+        { etiqueta: "Rol", valor: "{rol}" },
+        { etiqueta: "Panel", valor: "{dominio}/admin" },
+      ] },
+      { id: id(), tipo: "boton", texto: "Crear mi contraseña", enlace: "{enlaceClave}" },
+      {
+        id: id(), tipo: "aviso", titulo: "importante",
+        texto: "Este enlace es de un solo uso y caduca. Si expira, pídele a un administrador que te reenvíe la invitación.",
+      },
+      { id: id(), tipo: "separador" },
+      { id: id(), tipo: "parrafo", apagado: true, texto: "Si el botón no abre, copia y pega este enlace en tu navegador:" },
+      { id: id(), tipo: "parrafo", texto: "{enlaceClave}" },
+      {
+        id: id(), tipo: "parrafo", apagado: true,
+        texto: "¿No esperabas este correo? Ignóralo — sin crear la contraseña, la cuenta no se activa.",
+      },
+    ],
+  },
+
+  {
+    slug: "pasaporte_confirmar",
+    nombre: "Confirmar cambios del pasaporte",
+    descripcion: "Pide confirmar los cambios que alguien pidió en un pasaporte, con el enlace de un solo uso.",
+    asunto: "Confirma los cambios en tu pasaporte — {evento}",
+    preview: "Confirma los cambios en tu pasaporte",
+    strip: "CONFIRMA LOS CAMBIOS ·",
+    bloques: [
+      { id: id(), tipo: "kicker", texto: "verificación" },
+      { id: id(), tipo: "titulo", texto: "{nombre}, confirma estos cambios.", siVacio: "Confirma estos cambios." },
+      {
+        id: id(), tipo: "parrafo",
+        texto: "Alguien pidió actualizar tu pasaporte con los datos de abajo. Si fuiste tú, confirma; si no reconoces esto, ignora el correo y no pasa nada.",
+      },
+      {
+        // Sólo salen las filas que cambian: las demás llegan sin valor.
+        id: id(), tipo: "datos", filas: [
+          { etiqueta: "Builder Center", valor: "{builderCenter}" },
+          { etiqueta: "LinkedIn", valor: "{linkedin}" },
+          { etiqueta: "Instagram", valor: "{instagram}" },
+          { etiqueta: "X / Twitter", valor: "{x}" },
+          { etiqueta: "GitHub", valor: "{github}" },
+          { etiqueta: "TikTok", valor: "{tiktok}" },
+          { etiqueta: "Foto", valor: "{foto}" },
+        ],
+      },
+      { id: id(), tipo: "boton", texto: "Sí, aplicar los cambios", enlace: "{enlaceConfirmar}" },
+      {
+        id: id(), tipo: "aviso", titulo: "seguridad",
+        texto: "Este enlace es de un solo uso y caduca pronto. Sin confirmar, tu pasaporte se queda exactamente como está.",
+      },
+    ],
+  },
+
+  {
+    slug: "voluntario_certificado",
+    nombre: "Certificado de voluntariado",
+    descripcion: "Acompaña al PDF del certificado que se manda a cada voluntario.",
+    asunto: "Tu certificado de voluntariado — {evento}",
+    preview: "Tu certificado de voluntariado está adjunto",
+    strip: "TU CERTIFICADO ·",
+    bloques: [
+      { id: id(), tipo: "kicker", texto: "gracias" },
+      { id: id(), tipo: "titulo", texto: "{nombre}, lo lograste." },
+      {
+        id: id(), tipo: "parrafo",
+        texto: "Adjunto va tu certificado de voluntariado del {evento}. Es tuyo: súbelo a LinkedIn, ponlo en tu CV, enséñaselo a quien quieras.",
+      },
+      {
+        id: id(), tipo: "parrafo",
+        texto: "Un evento así se ve fácil desde afuera justamente porque alguien lo sostuvo desde adentro. Ese alguien fuiste tú.",
+      },
+      { id: id(), tipo: "boton", texto: "Ver quién más estuvo", enlace: "{sitio}/directorio", contorno: true },
+      {
+        id: id(), tipo: "parrafo", apagado: true,
+        texto: "Si tu nombre está mal escrito en el certificado, respóndenos y lo reemitimos el mismo día.",
+      },
     ],
   },
 
@@ -317,7 +434,7 @@ const TODAS: Semilla[] = [
     ],
     bloques: [
       { id: id(), tipo: "kicker", texto: "pasaporte digital" },
-      { id: id(), tipo: "titulo", texto: "{nombre}, tienes un pasaporte." },
+      { id: id(), tipo: "titulo", texto: "{nombre}, tienes un pasaporte.", siVacio: "Tienes un pasaporte." },
       {
         id: id(), tipo: "parrafo",
         texto: "Es una página tuya, con tu nombre y tus redes, que existe desde que te registraste. Funciona como una tarjeta de presentación que no se arruga en el bolsillo: la abres, la muestran y listo.",

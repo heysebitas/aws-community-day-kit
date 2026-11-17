@@ -130,6 +130,23 @@ export async function armarCorreo(
   return armarDesdePlantilla(plantilla, { ...variables, ...valores }, banderas, extra);
 }
 
+/**
+ * Como `armarCorreo`, pero si la plantilla está desactivada o no existe usa el
+ * texto de fábrica: hay correos que no pueden depender de un interruptor.
+ */
+export async function armarCorreoObligatorio(
+  slug: SlugSistema,
+  valores: Record<string, string> = {},
+  banderas: string[] = [],
+): Promise<CorreoListo> {
+  const guardado = await armarCorreo(slug, valores, banderas);
+  if (guardado) return guardado;
+  const semilla = semillaDe(slug);
+  if (!semilla) throw new Error(`sin texto de fábrica para ${slug}`);
+  const { variables } = await enlacesActuales();
+  return armarDesdePlantilla(semilla, { ...variables, ...valores }, banderas);
+}
+
 /** Lo que hace falta de una plantilla para dibujarla. */
 export interface PlantillaParaArmar {
   asunto: string;

@@ -21,4 +21,4 @@ const SponsorPinSchema = new Schema<ISponsorPin>(
 );
 
 export const SponsorPin =
-  mongoose.models.SponsorPin || mongoose.model<ISponsorPin>("SponsorPin", SponsorPinSchema);
+  mongoose.models.SponsorPin! || mongoose.model<ISponsorPin>("SponsorPin", SponsorPinSchema);

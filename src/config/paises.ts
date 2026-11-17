@@ -293,7 +293,7 @@ export const PAISES: Record<CodigoPais, Pais> = {
     telefono: { prefijo: "+52", digitos: 10 },
     capital: { nombre: "Ciudad de México", lat: 19.43, lon: -99.13 },
     documentos: [
-      { value: "CURP", label: "CURP", en: "CURP", example: "GOMC800101HDFNRR09", rule: { kind: "curp" } },
+      { value: "CURP", label: "CURP", en: "CURP", example: "GOMC800101HDFNRR05", rule: { kind: "curp" } },
       { value: "INE", label: "INE / Credencial para votar", en: "INE / Voter ID", example: "Clave de elector", exampleEn: "Voter key", rule: { kind: "loose", min: 10, max: 20 } },
     ],
     estudiantes: [

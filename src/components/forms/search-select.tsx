@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,6 +85,7 @@ export function SearchSelect({
   tone?: Tono;
 }) {
   const s = ESTILOS[tone];
+  const listId = useId();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -174,6 +175,7 @@ export function SearchSelect({
         onClick={toggle}
         aria-haspopup="listbox"
         aria-expanded={open}
+        data-invalido={invalid ? "true" : undefined}
         className={cn(
           "flex w-full items-center justify-between gap-2 border-2 px-4 py-3 text-left font-mono text-sm transition-all",
           s.boton,
@@ -215,6 +217,10 @@ export function SearchSelect({
                 onKeyDown={onKeyDown}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
+                role="combobox"
+                aria-expanded
+                aria-controls={listId}
+                aria-activedescendant={filtered[active] ? `${listId}-${active}` : undefined}
                 className={cn(
                   "w-full border-0 py-2.5 pl-9 pr-3 font-mono text-sm",
                   s.buscador,
@@ -222,7 +228,7 @@ export function SearchSelect({
               />
             </div>
 
-            <ul role="listbox" className="m-0 max-h-64 list-none overflow-y-auto p-0">
+            <ul id={listId} role="listbox" className="m-0 max-h-64 list-none overflow-y-auto p-0">
               {filtered.length === 0 && (
                 <li className={cn("px-3 py-3 font-mono text-xs", s.vacio)}>{emptyLabel}</li>
               )}
@@ -234,6 +240,7 @@ export function SearchSelect({
                       </p>
                     )}
                     <button
+                      id={`${listId}-${i}`}
                       type="button"
                       role="option"
                       aria-selected={o.value === value}

@@ -161,7 +161,7 @@ export function drawEventDetails(doc: Doc, y: number): number {
   const boxX = MARGIN;
   const boxW = PAGE_W - MARGIN * 2;
   const dia = fechaConDia(EVENTO.inicio, "es");
-  const rows = [
+  const rows: [string, string][] = [
     ["FECHA", `${dia.charAt(0).toUpperCase()}${dia.slice(1)}, ${EVENTO.anio}`],
     ["HORA", `${hora(EVENTO.inicio, "es")} (${zonaDe(EVENTO.inicio, "es")})`],
     ["LUGAR", EVENTO.sede.nombre],

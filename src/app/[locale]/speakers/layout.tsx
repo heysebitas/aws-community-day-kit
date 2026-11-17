@@ -8,5 +8,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function SpeakersLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
-  return <MensajesDeRuta ruta="speakers" params={params}>{children}</MensajesDeRuta>;
+  return (
+    <>
+      <link rel="preconnect" href="https://challenges.cloudflare.com" crossOrigin="" />
+      <MensajesDeRuta ruta="speakers" params={params}>{children}</MensajesDeRuta>
+    </>
+  );
 }

@@ -20,7 +20,7 @@ export function bucleVisible(el: Element, fotograma: () => void, una = false): (
   };
   const centinela = new IntersectionObserver(
     ([e]) => {
-      visible = e.isIntersecting;
+      visible = e!.isIntersecting;
       arrancar();
     },
     { rootMargin: "100px" },

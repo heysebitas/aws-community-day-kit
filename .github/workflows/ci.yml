@@ -1,6 +1,7 @@
 name: CI
 
 # Los cambios que solo tocan documentación no pasan por el build.
+# Los jobs de medición (e2e, Lighthouse, bundle) solo corren en pull_request para no gastar CI en cada push.
 on:
   push:
     branches: [main]
@@ -16,13 +17,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  check-node:
+    name: check + build (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20.19 es el mínimo de `engines`: Tailwind 4 hace require() de un módulo ES, que antes no existe.
+        node: ["20.19", "22"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
       - run: npm run check
@@ -30,3 +37,133 @@ jobs:
         env:
           MODO_DEMO: "1"
           JWT_SECRET: solo-para-compilar-en-ci-no-se-usa-en-ningun-sitio
+
+
+  # La regla de `main` exige un check llamado «check»: lo da este job cuando pasan las dos versiones de Node.
+  check:
+    name: check
+    needs: check-node
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.check-node.result }}" = "success"
+
+  e2e:
+    name: e2e + axe (demo en producción)
+    if: github.event_name == 'pull_request'
+    # La demo en memoria solo aquí: con MODO_DEMO, `npm test` deja conexiones abiertas y no termina.
+    env:
+      MODO_DEMO: "1"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Playwright y axe solo viven en este job: no están en package.json ni en el lockfile.
+      - run: npm i --no-save @playwright/test @axe-core/playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Clave de sesión solo para este job
+        run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
+      - run: npm run build
+      - name: Levantar la demo
+        run: |
+          npx next start -p 3000 > servidor.log 2>&1 &
+          npx --yes wait-on@8 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
+      - run: npx playwright test
+        env:
+          PRUEBA_URL: http://localhost:3000
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-informe
+          path: |
+            test-results/
+            servidor.log
+          if-no-files-found: ignore
+
+  lighthouse:
+    name: Lighthouse (aviso)
+    if: github.event_name == 'pull_request'
+    # La demo en memoria solo aquí: con MODO_DEMO, `npm test` deja conexiones abiertas y no termina.
+    env:
+      MODO_DEMO: "1"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm i -g lighthouse@12.8.2
+      - name: Clave de sesión solo para este job
+        run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
+      - run: npm run build
+      - name: Levantar la demo
+        run: |
+          npx next start -p 3000 > servidor.log 2>&1 &
+          npx --yes wait-on@8 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
+      # Aviso, no fallo, hasta que se decida si las regresiones bloquean el PR.
+      - name: Comparar con la línea base
+        continue-on-error: true
+        run: npm run medir -- --url http://localhost:3000 --comparar
+      - name: Presupuestos de la fase 2 (portada móvil)
+        run: |
+          node -e '
+            const p = JSON.parse(require("fs").readFileSync("medidas/actual.json", "utf8")).paginas["/"];
+            const reglas = [
+              ["rendimiento", p.rendimiento >= 95, `${p.rendimiento} (mínimo 95)`],
+              ["LCP", p.lcp < 2500, `${p.lcp} ms (máximo 2500)`],
+              ["TBT", p.tbt < 100, `${p.tbt} ms (máximo 100)`],
+              ["accesibilidad", p.accesibilidad >= 96, `${p.accesibilidad} (mínimo 96)`],
+            ];
+            for (const [n, ok, txt] of reglas) if (!ok) console.log(`::warning title=Presupuesto de Lighthouse::${n} en la portada: ${txt}`);
+          '
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: medidas/actual.json
+          if-no-files-found: ignore
+
+  bundle:
+    name: Presupuesto de bundle (aviso)
+    if: github.event_name == 'pull_request'
+    # La demo en memoria solo aquí: con MODO_DEMO, `npm test` deja conexiones abiertas y no termina.
+    env:
+      MODO_DEMO: "1"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            base/package-lock.json
+      - name: Clave de sesión solo para este job
+        run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
+      - name: Medir la rama base
+        working-directory: base
+        run: |
+          npm ci
+          npm run build
+          # Se mide con el script de la rama del PR: la base puede no tenerlo.
+          node ../scripts/presupuesto-bundle.mjs --next .next --salida ../bundle-base.json
+      # La base vive dentro del repo: si se queda, el typecheck del PR la recorre como código propio.
+      - run: rm -rf base
+      - run: npm ci
+      - run: npm run build
+      - name: Comparar (sube más de 10 % → aviso)
+        run: node scripts/presupuesto-bundle.mjs --base bundle-base.json --umbral 10 --salida medidas/bundle.json

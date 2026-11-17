@@ -239,7 +239,7 @@ export function EventoForm({
                 setTipo(key);
                 if (key === "keynote" && keynotes.length > 0) {
                   setKeynoteIdx(0);
-                  aplicarKeynote(keynotes[0]);
+                  aplicarKeynote(keynotes[0]!);
                 }
               }}
               className={`flex min-h-11 items-center justify-center gap-2 border-2 px-2 py-2 font-mono text-xs font-bold transition-all ${

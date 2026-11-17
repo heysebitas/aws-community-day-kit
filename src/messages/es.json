@@ -15,7 +15,8 @@
     "open_menu": "Abrir menú",
     "close_menu": "Cerrar menú",
     "menu": "Menú de navegación",
-    "skip_to_content": "Saltar al contenido"
+    "skip_to_content": "Saltar al contenido",
+    "back_to_top": "Volver arriba"
   },
   "Strip": {
     "event": "[[evento]]",
@@ -393,6 +394,7 @@
     "preview_level": "Nivel {level}",
     "preview_inperson": "Presencial",
     "phone_label": "Número de teléfono",
+    "photo_remove": "Quitar foto",
     "phone_search": "Buscar país…",
     "phone_search_aria": "Buscar país",
     "form_error": "Ocurrió un error inesperado",
@@ -452,6 +454,7 @@
     "submit": "Crear Contraseña"
   },
   "Passport": {
+    "pin_label": "PIN de cuatro dígitos",
     "loading": "Cargando pasaporte",
     "not_found": "Pasaporte no encontrado",
     "not_found_hint": "Verifica el código QR de tu escarapela.",

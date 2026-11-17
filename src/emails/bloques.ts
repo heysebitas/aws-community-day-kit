@@ -25,8 +25,8 @@ interface Base {
 
 export type Bloque =
   | (Base & { tipo: "kicker"; texto: string })
-  | (Base & { tipo: "titulo"; texto: string })
-  | (Base & { tipo: "parrafo"; texto: string; apagado?: boolean })
+  | (Base & { tipo: "titulo"; texto: string; siVacio?: string })
+  | (Base & { tipo: "parrafo"; texto: string; apagado?: boolean; siVacio?: string })
   | (Base & { tipo: "boton"; texto: string; enlace: string; contorno?: boolean })
   | (Base & { tipo: "aviso"; titulo?: string; texto: string })
   | (Base & { tipo: "datos"; filas: { etiqueta: string; valor: string }[] })
@@ -77,7 +77,7 @@ export interface Variable {
   clave: string;
   explica: string;
   /** Para agrupar las fichas en el editor. */
-  grupo: "La persona" | "El evento" | "Sus enlaces" | "Enlaces del panel";
+  grupo: "La persona" | "El evento" | "Sus enlaces" | "Enlaces del panel" | "Del envío";
 }
 
 /**
@@ -123,6 +123,25 @@ export const VARIABLES: Variable[] = [
   { clave: "transmision", explica: "La transmisión en vivo.", grupo: "Enlaces del panel" },
   { clave: "fotos", explica: "La galería de fotos.", grupo: "Enlaces del panel" },
   { clave: "grabaciones", explica: "Las grabaciones de las charlas.", grupo: "Enlaces del panel" },
+
+  { clave: "enlaceClave", explica: "Invitación al panel: el enlace de un solo uso para crear la contraseña.", grupo: "Del envío" },
+  { clave: "rol", explica: "Invitación al panel: el rol que se le dio.", grupo: "Del envío" },
+  { clave: "enlaceConfirmar", explica: "Pasaporte: el enlace de un solo uso para confirmar los cambios.", grupo: "Del envío" },
+  { clave: "builderCenter", explica: "Pasaporte: el cambio pedido en Builder Center, si lo hay.", grupo: "Del envío" },
+  { clave: "linkedin", explica: "Pasaporte: el cambio pedido en LinkedIn, si lo hay.", grupo: "Del envío" },
+  { clave: "instagram", explica: "Pasaporte: el cambio pedido en Instagram, si lo hay.", grupo: "Del envío" },
+  { clave: "x", explica: "Pasaporte: el cambio pedido en X, si lo hay.", grupo: "Del envío" },
+  { clave: "github", explica: "Pasaporte: el cambio pedido en GitHub, si lo hay.", grupo: "Del envío" },
+  { clave: "tiktok", explica: "Pasaporte: el cambio pedido en TikTok, si lo hay.", grupo: "Del envío" },
+  { clave: "foto", explica: "Pasaporte: el cambio pedido en la foto, si lo hay.", grupo: "Del envío" },
+  { clave: "resumen", explica: "Postulación: la descripción de la propuesta.", grupo: "Del envío" },
+  { clave: "nivel", explica: "Postulación: el nivel de la audiencia.", grupo: "Del envío" },
+  { clave: "track", explica: "Postulación: el track elegido, si lo hay.", grupo: "Del envío" },
+  { clave: "idioma", explica: "Postulación: el idioma de la charla.", grupo: "Del envío" },
+  { clave: "ubicacion", explica: "Postulación: la ciudad de quien postula.", grupo: "Del envío" },
+  { clave: "cargo", explica: "Postulación: su rol o titular.", grupo: "Del envío" },
+  { clave: "coSpeakers", explica: "Postulación: los co-speakers, si los hay.", grupo: "Del envío" },
+  { clave: "requerimientos", explica: "Postulación: lo que pidió para su sesión, si pidió algo.", grupo: "Del envío" },
 ];
 
 /** Los grupos, en el orden en que salen en el editor. */
@@ -133,7 +152,7 @@ export function variablesUsadas(bloques: Bloque[], ...textos: string[]): Set<str
   const usadas = new Set<string>();
   const mirar = (t: unknown) => {
     if (typeof t !== "string") return;
-    for (const m of t.matchAll(/\{(\w+)\}/g)) usadas.add(m[1]);
+    for (const m of t.matchAll(/\{(\w+)\}/g)) usadas.add(m[1]!);
   };
 
   for (const t of textos) mirar(t);
@@ -155,6 +174,14 @@ export function variablesUsadas(bloques: Bloque[], ...textos: string[]): Set<str
 /** Sustituye `{variable}` por su valor. Lo que no tenga valor queda vacío. */
 export function aplicarVariables(texto: string, valores: Record<string, string>): string {
   return texto.replace(/\{(\w+)\}/g, (_, clave: string) => valores[clave] ?? "");
+}
+
+/** El texto del bloque: si alguna variable queda vacía y hay `siVacio`, se usa ese. */
+export function textoConAlternativa(texto: string, siVacio: string | undefined, valores: Record<string, string>): string {
+  if (siVacio && [...texto.matchAll(/\{(\w+)\}/g)].some((m) => !valores[m[1]!]?.trim())) {
+    return aplicarVariables(siVacio, valores);
+  }
+  return aplicarVariables(texto, valores);
 }
 
 /** Un id corto y único dentro de una plantilla. */
@@ -197,11 +224,19 @@ export function sanearBloques(entrada: unknown): Bloque[] {
 
     switch (o.tipo) {
       case "kicker":
+        salida.push({ id, mostrarSi, tipo: "kicker", texto: texto(o.texto, 200) });
+        break;
       case "titulo":
-        salida.push({ id, mostrarSi, tipo: o.tipo, texto: texto(o.texto, 200) });
+        salida.push({
+          id, mostrarSi, tipo: "titulo", texto: texto(o.texto, 200),
+          siVacio: o.siVacio ? texto(o.siVacio, 200) : undefined,
+        });
         break;
       case "parrafo":
-        salida.push({ id, mostrarSi, tipo: "parrafo", texto: texto(o.texto), apagado: o.apagado === true });
+        salida.push({
+          id, mostrarSi, tipo: "parrafo", texto: texto(o.texto), apagado: o.apagado === true,
+          siVacio: o.siVacio ? texto(o.siVacio) : undefined,
+        });
         break;
       case "boton":
         salida.push({

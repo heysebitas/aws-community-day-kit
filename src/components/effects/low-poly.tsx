@@ -11,7 +11,7 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
 /** Dirección de la luz, normalizada una sola vez. */
 const LUZ = (() => {
-  const l = [-0.35, 0.78, 0.52];
+  const l = [-0.35, 0.78, 0.52] as const;
   const n = Math.hypot(l[0], l[1], l[2]);
   return [l[0] / n, l[1] / n, l[2] / n] as const;
 })();
@@ -70,9 +70,9 @@ export function LowPoly({
     const vy = new Float32Array(n);
     const vz = new Float32Array(n);
     for (let i = 0; i < n; i++) {
-      vx[i] = pos[i * 3] / 1000;
-      vy[i] = pos[i * 3 + 1] / 1000;
-      vz[i] = pos[i * 3 + 2] / 1000;
+      vx[i] = pos[i * 3]! / 1000;
+      vy[i] = pos[i * 3 + 1]! / 1000;
+      vz[i] = pos[i * 3 + 2]! / 1000;
     }
 
     // Espacio reutilizado entre cuadros: sin esto se asignarían varios arrays
@@ -103,7 +103,7 @@ export function LowPoly({
       const cr = Math.cos(roll), sr = Math.sin(roll);
 
       for (let i = 0; i < n; i++) {
-        const x0 = vx[i], y0 = vy[i], z0 = vz[i];
+        const x0 = vx[i]!, y0 = vy[i]!, z0 = vz[i]!;
         const y1 = y0 * cr - z0 * sr;
         const z1 = y0 * sr + z0 * cr;
         const x2 = x0 * cp - y1 * sp;
@@ -123,29 +123,29 @@ export function LowPoly({
       // igual, así que dibujarlo era pintar dos veces cada píxel.
       let vis = 0;
       for (let f = 0; f < caras; f++) {
-        const a = tri[f * 3], b = tri[f * 3 + 1], c = tri[f * 3 + 2];
+        const a = tri[f * 3]!, b = tri[f * 3 + 1]!, c = tri[f * 3 + 2]!;
         const area =
-          (px[b] - px[a]) * (py[c] - py[a]) - (px[c] - px[a]) * (py[b] - py[a]);
+          (px[b]! - px[a]!) * (py[c]! - py[a]!) - (px[c]! - px[a]!) * (py[b]! - py[a]!);
         if (area <= 0) continue;
 
-        const ux = rx[b] - rx[a], uy = ry[b] - ry[a], uz = rz[b] - rz[a];
-        const wx = rx[c] - rx[a], wy = ry[c] - ry[a], wz = rz[c] - rz[a];
+        const ux = rx[b]! - rx[a]!, uy = ry[b]! - ry[a]!, uz = rz[b]! - rz[a]!;
+        const wx = rx[c]! - rx[a]!, wy = ry[c]! - ry[a]!, wz = rz[c]! - rz[a]!;
         const nx = uy * wz - uz * wy;
         const ny = uz * wx - ux * wz;
         const nz = ux * wy - uy * wx;
         const len = Math.hypot(nx, ny, nz) || 1;
         luzDe[f] = Math.abs((nx * LUZ[0] + ny * LUZ[1] + nz * LUZ[2]) / len);
-        prof[f] = (rz[a] + rz[b] + rz[c]) / 3;
+        prof[f] = (rz[a]! + rz[b]! + rz[c]!) / 3;
         visibles[vis++] = f;
       }
 
       // Pintor: lo de más atrás primero.
-      const orden = Array.from(visibles.subarray(0, vis)).sort((i, j) => prof[i] - prof[j]);
+      const orden = Array.from(visibles.subarray(0, vis)).sort((i, j) => prof[i]! - prof[j]!);
 
       ctx.clearRect(0, 0, W, H);
       for (const f of orden) {
-        const a = tri[f * 3], b = tri[f * 3 + 1], c = tri[f * 3 + 2];
-        const k = 0.26 + 0.9 * luzDe[f];
+        const a = tri[f * 3]!, b = tri[f * 3 + 1]!, c = tri[f * 3 + 2]!;
+        const k = 0.26 + 0.9 * luzDe[f]!;
         const tono = `rgb(${Math.min(255, color.r * k) | 0},${Math.min(255, color.g * k) | 0},${Math.min(255, color.b * k) | 0})`;
         ctx.fillStyle = tono;
         // Un trazo fino del mismo color tapa la raya de fondo que deja el
@@ -154,9 +154,9 @@ export function LowPoly({
         ctx.lineWidth = 0.6;
         ctx.lineJoin = "round";
         ctx.beginPath();
-        ctx.moveTo(px[a], py[a]);
-        ctx.lineTo(px[b], py[b]);
-        ctx.lineTo(px[c], py[c]);
+        ctx.moveTo(px[a]!, py[a]!);
+        ctx.lineTo(px[b]!, py[b]!);
+        ctx.lineTo(px[c]!, py[c]!);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();

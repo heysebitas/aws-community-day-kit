@@ -74,7 +74,7 @@ export function getIp(request: Request): string {
   if (!lista.length) return "unknown";
 
   const saltos = Math.max(1, Number(process.env.PROXIES_DE_CONFIANZA) || 1);
-  return lista[Math.max(0, lista.length - saltos)];
+  return lista[Math.max(0, lista.length - saltos)]!;
 }
 
 // ── Intentos fallidos (PIN de patrocinadores, contraseñas) ──────────────────

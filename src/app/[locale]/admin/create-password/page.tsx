@@ -125,7 +125,7 @@ function CreatePasswordContent() {
   }
 
   if (tokenStatus === "invalid") {
-    const info = REASONS[invalidReason] ?? REASONS.not_found;
+    const info = REASONS[invalidReason] ?? REASONS.not_found!;
     return (
       <div className="flex min-h-svh items-center justify-center bg-surface-900 px-4">
         <div className="w-full max-w-sm text-center">

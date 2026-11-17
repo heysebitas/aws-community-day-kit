@@ -52,7 +52,7 @@ export async function datosDelEvento(idioma: Idioma) {
 
   return {
     nombre: tokensDe(idioma).evento,
-    descripcion: m.Metadata.description,
+    descripcion: m.Metadata?.description ?? "",
     organiza: EVENTO.organiza,
     gratuito: true,
     idiomas: IDIOMAS,
@@ -104,7 +104,7 @@ export async function datosDelEvento(idioma: Idioma) {
     })),
     preguntasFrecuentes: faqs.length
       ? faqs.map((f) => ({ pregunta: en ? f.questionEn : f.questionEs, respuesta: en ? f.answerEn : f.answerEs }))
-      : Array.from({ length: 10 }, (_, i) => ({ pregunta: m.FAQ[`q${i + 1}`], respuesta: m.FAQ[`a${i + 1}`] })),
+      : Array.from({ length: 10 }, (_, i) => ({ pregunta: m.FAQ?.[`q${i + 1}`] ?? "", respuesta: m.FAQ?.[`a${i + 1}`] ?? "" })),
     equipo: equipo.map((o) => ({ nombre: o.nombre, rol: o.rol })),
     patrocinadores: patrocinadores.map((p) => ({ nombre: p.nombre, url: p.url })),
     comunidades: comunidades.map((c) => c.nombre),

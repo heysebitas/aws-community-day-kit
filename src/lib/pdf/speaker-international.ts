@@ -38,7 +38,7 @@ export async function generateInternationalSpeakerPDF(name: string): Promise<Buf
       mono(doc).fontSize(8).fillColor(COLORS.ink).text("·", MARGIN + pad, ty, { lineBreak: false });
       doc.font("Helvetica").fontSize(8).fillColor(COLORS.muted)
         .text(c, MARGIN + pad + 12, ty, { width: ancho - pad * 2 - 12, lineGap: 1 });
-      ty += altos[i] + 5;
+      ty += altos[i]! + 5;
     });
     y += alto + 14;
   }

@@ -51,7 +51,7 @@ function extractShortId(raw: string): string {
   try {
     const url = new URL(raw);
     const m = url.pathname.match(/pasaporte\/([^/?]+)/);
-    if (m) return m[1];
+    if (m) return m[1]!;
     const parts = url.pathname.split("/").filter(Boolean);
     return parts[parts.length - 1] || raw;
   } catch {

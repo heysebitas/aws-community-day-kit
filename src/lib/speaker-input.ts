@@ -2,16 +2,7 @@ import { esTrack } from "@/data/session-tracks";
 import { cleanWhitespace, cleanMultiline, normalizeEmail, normalizeLink, sinEmoji, toName } from "@/lib/normalize";
 import { esDelBucket } from "@/lib/subidas";
 import { EVENTO } from "@/config";
-
-export function toSlug(raw: string): string {
-  return raw
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
+import { toSlug } from "@/lib/slug";
 
 export function buildSlugFromNames(firstName: string, lastName: string, coSpeakers: { firstName: string; lastName: string }[]): string {
   const mainSlug = toSlug(`${firstName} ${lastName}`);
@@ -20,7 +11,7 @@ export function buildSlugFromNames(firstName: string, lastName: string, coSpeake
     .map((cs) => toSlug(`${cs.firstName} ${cs.lastName}`))
     .filter(Boolean);
   const all = [mainSlug, ...coSlugs];
-  if (all.length === 1) return all[0];
+  if (all.length === 1) return all[0]!;
   const last = all[all.length - 1];
   return all.slice(0, -1).join("-") + "-y-" + last;
 }

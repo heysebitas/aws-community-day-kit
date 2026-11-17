@@ -129,7 +129,7 @@ describe("el selector de idioma", () => {
     if (!visible) return false;
     if (!etiqueta.toLowerCase().startsWith(visible.toLowerCase())) return false;
     const resto = etiqueta.slice(visible.length);
-    return resto === "" || !/\p{L}/u.test(resto[0]);
+    return resto === "" || !/\p{L}/u.test(resto[0]!);
   }
 
   test("cada botón tiene nombre accesible", () => {
@@ -138,14 +138,14 @@ describe("el selector de idioma", () => {
     const esperados = IDIOMAS.length < 2 ? 0 : IDIOMAS.length;
     assert.equal(botones.length, esperados, "un botón por idioma");
     for (const [, atributos] of botones) {
-      assert.match(atributos, /aria-label="[^"]+"/);
+      assert.match(atributos!, /aria-label="[^"]+"/);
     }
   });
 
   test("el nombre accesible empieza por el texto que se ve", () => {
     for (const [, atributos, texto] of html.matchAll(/<button([^>]*)>([^<]*)<\/button>/g)) {
-      const etiqueta = /aria-label="([^"]*)"/.exec(atributos)?.[1] ?? "";
-      const visible = texto.trim();
+      const etiqueta = /aria-label="([^"]*)"/.exec(atributos!)?.[1] ?? "";
+      const visible = texto!.trim();
       assert.ok(visible, "el botón tiene que mostrar su texto");
       assert.ok(
         empiezaPorVisible(etiqueta, visible),
@@ -201,7 +201,7 @@ describe("las listas ordenadas", () => {
   test("el análisis ve los dos casos", () => {
     // Sin esto, la comprobación de arriba pasaría igual si el análisis se
     // rompiera y dejaría de proteger nada.
-    assert.equal(primerHijo(bloquesDe("<ol><li>uno</li></ol>")[0]), "li");
-    assert.equal(primerHijo(bloquesDe("<ol><div><li>uno</li></div></ol>")[0]), "div");
+    assert.equal(primerHijo(bloquesDe("<ol><li>uno</li></ol>")[0]!), "li");
+    assert.equal(primerHijo(bloquesDe("<ol><div><li>uno</li></div></ol>")[0]!), "div");
   });
 });

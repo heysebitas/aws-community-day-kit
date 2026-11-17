@@ -94,7 +94,6 @@ export function Banner() {
       <Puntos ancho={1200} alto={630} />
       <Globo r={330} cx={1010} cy={330} ancho={1200} alto={630} />
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "52px 60px", width: 820, height: 630 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {logo ? <img src={logo} alt="" height={64} /> : <span />}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <Nombre tamano={104} />
@@ -117,7 +116,6 @@ export function CabeceraCorreo() {
       <Puntos ancho={1192} alto={440} />
       <Globo r={300} cx={1050} cy={250} ancho={1192} alto={440} />
       <div style={{ display: "flex", alignItems: "center", gap: 64, paddingLeft: 90 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {logo && <img src={logo} alt="" height={104} />}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Nombre tamano={84} />
@@ -150,8 +148,8 @@ export function PieCorreo() {
   });
   const trazo = (cerca: boolean) =>
     edges
-      .filter(([a, b]) => (p[a].z + p[b].z) / 2 > 0 === cerca)
-      .map(([a, b]) => `M${p[a].x.toFixed(1)} ${p[a].y.toFixed(1)}L${p[b].x.toFixed(1)} ${p[b].y.toFixed(1)}`)
+      .filter(([a, b]) => (p[a]!.z + p[b]!.z) / 2 > 0 === cerca)
+      .map(([a, b]) => `M${p[a]!.x.toFixed(1)} ${p[a]!.y.toFixed(1)}L${p[b]!.x.toFixed(1)} ${p[b]!.y.toFixed(1)}`)
       .join("");
 
   const cuadros = Array.from({ length: 24 }, (_, i) => i);

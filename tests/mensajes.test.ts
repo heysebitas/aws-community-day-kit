@@ -43,7 +43,7 @@ describe("los datos de la edición dentro de los textos", () => {
       for (const [ns, v] of Object.entries(leer(i))) {
         for (const [k, texto] of Object.entries(v)) {
           for (const m of String(texto).matchAll(/\[\[([a-z_]+)\]\]/g)) {
-            assert.ok(conocidos.has(m[1]), `${i}.json → ${ns}.${k} usa [[${m[1]}]], que no existe`);
+            assert.ok(conocidos.has(m[1]!), `${i}.json → ${ns}.${k} usa [[${m[1]}]], que no existe`);
           }
         }
       }
@@ -84,13 +84,14 @@ describe("lo que piden las pantallas", () => {
         ...codigo.matchAll(/const (\w+) = (?:await )?(?:useTranslations|getTranslations)\(\s*(?:\{[^}]*namespace:\s*)?"(\w+)"/g),
       ];
       for (const [, variable, ns] of traductores) {
-        if (!mensajes[ns]) {
+        const espacio = mensajes[ns!];
+        if (!espacio) {
           faltan.push(`${path.relative(RAIZ, archivo)}: el espacio «${ns}» no existe`);
           continue;
         }
         const usos = codigo.matchAll(new RegExp(`(?<![\\w.])${variable}(?:\\.rich|\\.raw)?\\(\\s*"([\\w.]+)"`, "g"));
         for (const [, clave] of usos) {
-          if (!(clave in mensajes[ns])) faltan.push(`${path.relative(RAIZ, archivo)}: ${ns}.${clave}`);
+          if (!(clave! in espacio)) faltan.push(`${path.relative(RAIZ, archivo)}: ${ns}.${clave}`);
         }
       }
     }

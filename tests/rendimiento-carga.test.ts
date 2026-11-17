@@ -8,8 +8,8 @@ const leer = (ruta: string) => readFileSync(ruta, "utf8");
 
 test("las reglas de especulación son prefetch moderado en /* sin las rutas con datos personales", () => {
   const [regla] = reglasEspeculativas().prefetch;
-  assert.equal(regla.eagerness, "moderate");
-  const [incluye, excluye] = regla.where.and as [{ href_matches: string }, { not: { href_matches: string[] } }];
+  assert.equal(regla!.eagerness, "moderate");
+  const [incluye, excluye] = regla!.where.and as [{ href_matches: string }, { not: { href_matches: string[] } }];
   assert.equal(incluye.href_matches, "/*");
   const fuera = excluye.not.href_matches;
   for (const r of ["admin", "api", "confirmar", "encuesta", "pasaporte"]) {
@@ -39,7 +39,7 @@ test("el encabezado del CFP no espera al scroll para mostrarse", () => {
   const cuerpo = src.slice(src.indexOf("export function CallForSpeakers"));
   const primeros = [...cuerpo.matchAll(/<ScrollReveal([^>]*)>/g)].slice(0, 3);
   assert.equal(primeros.length, 3);
-  for (const m of primeros) assert.match(m[1], /inmediato/);
+  for (const m of primeros) assert.match(m[1]!, /inmediato/);
 });
 
 // Contra el HTML servido: PRUEBA_URL=http://localhost:3000 npm test

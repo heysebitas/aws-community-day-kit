@@ -70,7 +70,7 @@ function literales(codigo: string): string[] {
 
 /** El texto que va entre etiquetas, que también puede llevar un año. */
 function textoJsx(codigo: string): string[] {
-  return [...codigo.matchAll(/>([^<>{}]+)</g)].map((m) => m[1]);
+  return [...codigo.matchAll(/>([^<>{}]+)</g)].map((m) => m[1]!);
 }
 
 function archivosDeSrc(): string[] {

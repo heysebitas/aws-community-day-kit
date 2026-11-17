@@ -36,7 +36,7 @@ function extractShortId(raw: string): string {
   try {
     const url = new URL(raw);
     const m = url.pathname.match(/pasaporte\/([^/?]+)/);
-    if (m) return m[1];
+    if (m) return m[1]!;
     const parts = url.pathname.split("/").filter(Boolean);
     return parts[parts.length - 1] || raw;
   } catch {
@@ -65,7 +65,7 @@ export default function BadgesScannerPage() {
       .then((d) => {
         const list: Badge[] = d.badges || [];
         setBadges(list);
-        if (list.length === 1) setSelectedId(list[0].id); // auto-selecciona si solo tiene uno
+        if (list.length === 1) setSelectedId(list[0]!.id); // auto-selecciona si solo tiene uno
       })
       .catch(() => toast("Error al cargar badges", "error"));
   }, [toast]);

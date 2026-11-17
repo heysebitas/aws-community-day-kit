@@ -1,6 +1,6 @@
 # Despliegue
 
-El kit es una aplicación de Next.js que corre con Node 20.12 o más: sirve en
+El kit es una aplicación de Next.js que corre con Node 20.19 o más: sirve en
 cualquier lugar donde puedas ejecutar `npm run build` y `npm start`. Necesita
 tres cosas por fuera: una base ([base-de-datos.md](base-de-datos.md)), un
 proveedor de correo ([correo.md](correo.md)) y un bucket para archivos.

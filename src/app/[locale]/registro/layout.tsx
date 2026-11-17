@@ -8,5 +8,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function RegistroLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
-  return <MensajesDeRuta ruta="registro" params={params}>{children}</MensajesDeRuta>;
+  return (
+    <>
+      <link rel="preconnect" href="https://challenges.cloudflare.com" crossOrigin="" />
+      <MensajesDeRuta ruta="registro" params={params}>{children}</MensajesDeRuta>
+    </>
+  );
 }

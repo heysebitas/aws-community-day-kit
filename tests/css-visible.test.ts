@@ -72,7 +72,7 @@ describe("tipografía en rem sin cambiar tamaños", () => {
   }
   function clamp(expr: string, w: number): number {
     const [a, b, c] = expr.replace(/^clamp\(|\)$/g, "").split(",");
-    return Math.min(Math.max(px(a, w), px(b, w)), px(c, w));
+    return Math.min(Math.max(px(a!, w), px(b!, w)), px(c!, w));
   }
   /** Tamaño a un ancho, desde un `clamp(...)` o desde clases `[sm:|lg:|xl:]text-[valor]`. */
   function tam(expr: string, w: number): number {
@@ -80,7 +80,7 @@ describe("tipografía en rem sin cambiar tamaños", () => {
     let sel = 0, out = NaN;
     for (const m of expr.matchAll(/(?:(sm|lg|xl):)?text-\[([\d.]+(?:vw|rem|px))\]/g)) {
       const bp = BP[m[1] ?? ""];
-      if (w >= bp && bp >= sel) { sel = bp; out = px(m[2], w); }
+      if (bp !== undefined && w >= bp && bp >= sel) { sel = bp; out = px(m[2]!, w); }
     }
     return out;
   }
@@ -91,7 +91,7 @@ describe("tipografía en rem sin cambiar tamaños", () => {
     { f: "app/[locale]/speakers/[slug]/_perfil.tsx", antes: ["text-[11vw] sm:text-[7vw] lg:text-[4.6vw] xl:text-[64px]"] },
     { f: "components/not-found-screen.tsx", antes: ["text-[22vw] sm:text-[18vw] lg:text-[13vw]"] },
     { f: "app/[locale]/directorio/_components.tsx", antes: ["clamp(18px,2.2vw,26px)"] },
-    { f: "app/[locale]/pasaporte/[shortId]/page.tsx", antes: ["clamp(30px,8.5vw,44px)", "clamp(30px,8.5vw,44px)"] },
+    { f: "app/[locale]/pasaporte/[shortId]/_tarjeta.tsx", antes: ["clamp(30px,8.5vw,44px)", "clamp(30px,8.5vw,44px)"] },
     { f: "app/[locale]/confirmar/[token]/page.tsx", antes: ["clamp(28px,8vw,40px)", "clamp(28px,8vw,40px)"] },
     { f: "components/sections/call-for-speakers.tsx", antes: ["clamp(28px,4vw,48px)"] },
     { f: "components/sections/tracks.tsx", antes: ["clamp(28px,4vw,48px)"] },
@@ -102,14 +102,14 @@ describe("tipografía en rem sin cambiar tamaños", () => {
   for (const { f, antes } of CASOS) {
     test(`${f}: mismo tamaño ±1 px a ${ANCHOS.join(", ")} y todo en rem`, () => {
       const c = readFileSync(join(RAIZ, f), "utf8");
-      const ahoraExpr = antes[0].startsWith("clamp(")
+      const ahoraExpr = antes[0]!.startsWith("clamp(")
         ? [...c.matchAll(/clamp\([^)]*\)/g)].map((m) => m[0])
         : [c.match(/font-display[^"`]*/)?.[0] ?? ""];
       assert.equal(ahoraExpr.length, antes.length, f);
       antes.forEach((a, i) => {
-        assert.ok(!/\dpx/.test(ahoraExpr[i]), `sin px: ${ahoraExpr[i]}`);
+        assert.ok(!/\dpx/.test(ahoraExpr[i]!), `sin px: ${ahoraExpr[i]}`);
         for (const w of ANCHOS) {
-          const x = tam(a, w), y = tam(ahoraExpr[i], w);
+          const x = tam(a, w), y = tam(ahoraExpr[i]!, w);
           assert.ok(Math.abs(x - y) <= 1, `${f} a ${w}px: antes ${x}, ahora ${y}`);
         }
       });

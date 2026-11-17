@@ -53,6 +53,7 @@ export async function registrarTramo(p: {
   envios.forEach((e, i) => {
     if (e.estado !== "enviado") return;
     const d = p.gente[i];
+    if (!d) return;
     const lista = porPublico.get(d.publico) ?? [];
     lista.push(d.id);
     porPublico.set(d.publico, lista);

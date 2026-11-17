@@ -42,7 +42,7 @@ export default function PlantillasPage() {
   const actual = useMemo(() => plantillas.find((p) => p.slug === slug) ?? null, [plantillas, slug]);
 
   useEffect(() => {
-    if (!slug && plantillas.length) setSlug(plantillas[0].slug);
+    if (!slug && plantillas.length) setSlug(plantillas[0]!.slug);
   }, [plantillas, slug]);
 
   useEffect(() => { if (error) toast("No se pudieron cargar las plantillas", "error"); }, [error, toast]);
@@ -58,7 +58,7 @@ export default function PlantillasPage() {
       bloques: actual.bloques,
     });
     setSucio(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- solo cambiar de plantilla reinicia el borrador; no cada refresco de la lista
   }, [actual?.slug]);
 
   /** Qué variables menciona el texto. */

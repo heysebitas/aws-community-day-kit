@@ -1,0 +1,11 @@
+{
+  "fecha": "2026-11-16T00:00:00.000Z",
+  "pasadas": 3,
+  "dispositivo": "móvil",
+  "paginas": {
+    "/": { "rendimiento": 90, "fcp": 1059, "lcp": 3675, "tbt": 4, "cls": 0.001 },
+    "/speakers": { "rendimiento": 90, "fcp": 1057, "lcp": 3671, "tbt": 3.5, "cls": 0.001 },
+    "/registro": { "rendimiento": 92, "fcp": 1056, "lcp": 3368, "tbt": 3.5, "cls": 0 },
+    "/directorio": { "rendimiento": 91, "fcp": 1057, "lcp": 3524, "tbt": 4.5, "cls": 0 }
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { createContext, useContext, useId, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { prepararImagen, ponerCabeceras } from "@/lib/imagen-cliente";
@@ -36,21 +37,50 @@ export function FacebookIcon({ className }: { className?: string }) {
 }
 
 // ── Primitivas de formulario ──────────────────────────────────────────────────
-export function Field({ label, error, children, hint }: { label?: string; error?: string; children: React.ReactNode; hint?: string }) {
+interface CampoCtx { id: string; invalido: boolean; describedBy?: string }
+const CampoContext = createContext<CampoCtx | null>(null);
+
+/** Atributos que enlazan un control con la etiqueta y el error de su `Field`. */
+function useCampo(propio: string) {
+  const c = useContext(CampoContext);
+  return {
+    id: c?.id ?? propio,
+    "aria-invalid": c?.invalido ? (true as const) : undefined,
+    "aria-describedby": c?.describedBy,
+  };
+}
+
+export function Field({ label, error, children, hint, grupo }: { label?: string; error?: string; children: React.ReactNode; hint?: string; /** El contenido son botones o varios controles: la etiqueta nombra al grupo. */ grupo?: boolean }) {
+  const id = useId();
+  const errId = `${id}-error`;
+  const hintId = `${id}-hint`;
+  const describedBy = error ? errId : hint ? hintId : undefined;
   return (
-    <div className="flex flex-col gap-1.5">
-      {label && <span className="font-mono text-xs font-semibold text-tinta">{label}</span>}
-      {children}
-      {hint && !error && <p className="font-mono text-xs text-tinta/70">{hint}</p>}
-      {error && <p className="font-mono text-xs text-red-400">{error}</p>}
+    <div
+      className="flex flex-col gap-1.5"
+      role={grupo && label ? "group" : undefined}
+      aria-labelledby={grupo && label ? `${id}-label` : undefined}
+      aria-describedby={grupo ? describedBy : undefined}
+      // Un grupo con error no tiene un campo que enfocar: se enfoca el grupo.
+      tabIndex={grupo && error ? -1 : undefined}
+      data-invalido={grupo && error ? "true" : undefined}
+    >
+      {label && (grupo
+        ? <span id={`${id}-label`} className="font-mono text-xs font-semibold text-tinta">{label}</span>
+        : <label htmlFor={id} className="font-mono text-xs font-semibold text-tinta">{label}</label>)}
+      <CampoContext.Provider value={{ id, invalido: !!error, describedBy }}>{children}</CampoContext.Provider>
+      {hint && !error && <p id={hintId} className="font-mono text-xs text-tinta/70">{hint}</p>}
+      {error && <p id={errId} className="font-mono text-xs text-error">{error}</p>}
     </div>
   );
 }
 
-export function TextInput({ value, onChange, onBlur, placeholder, maxLength, className, inputMode, autoComplete, name }: { value: string; onChange: (v: string) => void; onBlur?: () => void; placeholder?: string; maxLength?: number; className?: string; inputMode?: "text" | "email" | "numeric" | "url"; autoComplete?: string; name?: string }) {
+export function TextInput({ value, onChange, onBlur, placeholder, maxLength, className, inputMode, autoComplete, name, enterKeyHint }: { value: string; onChange: (v: string) => void; onBlur?: () => void; placeholder?: string; maxLength?: number; className?: string; inputMode?: "text" | "email" | "numeric" | "url"; autoComplete?: string; name?: string; enterKeyHint?: "next" | "done" | "go" }) {
+  const campo = useCampo(useId());
   return (
     <div className="relative">
       <input
+        {...campo}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         // Al salir se recorta lo que sobra: nunca se guarda con espacios al borde.
@@ -58,6 +88,7 @@ export function TextInput({ value, onChange, onBlur, placeholder, maxLength, cla
         placeholder={placeholder}
         maxLength={maxLength}
         inputMode={inputMode}
+        enterKeyHint={enterKeyHint}
         name={name}
         autoComplete={autoComplete}
         spellCheck={false}
@@ -71,9 +102,11 @@ export function TextInput({ value, onChange, onBlur, placeholder, maxLength, cla
 }
 
 export function Textarea({ value, onChange, placeholder, maxLength, rows = 4 }: { value: string; onChange: (v: string) => void; placeholder?: string; maxLength?: number; rows?: number }) {
+  const campo = useCampo(useId());
   return (
     <div className="relative">
       <textarea
+        {...campo}
         onBlur={() => onChange(value.trim())}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -93,7 +126,8 @@ export function Textarea({ value, onChange, placeholder, maxLength, rows = 4 }: 
 
 // ── Subida de foto (S3 vía public presign) ───────────────────────────────────
 export function PhotoUpload({ value, onChange, className }: { value: string; onChange: (url: string) => void; className?: string }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations("Forms");
+  const campo = useCampo(useId());
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [err, setErr] = useState<string | null>(null);
@@ -121,44 +155,45 @@ export function PhotoUpload({ value, onChange, className }: { value: string; onC
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div
-        onClick={() => !uploading && inputRef.current?.click()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) upload(f); }}
-        className={cn("relative flex cursor-pointer flex-col items-center justify-center overflow-hidden border-2 border-dashed transition-all", className ?? "aspect-square w-full max-w-[200px]", value ? "border-tinta/40" : "border-tinta/25 bg-white/40 hover:border-tinta/40 hover:bg-white/40", uploading && "pointer-events-none cursor-wait")}
-      >
-        {value && !uploading && (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={value} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/60 opacity-0 transition-opacity hover:opacity-100">
-              <Upload className="h-5 w-5 text-white" />
-              <span className="font-mono text-xs font-semibold text-white">Cambiar</span>
+      <div className={cn("relative", className ?? "aspect-square w-full max-w-[200px]")}>
+        {/* El input real va dentro de la etiqueta: se abre con teclado y con toque. */}
+        <label
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) upload(f); }}
+          className={cn("absolute inset-0 flex cursor-pointer flex-col items-center justify-center overflow-hidden border-2 border-dashed transition-all has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-tinta", value ? "border-tinta/40" : "border-tinta/25 bg-white/40 hover:border-tinta/40 hover:bg-white/40", uploading && "pointer-events-none cursor-wait")}
+        >
+          <input {...campo} type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
+          {value && !uploading && (
+            <>
+              <img src={value} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/60 opacity-0 transition-opacity hover:opacity-100">
+                <Upload className="h-5 w-5 text-white" />
+                <span className="font-mono text-xs font-semibold text-white">Cambiar</span>
+              </div>
+            </>
+          )}
+          {!value && !uploading && (
+            <div className="flex flex-col items-center gap-2 p-4 text-center">
+              <Upload className="h-7 w-7 text-tinta/70" />
+              <p className="font-mono text-xs font-semibold text-tinta/70">Subir foto</p>
             </div>
-          </>
-        )}
-        {!value && !uploading && (
-          <div className="flex flex-col items-center gap-2 p-4 text-center">
-            <Upload className="h-7 w-7 text-tinta/70" />
-            <p className="font-mono text-xs font-semibold text-tinta/70">Subir foto</p>
-          </div>
-        )}
-        {uploading && (
-          <div className="flex w-full flex-col items-center gap-2 p-4">
-            <div className="h-1.5 w-3/4 overflow-hidden bg-tinta/20">
-              <div className="h-full bg-tinta transition-all" style={{ width: `${progress}%` }} />
+          )}
+          {uploading && (
+            <div className="flex w-full flex-col items-center gap-2 p-4">
+              <div className="h-1.5 w-3/4 overflow-hidden bg-tinta/20">
+                <div className="h-full bg-tinta transition-all" style={{ width: `${progress}%` }} />
+              </div>
+              <span className="font-mono text-xs text-tinta/70">{progress}%</span>
             </div>
-            <span className="font-mono text-xs text-tinta/70">{progress}%</span>
-          </div>
-        )}
+          )}
+        </label>
         {value && !uploading && (
-          <button type="button" onClick={(e) => { e.stopPropagation(); onChange(""); }} className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white hover:bg-red-500 transition-colors">
-            <X className="h-3 w-3" />
+          <button type="button" aria-label={t("photo_remove")} onClick={() => onChange("")} className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white hover:bg-red-500 transition-colors">
+            <X className="h-3 w-3" aria-hidden="true" />
           </button>
         )}
       </div>
-      {err && <p className="font-mono text-xs text-red-400">{err}</p>}
-      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
+      {err && <p className="font-mono text-xs text-error">{err}</p>}
     </div>
   );
 }

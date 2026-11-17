@@ -30,4 +30,4 @@ const schema = new Schema<IEventConfig>(
   { timestamps: true },
 );
 
-export const EventConfig = models.EventConfig || model<IEventConfig>("EventConfig", schema);
+export const EventConfig = models.EventConfig! || model<IEventConfig>("EventConfig", schema);

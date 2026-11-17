@@ -181,6 +181,15 @@ function cpfValido(d: string): boolean {
  * Donde el documento trae dígito verificador se comprueba el número y no sólo
  * el formato: así el error de tipeo aparece al registrarse y no en la puerta.
  */
+const DICCIONARIO_CURP = "0123456789ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+
+/** Dígito verificador oficial (RENAPO): suma ponderada 18..2 de los 17 primeros. */
+function verificadorCurpOk(c: string) {
+  let suma = 0;
+  for (let i = 0; i < 17; i++) suma += DICCIONARIO_CURP.indexOf(c[i]!) * (18 - i);
+  return (10 - (suma % 10)) % 10 === Number(c[17]);
+}
+
 export function normalizeDocument(raw: string, rule: DocRule): DocCheck {
   const value = cleanWhitespace(raw);
   if (!value) return { ok: false, value: "", reason: "Escribe tu número de documento." };
@@ -194,7 +203,7 @@ export function normalizeDocument(raw: string, rule: DocRule): DocCheck {
         return { ok: false, value, reason: "El RUN va con dígito verificador (ej. 12.345.678-5)." };
       }
       const [, body, dv] = m;
-      if (runVerifier(body) !== dv) {
+      if (runVerifier(body!) !== dv) {
         return { ok: false, value, reason: "Ese RUN no es válido: revisa el dígito verificador." };
       }
       return { ok: true, value: `${body}-${dv}` };
@@ -227,7 +236,10 @@ export function normalizeDocument(raw: string, rule: DocRule): DocCheck {
       const c = value.replace(/[\s-]/g, "").toUpperCase();
       // 4 letras, fecha AAMMDD, sexo, entidad, 3 consonantes, homoclave y dígito.
       if (!/^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$/.test(c)) {
-        return { ok: false, value, reason: "La CURP son 18 caracteres (ej. GOMC800101HDFNRR09)." };
+        return { ok: false, value, reason: "La CURP son 18 caracteres (ej. GOMC800101HDFNRR05)." };
+      }
+      if (!verificadorCurpOk(c)) {
+        return { ok: false, value, reason: "El dígito verificador de la CURP no coincide; revisa que esté bien escrita." };
       }
       return { ok: true, value: c };
     }
@@ -292,7 +304,7 @@ export const COUNTRIES: Country[] = [
 ];
 
 // El país de la edición (`PAIS`), no el primero de la lista.
-export const DEFAULT_COUNTRY = LISTA.find((c) => c.code === PAIS.codigo) ?? COUNTRIES[0];
+export const DEFAULT_COUNTRY = LISTA.find((c) => c.code === PAIS.codigo) ?? COUNTRIES[0]!;
 
 export function findCountry(code: string): Country {
   return COUNTRIES.find((c) => c.code === code) ?? DEFAULT_COUNTRY;

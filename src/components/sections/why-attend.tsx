@@ -25,7 +25,7 @@ function WhyRow({ num, titleKey, tagKey, descKey, t }: {
     let timer: ReturnType<typeof setTimeout>;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && window.matchMedia("(hover: none)").matches) {
+        if (entry!.isIntersecting && window.matchMedia("(hover: none)").matches) {
           clearTimeout(timer);
           setLit(true);
           timer = setTimeout(() => setLit(false), 900);

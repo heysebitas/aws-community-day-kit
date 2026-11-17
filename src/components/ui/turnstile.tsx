@@ -110,7 +110,7 @@ export const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(function Tu
       }
     };
     // Solo re-renderiza si cambia la site key.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo la site key recrea el widget
   }, [siteKey]);
 
   return <div ref={containerRef} />;

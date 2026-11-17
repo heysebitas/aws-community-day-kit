@@ -29,7 +29,7 @@ carpeta y el resto se adapta.
 
 ## Pruébalo en dos minutos
 
-Sólo hace falta Node 20.12 o más. Ni base de datos, ni cuentas, ni llaves.
+Sólo hace falta Node 20.19 o más. Ni base de datos, ni cuentas, ni llaves.
 
 ```bash
 git clone https://github.com/heysebitas/aws-community-day-kit.git

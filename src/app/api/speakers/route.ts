@@ -5,7 +5,7 @@ import { requireAccess } from "@/lib/auth";
 import { verifyCaptcha } from "@/lib/captcha";
 import { Setting } from "@/models/setting";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
-import { CopiaDeLaPropuesta } from "@/emails/speaker-submission-confirmation";
+import { valoresDeLaPropuesta } from "@/lib/correo-propuesta";
 import { armarCorreo } from "@/lib/email-plantillas";
 import { SpeakerProfile, isProfileStatus } from "@/models/speaker-profile";
 import { EVENTO } from "@/config";
@@ -208,19 +208,20 @@ export async function POST(request: NextRequest) {
 
     // Acuse de recibo con copia de lo enviado.
     try {
-      // El mensaje sale de la plantilla editable; la copia de lo enviado se
-      // cuelga detrás, porque es un volcado distinto en cada correo y no
-      // contenido que nadie quiera redactar.
+      // Todo sale de la plantilla editable; lo enviado entra como variables.
       const correo = await armarCorreo(
         "speaker_postulacion",
-        { nombre: firstName, nombreCompleto: `${firstName} ${lastName}`, correo: email, charla: talkTitle },
+        {
+          nombre: firstName,
+          nombreCompleto: `${firstName} ${lastName}`,
+          correo: email,
+          ...valoresDeLaPropuesta({
+            talkTitle, talkAbstract, sessionType, audienceLevel, language, track,
+            countryCity, tagline, requirements,
+            coSpeakerNames: coSpeakers.map((c) => `${c.firstName} ${c.lastName}`.trim()).filter(Boolean),
+          }),
+        },
         [sessionType === "online" ? "online" : "presencial"],
-        CopiaDeLaPropuesta({
-          talkTitle, talkAbstract, sessionType, audienceLevel, language, track,
-          countryCity, tagline, requirements,
-          coSpeakerNames: coSpeakers.map((c) => `${c.firstName} ${c.lastName}`.trim()).filter(Boolean),
-          slug: profile.slug,
-        }),
       );
       if (!correo) throw new Error("plantilla speaker_postulacion no disponible");
 

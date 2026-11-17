@@ -58,15 +58,15 @@ function esEspanol(texto: string): boolean {
 /** El texto que se ve: los nodos de JSX y los atributos literales. */
 function* visibles(codigo: string): Generator<{ donde: string; texto: string }> {
   for (const m of codigo.matchAll(/>([^<>{}]+)(?=[<{])/g)) {
-    const texto = m[1].trim();
+    const texto = m[1]!.trim();
     // Un trozo con paréntesis o signos es código, no texto.
     if (texto && /[a-zá-ú]/i.test(texto) && !/[();=|&]/.test(texto) && texto.length <= 160) {
       yield { donde: "texto JSX", texto };
     }
   }
   for (const m of codigo.matchAll(/\b(placeholder|aria-label|title|label|alt)="([^"]*)"/g)) {
-    const texto = m[2].trim();
-    if (texto) yield { donde: m[1], texto };
+    const texto = m[2]!.trim();
+    if (texto) yield { donde: m[1]!, texto };
   }
 }
 
@@ -108,7 +108,7 @@ describe("los formularios de acceso", () => {
       "src/app/[locale]/admin/login/login-form.tsx",
       "src/app/[locale]/admin/create-password/page.tsx",
       "src/app/[locale]/registro/_form.tsx",
-      "src/app/[locale]/voluntarios/_form.tsx",
+      "src/app/[locale]/voluntarios/_bloque-cierre.tsx",
     ];
     for (const f of formularios) {
       const src = leer(f);

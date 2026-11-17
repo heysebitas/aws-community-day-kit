@@ -1,19 +1,10 @@
+import { toSlug } from "@/lib/slug";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { SpeakerProfile } from "@/models/speaker-profile";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
-
-function toSlug(raw: string): string {
-  return raw
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
 
 export async function GET(req: NextRequest) {
   const limite = rateLimit(`slug-speaker:${getIp(req)}`, 120, 15 * 60 * 1000);

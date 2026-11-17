@@ -217,7 +217,7 @@ export async function contarAudiencia(
 
   return {
     total: vistos.size,
-    porSegmento: audiencia.map((s, i) => ({ resumen: resumenSegmento(s), total: listas[i].length })),
+    porSegmento: audiencia.map((s, i) => ({ resumen: resumenSegmento(s), total: listas[i]!.length })),
     repetidos,
   };
 }

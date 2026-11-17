@@ -81,6 +81,9 @@ export const SISTEMA = {
   voluntario_aprobado: "Al aprobar a un voluntario",
   registro_presencial: "Al registrarse como asistente presencial",
   registro_online: "Al registrarse como asistente online",
+  invitacion_panel: "Al invitar a una persona al panel",
+  pasaporte_confirmar: "Al pedir cambios en un pasaporte",
+  voluntario_certificado: "Al mandar el certificado a un voluntario",
 } as const;
 
 export type SlugSistema = keyof typeof SISTEMA;

@@ -29,7 +29,7 @@ describe("los módulos de servidor", () => {
       '"use client";\nimport { connectDB } from "@/lib/db";\n',
       { filePath: path.join(RAIZ, "src/contexts/auth-context.tsx") },
     );
-    const error = resultado.messages.find((mensaje) => mensaje.ruleId === "no-restricted-imports");
+    const error = resultado!.messages.find((mensaje) => mensaje.ruleId === "no-restricted-imports");
     assert.ok(error, "ESLint no bloqueó la importación de un módulo de servidor");
   });
 });

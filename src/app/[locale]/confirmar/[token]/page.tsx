@@ -98,7 +98,7 @@ export default function ConfirmarPage() {
     }
   }, [selected, token]);
 
-  const role = data ? (ROLE_BADGE[data.role] ?? ROLE_BADGE.attendee) : ROLE_BADGE.attendee;
+  const role = data ? (ROLE_BADGE[data.role] ?? ROLE_BADGE.attendee!) : ROLE_BADGE.attendee!;
   const isConfirmed = data?.status === "confirmed";
   const isExpiredState = !isConfirmed && (data?.status === "expired" || isExpired);
 
@@ -165,7 +165,6 @@ export default function ConfirmarPage() {
                     background: "linear-gradient(135deg, var(--color-acento), #FCD34D, var(--color-acento))",
                     backgroundSize: "200% 200%", animation: "grad-border 3s ease infinite",
                   }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={avatarUrl(token)}
                       alt={`${data.firstName} ${data.lastName}`}
@@ -192,7 +191,7 @@ export default function ConfirmarPage() {
                   </p>
                 )}
                 {data.email && (
-                  <p style={{ margin: "4px 0 0", fontFamily: "monospace", fontSize: 10, color: "#4b5563" }}>{data.email}</p>
+                  <p style={{ margin: "4px 0 0", fontFamily: "monospace", fontSize: 10, color: "var(--color-surface-400)" }}>{data.email}</p>
                 )}
               </div>
 
@@ -346,7 +345,7 @@ export default function ConfirmarPage() {
                   >
                     {submitting ? "Confirmando…" : "✓ Confirmar mi asistencia"}
                   </button>
-                  <p style={{ color: "#4b5563", fontSize: 10, textAlign: "center", margin: "12px 0 0", fontFamily: "monospace" }}>
+                  <p style={{ color: "var(--color-surface-400)", fontSize: 10, textAlign: "center", margin: "12px 0 0", fontFamily: "monospace" }}>
                     Solo puedes confirmar una vez.
                   </p>
                 </div>

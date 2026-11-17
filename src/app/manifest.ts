@@ -6,6 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     name: EVENTO.nombreCompleto,
     short_name: EVENTO.nombreCorto,
     description: `${EVENTO.ciudad} · ${EVENTO.organiza}`,
+    id: "/",
+    scope: "/",
     start_url: "/",
     display: "standalone",
     background_color: "#000000",

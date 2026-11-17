@@ -27,8 +27,8 @@ export function cabecera(texto: string): string {
 export function direccion(valor: string): string {
   const m = /^\s*(.*?)\s*<([^<>]+)>\s*$/.exec(valor);
   if (!m) return valor.replace(/[\r\n]+/g, "").trim();
-  const nombre = m[1].replace(/^"|"$/g, "");
-  return nombre ? `${cabecera(nombre)} <${m[2].trim()}>` : m[2].trim();
+  const nombre = m[1]!.replace(/^"|"$/g, "");
+  return nombre ? `${cabecera(nombre)} <${m[2]!.trim()}>` : m[2]!.trim();
 }
 
 const TIPOS: Record<string, string> = {

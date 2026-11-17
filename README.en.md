@@ -26,7 +26,7 @@ your event in one folder and everything else adapts.
 
 ## Try it in two minutes
 
-You only need Node 20.12+. No database, accounts or keys.
+You only need Node 20.19+. No database, accounts or keys.
 
 ```bash
 git clone https://github.com/heysebitas/aws-community-day-kit.git

@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { render } from "@react-email/components";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { VolunteerSubmission } from "@/models/volunteer-submission";
 import { generateVolunteerCertificate } from "@/lib/pdf/certificate";
-import { VolunteerCertificateEmail } from "@/emails/volunteer-certificate";
+import { armarCorreoObligatorio } from "@/lib/email-plantillas";
 import { sendEmail, sleep, EMAIL_FROM } from "@/lib/correo";
 import { createLog } from "@/lib/log";
-import { SLUG, EVENTO } from "@/config";
+import { SLUG } from "@/config";
 import { ruta } from "@/lib/api";
 import { leerCuerpo, listaDeTextos } from "@/lib/cuerpo";
 
@@ -15,8 +14,6 @@ export const maxDuration = 300;
 
 /** 100 × ~1 s entra en `maxDuration`. */
 const TOPE_IDS = 100;
-
-const SUBJECT = `Tu certificado de voluntariado — ${EVENTO.nombreCompleto}`;
 
 // Envía el certificado (PDF adjunto) a los voluntarios seleccionados (1 o varios).
 export const POST = ruta(async (req: NextRequest) => {
@@ -44,12 +41,12 @@ export const POST = ruta(async (req: NextRequest) => {
     if (!email || !name) { skipped++; continue; }
 
     const pdf = await generateVolunteerCertificate(name);
-    const html = await render(VolunteerCertificateEmail({ name }));
+    const correo = await armarCorreoObligatorio("voluntario_certificado", { nombre: name.split(" ")[0]!, nombreCompleto: name });
     const res = await sendEmail({
       from: EMAIL_FROM,
       to: email,
-      subject: SUBJECT,
-      html,
+      subject: correo.asunto,
+      html: correo.html,
       attachments: [{ filename: `certificado-${SLUG}.pdf`, content: pdf.toString("base64") }],
     });
     if (res.error) { failedCount++; } else {

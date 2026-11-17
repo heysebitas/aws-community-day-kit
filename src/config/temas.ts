@@ -34,7 +34,7 @@ const aHex = ([r, g, b]: RGB) =>
   "#" + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("").toUpperCase();
 
 const mezclar = (a: RGB, b: RGB, t: number): RGB =>
-  [0, 1, 2].map((i) => a[i] + (b[i] - a[i]) * t) as RGB;
+  [0, 1, 2].map((i) => a[i]! + (b[i]! - a[i]!) * t) as RGB;
 
 function luminancia([r, g, b]: RGB): number {
   const canal = (v: number) => {
@@ -46,7 +46,7 @@ function luminancia([r, g, b]: RGB): number {
 
 /** Contraste WCAG entre dos colores, de 1 a 21. */
 export function contraste(a: string, b: string): number {
-  const [l1, l2] = [luminancia(aRgb(a)), luminancia(aRgb(b))].sort((x, y) => y - x);
+  const [l1 = 0, l2 = 0] = [luminancia(aRgb(a)), luminancia(aRgb(b))].sort((x, y) => y - x);
   return (l1 + 0.05) / (l2 + 0.05);
 }
 

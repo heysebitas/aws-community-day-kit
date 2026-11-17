@@ -111,9 +111,9 @@ describe("el script del bucket", () => {
     assert.deepEqual(copiados, ["cfs/photos/ana.png"]);
     assert.equal(cliente.copias.length, 1);
     const copia = cliente.copias[0];
-    assert.equal(copia.cacheControl, CACHE_INMUTABLE);
-    assert.equal(copia.contentType, "image/jpeg");
-    assert.equal(copia.metadataDirective, "REPLACE");
+    assert.equal(copia!.cacheControl, CACHE_INMUTABLE);
+    assert.equal(copia!.contentType, "image/jpeg");
+    assert.equal(copia!.metadataDirective, "REPLACE");
     assert.equal(cliente.objetos.get("cfs/photos/ana.png")?.cacheControl, CACHE_INMUTABLE);
   });
 
@@ -144,7 +144,7 @@ describe("el script del bucket", () => {
 
     assert.equal(total, 1);
     assert.deepEqual(cambios.map((c) => c.key), ["2027/cfs/photos/ana.png"]);
-    assert.equal(cambios[0].nueva, CACHE_INMUTABLE);
+    assert.equal(cambios[0]!.nueva, CACHE_INMUTABLE);
   });
 
   test("conserva la metadata que ya tenía el objeto", async () => {
@@ -155,6 +155,6 @@ describe("el script del bucket", () => {
     const { cambios } = await revisar(cliente as never, config);
     await aplicar(cliente as never, config, cambios);
 
-    assert.deepEqual(cliente.copias[0].metadata, { readonly: "1" });
+    assert.deepEqual(cliente.copias[0]!.metadata, { readonly: "1" });
   });
 });
