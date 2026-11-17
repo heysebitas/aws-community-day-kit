@@ -14,6 +14,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+// Node 20 trae WebSocket solo con una bandera; sin ella, el script se relanza con ella.
+if (typeof WebSocket === "undefined") {
+  const hijo = spawn(process.execPath, ["--experimental-websocket", ...process.argv.slice(1)], { stdio: "inherit" });
+  hijo.on("exit", (codigo) => process.exit(codigo ?? 1));
+  await new Promise(() => {});
+}
+
 const [url, salida, ancho = "1440", alto = "900"] = process.argv.slice(2);
 if (!url || !salida) {
   console.error("Uso: node scripts/captura.mjs <url> <salida.png> [ancho] [alto]");

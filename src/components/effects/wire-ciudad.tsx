@@ -37,7 +37,7 @@ export function WireCiudad({
     let angle = 0.6;
     const camZ = 7.5;
 
-    // Proyección sin escala ni centro: el encuadre se calcula aparte.
+    // Proyección sin escala ni centro: se aplican al dibujar.
     const proyectar = ([x, y, z]: (typeof verts)[number], ang: number, pit: number) => {
       const cosA = Math.cos(ang), sinA = Math.sin(ang);
       const cosP = Math.cos(pit), sinP = Math.sin(pit);
@@ -49,28 +49,7 @@ export function WireCiudad({
       return { x: x1 * f, y: -y2 * f, depth: z2 };
     };
 
-    // Encuadre fijo para cualquier giro e inclinación posibles: el alto cuenta
-    // todo (las torres apoyan en el suelo) y el ancho sólo los edificios; lo que
-    // sobra del suelo por los lados se desvanece con la máscara del canvas.
-    const ySuelo = Math.min(...verts.map((v) => v[1]));
-    let enc = { s: 1, ox: 0, oy: 0 };
-    const encuadrar = () => {
-      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-      for (let k = 0; k < 24; k++) {
-        const ang = (k / 24) * Math.PI * 2;
-        for (const pit of [-0.08, 0.12, 0.32]) {
-          for (const v of verts) {
-            const p = proyectar(v, ang, pit);
-            if (v[1] > ySuelo + 1e-6) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); }
-            y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y);
-          }
-        }
-      }
-      const margen = 16;
-      const s = Math.min((w - 2 * margen) / (x1 - x0), (h - 2 * margen) / (y1 - y0));
-      enc = { s, ox: w / 2 - (s * (x0 + x1)) / 2, oy: h / 2 - (s * (y0 + y1)) / 2 };
-    };
-    const mascara = "linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)";
+    const mascara = "linear-gradient(to right, transparent, #000 14%, #000 86%, transparent)";
     canvas.style.maskImage = mascara;
     canvas.style.setProperty("-webkit-mask-image", mascara);
     let targetPitch = 0.12;
@@ -92,7 +71,6 @@ export function WireCiudad({
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      encuadrar();
     };
     resize();
     // Sin tamaño no se pide fotograma: al medirse, el observador lo reanuda.
@@ -121,9 +99,14 @@ export function WireCiudad({
       ctx.clearRect(0, 0, w, h);
       pitch += (targetPitch - pitch) * 0.05;
 
+      // Encuadre amplio a propósito: al girar, la ciudad se sale por los lados y
+      // ahí se desvanece con la máscara; abajo queda aire para que se vea el suelo.
+      const cx = w / 2;
+      const cy = h * 0.47;
+      const scale = Math.min(w, h) * 0.27;
       const proj = verts.map((v) => {
         const p = proyectar(v, angle, pitch);
-        return { x: enc.ox + p.x * enc.s, y: enc.oy + p.y * enc.s, depth: p.depth };
+        return { x: cx + p.x * scale, y: cy + p.y * scale, depth: p.depth };
       });
 
       // Las aristas lejanas primero y más tenues: eso da la profundidad.
