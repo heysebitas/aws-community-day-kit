@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  check-node:
     name: check + build (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
@@ -37,6 +37,16 @@ jobs:
         env:
           MODO_DEMO: "1"
           JWT_SECRET: solo-para-compilar-en-ci-no-se-usa-en-ningun-sitio
+
+
+  # La regla de `main` exige un check llamado «check»: lo da este job cuando pasan las dos versiones de Node.
+  check:
+    name: check
+    needs: check-node
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.check-node.result }}" = "success"
 
   e2e:
     name: e2e + axe (demo en producción)
