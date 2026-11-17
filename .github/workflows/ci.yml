@@ -23,8 +23,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 20.12 es el mínimo que promete `engines` en package.json.
-        node: ["20.12", "22"]
+        # 20.19 es el mínimo de `engines`: Tailwind 4 hace require() de un módulo ES, que antes no existe.
+        node: ["20.19", "22"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

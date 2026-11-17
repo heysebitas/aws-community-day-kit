@@ -127,7 +127,7 @@ bundle, `--next otra-carpeta/.next` mide otro checkout.
 ## Qué corre la CI
 
 Sólo en `pull_request` (y respetando el `paths-ignore` de documentación), además de
-`check` + `build` en Node 20.12 y 22 (el mínimo de `engines`):
+`check` + `build` en Node 20.19 y 22 (el mínimo de `engines`):
 
 | Job | Qué hace | Si falla |
 |---|---|---|

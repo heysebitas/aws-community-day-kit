@@ -21,7 +21,7 @@ por hacer. No edites `src/`: una edición se configura sólo en `evento/` y
 ## 1. Prepara el terreno
 
 ```bash
-node --version    # 20.12 o más
+node --version    # 20.19 o más
 npm install
 ```
 
