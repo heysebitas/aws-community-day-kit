@@ -10,6 +10,9 @@ services:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
     env_file: .env.local
+    # La plantilla del certificado oficial de un SCD no entra en la imagen: se monta.
+    # volumes:
+    #   - ./recursos:/app/recursos:ro
     environment:
       MONGODB_URI: mongodb://base:27017/evento
     ports:

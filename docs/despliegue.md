@@ -44,12 +44,15 @@ docker compose up --build
 para probar en local; en producción usa una base administrada y quita ese
 servicio.
 
-- **Construir:** `docker build -t community-day-kit --build-arg NEXT_PUBLIC_APP_URL=https://tu-dominio .`
+- **Construir:** `docker build -t aws-community-day-kit --build-arg NEXT_PUBLIC_APP_URL=https://tu-dominio .`
   Las `NEXT_PUBLIC_*` quedan escritas en el build, por eso son argumentos.
-- **Imagen:** `next.config.ts` usa `output: "standalone"`; la imagen final sólo
+- **Certificado de un SCD:** `recursos/` no entra en la imagen, a propósito. Si
+  usas la plantilla oficial, móntala: `-v ./recursos:/app/recursos:ro` (en
+  `compose.yaml` está comentado). Sin ella sale el certificado genérico.
+- **Imagen:** el build de Docker activa `output: "standalone"` (`NEXT_STANDALONE=1`); la imagen final sólo
   lleva `.next/standalone`, `.next/static` y `public`, corre sin root y arranca con `node server.js`.
 - **Variables:** el resto (`MONGODB_URI`, `JWT_SECRET`…) se pasan al arrancar:
-  `docker run --env-file .env.local -p 3000:3000 community-day-kit`.
+  `docker run --env-file .env.local -p 3000:3000 aws-community-day-kit`.
 - **Salud:** `GET /api/health` responde 200 si el proceso vive; con `?db=1`
   hace un `ping` a Mongo y responde 503 si no hay conexión. El `HEALTHCHECK` de la
   imagen usa la primera forma (que Mongo caiga no debe reiniciar el sitio); un

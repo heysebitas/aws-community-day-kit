@@ -4,7 +4,7 @@
 # Los colores del acento son los del tema «naranja», el de fábrica; el layout los
 # cambia por los del tema elegido en evento/config.ts. Los demás tokens no cambian.
 version: alpha
-name: "Community Day Kit"
+name: "AWS Community Day Kit"
 description: "Sitio, formularios y panel de un Student Community Day: que un estudiante entienda el evento y se registre en un minuto."
 
 colors:

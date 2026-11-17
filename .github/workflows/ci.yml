@@ -64,7 +64,7 @@ jobs:
           cache: npm
       - run: npm ci
       # Playwright y axe solo viven en este job: no están en package.json ni en el lockfile.
-      - run: npm i --no-save @playwright/test @axe-core/playwright
+      - run: npm i --no-save @playwright/test@1.65.1 @axe-core/playwright@4.14.0
       - run: npx playwright install --with-deps chromium
       - name: Clave de sesión solo para este job
         run: echo "JWT_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
@@ -72,7 +72,7 @@ jobs:
       - name: Levantar la demo
         run: |
           npx next start -p 3000 > servidor.log 2>&1 &
-          npx --yes wait-on@8 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
+          npx --yes wait-on@8.0.5 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
       - run: npx playwright test
         env:
           PRUEBA_URL: http://localhost:3000
@@ -107,7 +107,7 @@ jobs:
       - name: Levantar la demo
         run: |
           npx next start -p 3000 > servidor.log 2>&1 &
-          npx --yes wait-on@8 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
+          npx --yes wait-on@8.0.5 http://localhost:3000/ --timeout 60000 || { cat servidor.log; exit 1; }
       # Aviso, no fallo, hasta que se decida si las regresiones bloquean el PR.
       - name: Comparar con la línea base
         continue-on-error: true

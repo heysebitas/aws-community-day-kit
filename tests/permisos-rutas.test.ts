@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { NextRequest } from "next/server";
@@ -147,7 +148,7 @@ async function sesion(email: string, role: string, permisos: unknown[]) {
 type Manejador = (r: NextRequest, c: { params: Promise<Record<string, string>> }) => Promise<Response>;
 
 async function llamar(e: Entrada, metodo: string, consulta = "") {
-  const mod = (await import(e.archivo)) as Record<string, Manejador>;
+  const mod = (await import(pathToFileURL(e.archivo).href)) as Record<string, Manejador>;
   const params: Record<string, string> = {};
   const valor = (n: string) => PARAMS[n] ?? "000000000000000000000000";
   for (const m of e.ruta.matchAll(/\[(\w+)\]/g)) params[m[1]!] = valor(m[1]!);
@@ -162,7 +163,7 @@ async function llamar(e: Entrada, metodo: string, consulta = "") {
 }
 
 async function metodosDe(e: Entrada) {
-  const mod = (await import(e.archivo)) as Record<string, unknown>;
+  const mod = (await import(pathToFileURL(e.archivo).href)) as Record<string, unknown>;
   return METODOS.filter((m) => typeof mod[m] === "function");
 }
 
