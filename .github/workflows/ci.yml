@@ -1,13 +1,14 @@
 name: CI
 
-# Los cambios que solo tocan documentación no pasan por el build.
+# Un push a main que solo toca documentación no pasa por el build. Los pull
+# requests corren siempre: la regla de `main` exige el check «check», y sin él
+# un PR de solo documentación no se podría fusionar.
 # Los jobs de medición (e2e, Lighthouse, bundle) solo corren en pull_request para no gastar CI en cada push.
 on:
   push:
     branches: [main]
     paths-ignore: ["docs/**", "**/*.md"]
   pull_request:
-    paths-ignore: ["docs/**", "**/*.md"]
 
 permissions:
   contents: read
