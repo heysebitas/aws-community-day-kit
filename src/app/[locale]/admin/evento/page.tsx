@@ -4,9 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   QrCode, Utensils, Coffee, Stamp, Activity, Trophy, RefreshCw, Award,
 } from "lucide-react";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
-} from "recharts";
+import { Barras } from "@/components/admin/graficas";
 import { PAIS } from "@/config";
 
 interface EventStats {
@@ -51,15 +49,7 @@ function SectionTitle({ icon: Icon, children, accent }: { icon: React.ElementTyp
   );
 }
 
-function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="border-2 border-surface-600 bg-surface-800 px-3 py-2 shadow-xl">
-      {label && <p className="mb-0.5 font-mono text-xs text-surface-300">{label}</p>}
-      <p className="font-mono text-xs text-surface-100">{payload[0]!.value.toLocaleString(PAIS.locale)}</p>
-    </div>
-  );
-}
+const recortar = (v: string) => (v.length > 22 ? v.slice(0, 22) + "…" : v);
 
 export default function EventDashboardPage() {
   const [stats, setStats] = useState<EventStats | null>(null);
@@ -134,15 +124,18 @@ export default function EventDashboardPage() {
               {stats.sessionAttendance.length === 0 ? (
                 <p className="py-8 text-center font-mono text-xs text-surface-300">Sin sesiones</p>
               ) : (
-                <ResponsiveContainer width="100%" height={Math.max(160, stats.sessionAttendance.length * 34)}>
-                  <BarChart data={stats.sessionAttendance} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-                    <XAxis type="number" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <YAxis type="category" dataKey="title" tick={{ fill: "#a1a1aa", fontSize: 10 }} tickLine={false} axisLine={false} width={150} tickFormatter={(v: string) => (v.length > 22 ? v.slice(0, 22) + "…" : v)} />
-                    <Tooltip content={<ChartTooltip />} cursor={{ fill: "#ffffff08" }} />
-                    <Bar dataKey="count" radius={[0, 4, 4, 0]} fill={C.sky} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <Barras
+                  data={stats.sessionAttendance}
+                  alto={Math.max(160, stats.sessionAttendance.length * 34)}
+                  horizontal
+                  categoria="title"
+                  valor="count"
+                  color={C.sky}
+                  anchoEje={150}
+                  formatoEje={recortar}
+                  margen={{ top: 0, right: 24, left: 0, bottom: 0 }}
+                  tooltipSimple
+                />
               )}
             </div>
           </section>
@@ -154,15 +147,18 @@ export default function EventDashboardPage() {
               {stats.badgesBySponsor.length === 0 ? (
                 <p className="py-8 text-center font-mono text-xs text-surface-300">Sin sponsors activos</p>
               ) : (
-                <ResponsiveContainer width="100%" height={Math.max(160, stats.badgesBySponsor.length * 34)}>
-                  <BarChart data={stats.badgesBySponsor} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-                    <XAxis type="number" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <YAxis type="category" dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 10 }} tickLine={false} axisLine={false} width={150} tickFormatter={(v: string) => (v.length > 22 ? v.slice(0, 22) + "…" : v)} />
-                    <Tooltip content={<ChartTooltip />} cursor={{ fill: "#ffffff08" }} />
-                    <Bar dataKey="count" radius={[0, 4, 4, 0]} fill={C.purple} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <Barras
+                  data={stats.badgesBySponsor}
+                  alto={Math.max(160, stats.badgesBySponsor.length * 34)}
+                  horizontal
+                  categoria="name"
+                  valor="count"
+                  color={C.purple}
+                  anchoEje={150}
+                  formatoEje={recortar}
+                  margen={{ top: 0, right: 24, left: 0, bottom: 0 }}
+                  tooltipSimple
+                />
               )}
             </div>
           </section>
@@ -174,17 +170,15 @@ export default function EventDashboardPage() {
               {stats.distribution.length === 0 ? (
                 <p className="py-8 text-center font-mono text-xs text-surface-300">Sin datos</p>
               ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={stats.distribution} margin={{ top: 8, right: 12, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                    <XAxis dataKey="stamps" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <Tooltip content={<ChartTooltip />} cursor={{ fill: "#ffffff08" }} />
-                    <Bar dataKey="people" radius={[4, 4, 0, 0]}>
-                      {stats.distribution.map((_, i) => <Cell key={i} fill={C.orange} />)}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                <Barras
+                  data={stats.distribution}
+                  alto={220}
+                  categoria="stamps"
+                  valor="people"
+                  color={C.orange}
+                  margen={{ top: 8, right: 12, left: -20, bottom: 0 }}
+                  tooltipSimple
+                />
               )}
             </div>
           </section>

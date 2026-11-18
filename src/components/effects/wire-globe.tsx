@@ -32,7 +32,7 @@ export function WireGlobe({
 
     const { giro: home, inclinacion } = encuadre(marker);
     let ACENTO = acentoCanvas();
-    const dejarDeObservar = observarAcento((v) => { ACENTO = v; });
+    const dejarDeObservar = observarAcento((v) => { ACENTO = v; pedir(); });
 
     let raf = 0;
     let spin = home;
@@ -48,6 +48,7 @@ export function WireGlobe({
       lastX = e.clientX;
       lastY = e.clientY;
       canvas.setPointerCapture(e.pointerId);
+      pedir();
       canvas.style.cursor = "grabbing";
     };
     const onMove = (e: PointerEvent) => {
@@ -56,6 +57,7 @@ export function WireGlobe({
       tiltTarget = Math.max(-0.6, Math.min(0.6, tiltTarget + (e.clientY - lastY) * 0.004));
       lastX = e.clientX;
       lastY = e.clientY;
+      pedir();
     };
     const onUp = (e: PointerEvent) => {
       dragging = false;
@@ -65,6 +67,7 @@ export function WireGlobe({
       const vueltas = Math.round((spinTarget - home) / (Math.PI * 2));
       spinTarget = home + vueltas * Math.PI * 2;
       tiltTarget = 0;
+      pedir();
     };
     canvas.style.cursor = "grab";
     // El gesto vertical sigue siendo scroll de la página; el horizontal gira el globo.
@@ -103,6 +106,10 @@ export function WireGlobe({
       } else if (!raf) raf = requestAnimationFrame(draw);
     }, { rootMargin: "100px" });
     centinela.observe(canvas);
+
+    const pedir = () => {
+      if (visible && size && !raf) raf = requestAnimationFrame(draw);
+    };
 
     const draw = () => {
       if (!visible) {
@@ -209,7 +216,10 @@ export function WireGlobe({
 
       spin += (spinTarget - spin) * (dragging ? 0.35 : 0.06);
       tiltExtra += (tiltTarget - tiltExtra) * (dragging ? 0.35 : 0.06);
-      raf = requestAnimationFrame(draw);
+      // Con movimiento reducido el pulso está quieto: sólo hace falta otro
+      // fotograma mientras el globo sigue al arrastre o vuelve a su encuadre.
+      const quieto = Math.abs(spinTarget - spin) < 1e-3 && Math.abs(tiltTarget - tiltExtra) < 1e-3;
+      raf = reduced && !dragging && quieto ? 0 : requestAnimationFrame(draw);
     };
 
     draw();
