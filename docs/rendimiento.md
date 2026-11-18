@@ -37,3 +37,27 @@ Medido con `npm run build && npm start` y `curl` sobre la portada (`/`), gzip -9
 
 El CSS pesa unos 20 KB gzip, pero el HTML crece 60 KB porque el CSS viaja en el
 documento y otra vez en la carga RSC. Pasa del tope de 25 KB, así que no se activa.
+
+## Servidor
+
+Medido con la imagen del `Dockerfile` en Docker (`--cpus=1 --memory=1g`, aarch64), la
+semilla de la demo más 20 000 registros, Mongo fuera del contenedor y `autocannon`
+8 s por ruta. La CPU de mongod no cuenta. Entre corridas varía ±30 %.
+
+| | Antes (Alpine) | Ahora (Alpine) | Ahora (glibc, como pm2) |
+|---|---|---|---|
+| RSS en reposo | 114 MB | 116 MB | 110 MB |
+| RSS caliente, tras GC | 184 MB | 190 MB | 201 MB |
+| Pico (VmHWM) con la mezcla | 525 MB | 437–462 MB | 509 MB |
+| RSS final, tras GC | 219 MB | 209 MB | 388 MB |
+| `/api/marca/banner` c10 | 9 rps, p99 3,4 s | 520–620 rps, p99 90–440 ms | 623 rps, p99 110 ms |
+| `/api/og/speaker` c10 | 7 rps, p99 2,2 s | 184–318 rps, p99 180–495 ms | 657 rps, p99 95 ms |
+
+- Las imágenes de marca y las tarjetas de speaker se dibujan una vez y se sirven
+  de memoria (`src/lib/cache-imagen.ts`, con tope de entradas y de bytes). La
+  tarjeta cambia de clave cuando se edita el perfil.
+- Lo que sube el pico ahora son las rutas dinámicas con 50 conexiones a la vez
+  (`/api/evento`, `/speakers/[slug]`), no el heap (≤ 170 MB): sacarlas a ISR es
+  lo siguiente. Bajar el heap a 192 MB o el semiespacio no lo cambió.
+- Con nginx delante (`deploy/nginx/sitio.conf`), la portada y las imágenes ya
+  cacheadas no llegan a Node.

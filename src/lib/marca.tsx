@@ -16,13 +16,18 @@ import { globoSvg } from "@/lib/globo";
 
 const publico = (ruta: string) => path.join(/*turbopackIgnore: true*/ process.cwd(), "public", ruta);
 
-export function fuentes() {
+// Las fuentes no cambian mientras corre el servidor: se leen una vez.
+let cargadas: ReturnType<typeof leerFuentes> | undefined;
+function leerFuentes() {
   const leer = (archivo: string) => fs.readFileSync(publico(`fonts/${archivo}`));
   return [
     { name: "Oxanium", data: leer("Oxanium-Medium.woff"), weight: 500 as const, style: "normal" as const },
     { name: "Handjet", data: leer("Handjet-Medium.woff"), weight: 500 as const, style: "normal" as const },
     { name: "JetBrains Mono", data: leer("JetBrainsMono-Bold.ttf"), weight: 700 as const, style: "normal" as const },
   ];
+}
+export function fuentes() {
+  return (cargadas ??= leerFuentes());
 }
 
 /** Un archivo de `public/` como data URI, para incrustarlo en la imagen. */

@@ -23,6 +23,9 @@ services:
 
   base:
     image: mongo:8
+    # En la misma máquina que el sitio: la caché de WiredTiger por omisión es la
+    # mitad de la RAM menos 1 GB (256 MB como mínimo). Ver docs/despliegue.md.
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
     volumes:
       - datos:/data/db
     restart: unless-stopped
