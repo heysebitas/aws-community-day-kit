@@ -47,7 +47,7 @@ export function WireCiudad({
     const pd = new Float32Array(verts.length);
     const grupos: number[][] = Array.from({ length: 2 * NIVELES }, () => []);
     let ACENTO = acentoCanvas();
-    const dejarDeObservar = observarAcento((v) => { ACENTO = v; });
+    const dejarDeObservar = observarAcento((v) => { ACENTO = v; pedir(); });
     let raf = 0;
     let angle = 0.6;
     const camZ = 7.5;
@@ -70,11 +70,14 @@ export function WireCiudad({
     let targetPitch = 0.12;
     let pitch = 0.12;
 
+    // Fuera de pantalla no se lee la maqueta en cada movimiento del puntero.
+    // Con movimiento reducido la ciudad no sigue al puntero.
     const onPointer = (e: PointerEvent) => {
+      if (!visible) return;
       const rect = canvas.getBoundingClientRect();
       targetPitch = 0.12 + ((e.clientY - rect.top) / rect.height - 0.5) * 0.4;
     };
-    window.addEventListener("pointermove", onPointer, { passive: true });
+    if (!reduced) window.addEventListener("pointermove", onPointer, { passive: true });
 
     let w = 0;
     let h = 0;
@@ -101,6 +104,10 @@ export function WireCiudad({
       if (visible && !raf) raf = requestAnimationFrame(draw);
     }, { rootMargin: "100px" });
     centinela.observe(canvas);
+
+    const pedir = () => {
+      if (visible && w && h && !raf) raf = requestAnimationFrame(draw);
+    };
 
     const draw = () => {
       if (!visible) {
@@ -165,7 +172,13 @@ export function WireCiudad({
       ctx.fillStyle = "#FFFFFF";
       ctx.fill();
 
-      if (!reduced) angle += 0.0022;
+      // Con movimiento reducido es un dibujo fijo: se repinta sólo al verse,
+      // al cambiar de tamaño o de acento.
+      if (reduced) {
+        raf = 0;
+        return;
+      }
+      angle += 0.0022;
       raf = requestAnimationFrame(draw);
     };
 

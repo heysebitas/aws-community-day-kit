@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { PageHead } from "@/components/admin/ui";
 import { StaffHub } from "@/components/admin/staff-hub";
@@ -9,10 +9,7 @@ import {
   Users, Mic2, ClipboardList, QrCode, Heart, Mail, UserCheck,
   ShieldCheck, MapPin, Wifi, TrendingUp, Sparkles, Ticket,
 } from "lucide-react";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar, LineChart, Line,
-} from "recharts";
+import { Areas, Barras, Dona, Linea } from "@/components/admin/graficas";
 import { EVENTO, PAIS } from "@/config";
 
 interface Stats {
@@ -96,20 +93,6 @@ function StatsCard({
   );
 }
 
-function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="border-2 border-surface-600 bg-surface-800 px-3 py-2 shadow-xl">
-      {label && <p className="mb-1 font-mono text-xs text-surface-400">{label}</p>}
-      {payload.map((p, i) => (
-        <p key={i} className="font-mono text-xs" style={{ color: p.color }}>
-          {p.name}: {p.value.toLocaleString(PAIS.locale)}
-        </p>
-      ))}
-    </div>
-  );
-}
-
 function SectionTitle({ icon: Icon, children, accent }: { icon: React.ElementType; children: React.ReactNode; accent?: string }) {
   return (
     <div className="mb-4 flex items-center gap-2">
@@ -119,51 +102,64 @@ function SectionTitle({ icon: Icon, children, accent }: { icon: React.ElementTyp
   );
 }
 
-export default function DashboardPage() {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<Stats | null>(null);
+// La cuenta atrás es lo único que cambia cada segundo: vive aparte para que
+// el tic no vuelva a pintar el resto del tablero.
+const CuentaAtras = memo(function CuentaAtras() {
   const { days, hours, minutes, seconds, isExpired } = useCountdown(EVENTO.inicio);
+  return (
+    <div className="mb-6 border-2 border-surface-600 bg-surface-800 p-4 sm:p-5">
+      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+        <p className="font-mono text-xs uppercase tracking-wider text-surface-400">
+          {isExpired ? "El evento ya pasó" : "Faltan para el evento"}
+        </p>
+        <div className="flex gap-2">
+          {[
+            { value: days, label: "días" },
+            { value: hours, label: "hrs" },
+            { value: minutes, label: "min" },
+            { value: seconds, label: "seg" },
+          ].map((b) => (
+            <div key={b.label} className="flex flex-col items-center">
+              <div className="border-2 border-surface-600 bg-surface-800 px-2.5 py-1.5 min-w-[44px]">
+                <span className="font-mono text-xl font-bold text-acento tabular-nums sm:text-2xl">
+                  {String(b.value).padStart(2, "0")}
+                </span>
+              </div>
+              <span className="mt-0.5 font-mono text-[10px] text-surface-300">{b.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+});
 
-  // El dashboard de stats es solo admin/organizer; el staff ve su hub de botones.
-  const isStaff = !!user && user.role !== "admin" && user.role !== "organizer";
-
-  useEffect(() => {
-    if (isStaff) return;
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then(setStats)
-      .catch(() => {});
-  }, [isStaff]);
-
-  if (isStaff) return <StaffHub />;
-
-  // Merge all time series into unified dataset
-  const allDates = new Set<string>();
-  stats?.registrationsByDay?.forEach((d) => allDates.add(d.date));
-  stats?.speakersByDay?.forEach((d) => allDates.add(d.date));
-  stats?.volunteersByDay?.forEach((d) => allDates.add(d.date));
-  stats?.checkInsByDay?.forEach((d) => allDates.add(d.date));
-
-  const sortedDates = Array.from(allDates).sort();
+/** Las series de las gráficas, calculadas una vez por respuesta de `/api/stats`. */
+function series(stats: Stats | null) {
+  const porDia = (lista?: { date: string; count: number }[]) =>
+    new Map((lista ?? []).map((d) => [d.date, d.count]));
+  const registros = porDia(stats?.registrationsByDay);
+  const speakers = porDia(stats?.speakersByDay);
+  const voluntarios = porDia(stats?.volunteersByDay);
+  const checkIns = porDia(stats?.checkInsByDay);
+  const sortedDates = Array.from(
+    new Set([...registros.keys(), ...speakers.keys(), ...voluntarios.keys(), ...checkIns.keys()]),
+  ).sort();
 
   const activityData = sortedDates.map((date) => ({
     date: date.slice(5),
-    Asistentes: stats?.registrationsByDay?.find((d) => d.date === date)?.count || 0,
-    Speakers: stats?.speakersByDay?.find((d) => d.date === date)?.count || 0,
-    Voluntarios: stats?.volunteersByDay?.find((d) => d.date === date)?.count || 0,
-    "Check-ins": stats?.checkInsByDay?.find((d) => d.date === date)?.count || 0,
+    Asistentes: registros.get(date) || 0,
+    Speakers: speakers.get(date) || 0,
+    Voluntarios: voluntarios.get(date) || 0,
+    "Check-ins": checkIns.get(date) || 0,
   }));
 
   // Crecimiento acumulado.
-  const cumulativeData = sortedDates.reduce<{ date: string; Acumulado: number }[]>(
-    (acc, date) => {
-      const prev = acc.length > 0 ? acc[acc.length - 1]!.Acumulado : 0;
-      const day = stats?.registrationsByDay?.find((d) => d.date === date)?.count || 0;
-      acc.push({ date: date.slice(5), Acumulado: prev + day });
-      return acc;
-    },
-    [],
-  );
+  let acumulado = 0;
+  const cumulativeData = sortedDates.map((date) => {
+    acumulado += registros.get(date) || 0;
+    return { date: date.slice(5), Acumulado: acumulado };
+  });
 
   const c = stats?.confirmed;
   const confirmedComposition = [
@@ -202,37 +198,53 @@ export default function DashboardPage() {
     { name: "Pendiente", value: (stats?.totalRegistrations || 0) - (stats?.totalCheckedIn || 0), color: COLORS.gray },
   ];
 
+  return {
+    activityData, cumulativeData, confirmedComposition, speakerFunnelData,
+    modalityDonut, volunteerDonut, teamData, checkInDonut,
+  };
+}
+
+const SERIES_ACTIVIDAD = [
+  { clave: "Asistentes", color: COLORS.orange },
+  { clave: "Speakers", color: COLORS.blue },
+  { clave: "Voluntarios", color: COLORS.purple },
+  { clave: "Check-ins", color: COLORS.emerald },
+];
+
+const sinPrefijoGrupo = (v: string) => v.replace("AWS Student Builder Group ", "");
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  // El dashboard de stats es solo admin/organizer; el staff ve su hub de botones
+  // y así tampoco descarga las gráficas.
+  const isStaff = !!user && user.role !== "admin" && user.role !== "organizer";
+  if (isStaff) return <StaffHub />;
+  return <PanelOrganizador nombre={user?.name} />;
+}
+
+function PanelOrganizador({ nombre }: { nombre?: string }) {
+  const [stats, setStats] = useState<Stats | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then(setStats)
+      .catch(() => {});
+  }, []);
+
+  const {
+    activityData, cumulativeData, confirmedComposition, speakerFunnelData,
+    modalityDonut, volunteerDonut, teamData, checkInDonut,
+  } = useMemo(() => series(stats), [stats]);
+  const c = stats?.confirmed;
+
   return (
     <div className="mx-auto max-w-6xl">
       <PageHead
-        title={`hola, ${(user?.name?.split(" ")[0] || "admin").toLowerCase()}`}
+        title={`hola, ${(nombre?.split(" ")[0] || "admin").toLowerCase()}`}
       />
 
-      {/* Countdown */}
-      <div className="mb-6 border-2 border-surface-600 bg-surface-800 p-4 sm:p-5">
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-          <p className="font-mono text-xs uppercase tracking-wider text-surface-400">
-            {isExpired ? "El evento ya pasó" : "Faltan para el evento"}
-          </p>
-          <div className="flex gap-2">
-            {[
-              { value: days, label: "días" },
-              { value: hours, label: "hrs" },
-              { value: minutes, label: "min" },
-              { value: seconds, label: "seg" },
-            ].map((b) => (
-              <div key={b.label} className="flex flex-col items-center">
-                <div className="border-2 border-surface-600 bg-surface-800 px-2.5 py-1.5 min-w-[44px]">
-                  <span className="font-mono text-xl font-bold text-acento tabular-nums sm:text-2xl">
-                    {String(b.value).padStart(2, "0")}
-                  </span>
-                </div>
-                <span className="mt-0.5 font-mono text-[10px] text-surface-300">{b.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <CuentaAtras />
 
       {/* ═══ HEADCOUNT CONFIRMADO — the highlight ═══ */}
       <div className="mb-6 overflow-hidden border-2 border-acento/30 bg-gradient-to-br from-acento/[0.08] via-glass to-glass">
@@ -363,17 +375,16 @@ export default function DashboardPage() {
         <div className="border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={Mic2} accent="text-blue-400">Postulaciones de speakers</SectionTitle>
           {speakerFunnelData.some((d) => d.value > 0) ? (
-            <ResponsiveContainer width="100%" height={Math.max(180, speakerFunnelData.length * 42)}>
-              <BarChart data={speakerFunnelData} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-                <XAxis type="number" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <YAxis type="category" dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 10 }} tickLine={false} axisLine={false} width={92} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: "#ffffff08" }} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} name="Postulaciones">
-                  {speakerFunnelData.map((d, i) => <Cell key={i} fill={d.color} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <Barras
+              data={speakerFunnelData}
+              alto={Math.max(180, speakerFunnelData.length * 42)}
+              horizontal
+              categoria="name"
+              valor="value"
+              nombre="Postulaciones"
+              anchoEje={92}
+              margen={{ top: 0, right: 24, left: 0, bottom: 0 }}
+            />
           ) : (
             <p className="py-8 text-center font-mono text-xs text-surface-300">Sin postulaciones aún</p>
           )}
@@ -383,14 +394,7 @@ export default function DashboardPage() {
         <div className="border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={Wifi} accent="text-sky-400">Modalidad — aceptados</SectionTitle>
           <div className="relative">
-            <ResponsiveContainer width="100%" height={180}>
-              <PieChart>
-                <Pie data={modalityDonut} cx="50%" cy="50%" innerRadius={54} outerRadius={74} paddingAngle={2} dataKey="value">
-                  {modalityDonut.map((d, i) => <Cell key={i} fill={d.color} />)}
-                </Pie>
-                <Tooltip content={<ChartTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+            <Dona data={modalityDonut} alto={180} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-mono text-2xl font-bold text-surface-50">
                 {(stats?.speakerModality?.presencialPeople ?? 0) + (stats?.speakerModality?.onlinePeople ?? 0)}
@@ -415,14 +419,7 @@ export default function DashboardPage() {
         <div className="border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={Heart} accent="text-purple-400">Voluntarios</SectionTitle>
           <div className="relative">
-            <ResponsiveContainer width="100%" height={180}>
-              <PieChart>
-                <Pie data={volunteerDonut} cx="50%" cy="50%" innerRadius={54} outerRadius={74} paddingAngle={2} dataKey="value">
-                  {volunteerDonut.map((d, i) => <Cell key={i} fill={d.color} />)}
-                </Pie>
-                <Tooltip content={<ChartTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+            <Dona data={volunteerDonut} alto={180} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-mono text-2xl font-bold text-surface-50">{stats?.volunteerFunnel?.approved ?? 0}</span>
               <span className="font-mono text-[10px] text-surface-300">aceptados</span>
@@ -442,17 +439,15 @@ export default function DashboardPage() {
         <div className="border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={ShieldCheck} accent="text-emerald-400">Equipo organizador</SectionTitle>
           {teamData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={teamData} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="name" tick={{ fill: "#71717a", fontSize: 9 }} tickLine={false} axisLine={false} interval={0} />
-                <YAxis tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <Tooltip content={<ChartTooltip />} cursor={{ fill: "#ffffff08" }} />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]} name="Miembros">
-                  {teamData.map((d, i) => <Cell key={i} fill={d.color} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <Barras
+              data={teamData}
+              alto={180}
+              categoria="name"
+              valor="value"
+              nombre="Miembros"
+              etiquetasApretadas
+              margen={{ top: 8, right: 8, left: -22, bottom: 0 }}
+            />
           ) : (
             <p className="py-8 text-center font-mono text-xs text-surface-300">Sin miembros</p>
           )}
@@ -465,14 +460,7 @@ export default function DashboardPage() {
         <div className="border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={QrCode} accent="text-emerald-400">Estado de Check-in</SectionTitle>
           <div className="relative">
-            <ResponsiveContainer width="100%" height={180}>
-              <PieChart>
-                <Pie data={checkInDonut} cx="50%" cy="50%" innerRadius={54} outerRadius={74} paddingAngle={2} dataKey="value">
-                  {checkInDonut.map((d, i) => <Cell key={i} fill={d.color} />)}
-                </Pie>
-                <Tooltip content={<ChartTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+            <Dona data={checkInDonut} alto={180} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-mono text-2xl font-bold text-surface-50">{stats?.checkInRate ?? 0}%</span>
               <span className="font-mono text-[10px] text-surface-300">check-in</span>
@@ -493,15 +481,7 @@ export default function DashboardPage() {
       {cumulativeData.length > 1 && (
         <div className="mt-6 border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={TrendingUp} accent="text-acento">Crecimiento de registros (acumulado)</SectionTitle>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={cumulativeData} margin={{ top: 10, right: 12, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-              <XAxis dataKey="date" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-              <Tooltip content={<ChartTooltip />} />
-              <Line type="monotone" dataKey="Acumulado" stroke={COLORS.orange} strokeWidth={2.5} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <Linea data={cumulativeData} alto={220} x="date" y="Acumulado" color={COLORS.orange} />
         </div>
       )}
 
@@ -509,18 +489,7 @@ export default function DashboardPage() {
       {activityData.length > 0 && (
         <div className="mt-6 border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={TrendingUp}>Actividad por día</SectionTitle>
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-              <XAxis dataKey="date" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-              <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="Asistentes" stackId="1" stroke={COLORS.orange} fill={COLORS.orange} fillOpacity={0.6} />
-              <Area type="monotone" dataKey="Speakers" stackId="2" stroke={COLORS.blue} fill={COLORS.blue} fillOpacity={0.6} />
-              <Area type="monotone" dataKey="Voluntarios" stackId="3" stroke={COLORS.purple} fill={COLORS.purple} fillOpacity={0.6} />
-              <Area type="monotone" dataKey="Check-ins" stackId="4" stroke={COLORS.emerald} fill={COLORS.emerald} fillOpacity={0.6} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <Areas data={activityData} alto={240} x="date" series={SERIES_ACTIVIDAD} />
           <div className="mt-3 flex flex-wrap justify-center gap-4">
             {[
               { c: COLORS.orange, l: "Asistentes" },
@@ -540,23 +509,18 @@ export default function DashboardPage() {
       {stats?.cloudClubBreakdown && stats.cloudClubBreakdown.length > 0 && (
         <div className="mt-6 border-2 border-surface-600 bg-surface-800 p-5">
           <SectionTitle icon={Users} accent="text-purple-400">Voluntarios por Student Builder Group</SectionTitle>
-          <ResponsiveContainer width="100%" height={Math.max(160, stats.cloudClubBreakdown.length * 40)}>
-            <BarChart data={stats.cloudClubBreakdown} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
-              <XAxis type="number" tick={{ fill: "#71717a", fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
-              <YAxis
-                type="category"
-                dataKey="club"
-                tick={{ fill: "#a1a1aa", fontSize: 10 }}
-                tickLine={false}
-                axisLine={false}
-                width={200}
-                tickFormatter={(v) => v.replace("AWS Student Builder Group ", "")}
-              />
-              <Tooltip content={<ChartTooltip />} cursor={{ fill: "#ffffff08" }} />
-              <Bar dataKey="count" fill={COLORS.purple} radius={[0, 4, 4, 0]} name="Voluntarios" />
-            </BarChart>
-          </ResponsiveContainer>
+          <Barras
+            data={stats.cloudClubBreakdown}
+            alto={Math.max(160, stats.cloudClubBreakdown.length * 40)}
+            horizontal
+            categoria="club"
+            valor="count"
+            nombre="Voluntarios"
+            color={COLORS.purple}
+            anchoEje={200}
+            formatoEje={sinPrefijoGrupo}
+            margen={{ top: 0, right: 20, left: 0, bottom: 0 }}
+          />
         </div>
       )}
     </div>

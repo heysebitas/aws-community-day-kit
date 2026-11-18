@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) return;
 
-    const interval = setInterval(async () => {
+    const comprobar = async () => {
       try {
         const res = await fetch("/api/auth/me");
         if (!res.ok) {
@@ -92,9 +92,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {
         // Network error — don't log out, just skip
       }
-    }, SESSION_CHECK_INTERVAL);
+    };
 
-    return () => clearInterval(interval);
+    // Con la pestaña oculta no se consulta: la tablet de la puerta en segundo
+    // plano no tiene por qué despertar la radio. Al volver se comprueba ya.
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const arrancar = () => {
+      if (interval === undefined) interval = setInterval(comprobar, SESSION_CHECK_INTERVAL);
+    };
+    const parar = () => {
+      clearInterval(interval);
+      interval = undefined;
+    };
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === "hidden") return parar();
+      void comprobar();
+      arrancar();
+    };
+    if (document.visibilityState !== "hidden") arrancar();
+    document.addEventListener("visibilitychange", alCambiarVisibilidad);
+
+    return () => {
+      parar();
+      document.removeEventListener("visibilitychange", alCambiarVisibilidad);
+    };
   }, [user, router, pathname]);
 
   const login = async (email: string, password: string, captchaToken?: string) => {
