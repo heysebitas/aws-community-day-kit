@@ -131,7 +131,7 @@ export function PieCorreo() {
   const ANCHO = 1192;
   const ALTO = 560;
   const silueta = EVENTO.sede.silueta === "santiago" ? "santiago" : "auto";
-  const { verts, edges } = siluetaDe(silueta, EVENTO.ciudad);
+  const { verts, edges, tipos } = siluetaDe(silueta, EVENTO.ciudad);
 
   const angulo = 0.38;
   const cabeceo = 0.1;
@@ -146,9 +146,11 @@ export function PieCorreo() {
     const f = 6 / (7.5 + z2);
     return { x: cx + x1 * f * escala * 2.1, y: cy - y2 * f * escala, z: z2 };
   });
+  // A menos profundidad, más cerca de la cámara. La cordillera del fondo y el
+  // suelo van finos para que no compitan con los edificios.
   const trazo = (cerca: boolean) =>
     edges
-      .filter(([a, b]) => (p[a]!.z + p[b]!.z) / 2 > 0 === cerca)
+      .filter(([a, b], i) => ((p[a]!.z + p[b]!.z) / 2 < 1.4 && tipos[i] !== "suelo") === cerca)
       .map(([a, b]) => `M${p[a]!.x.toFixed(1)} ${p[a]!.y.toFixed(1)}L${p[b]!.x.toFixed(1)} ${p[b]!.y.toFixed(1)}`)
       .join("");
 

@@ -3,7 +3,17 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { acentoCanvas, observarAcento } from "@/lib/tema-canvas";
-import { siluetaDe } from "./siluetas";
+import { siluetaDe, type TipoArista } from "./siluetas";
+
+/** Escalones de opacidad: cada uno se traza de una vez. */
+const NIVELES = 10;
+/** Opacidad de cada tipo de arista: [lejos, cuánto sube al acercarse]. */
+const PESO: Record<TipoArista, [number, number]> = {
+  edificio: [0.12, 0.72],
+  mastil: [0.12, 0.72],
+  cordillera: [0.08, 0.45],
+  suelo: [0.05, 0.3],
+};
 
 /**
  * Una silueta de ciudad en alambre, girando despacio. El puntero la inclina.
@@ -30,7 +40,12 @@ export function WireCiudad({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const { verts, edges, baliza } = siluetaDe(silueta, ciudad);
+    const { verts, edges, tipos, baliza } = siluetaDe(silueta, ciudad);
+    // Espacio reutilizado entre fotogramas.
+    const px = new Float32Array(verts.length);
+    const py = new Float32Array(verts.length);
+    const pd = new Float32Array(verts.length);
+    const grupos: number[][] = Array.from({ length: 2 * NIVELES }, () => []);
     let ACENTO = acentoCanvas();
     const dejarDeObservar = observarAcento((v) => { ACENTO = v; });
     let raf = 0;
@@ -104,40 +119,51 @@ export function WireCiudad({
       const cx = w / 2;
       const cy = h * 0.47;
       const scale = Math.min(w, h) * 0.27;
-      const proj = verts.map((v) => {
-        const p = proyectar(v, angle, pitch);
-        return { x: cx + p.x * scale, y: cy + p.y * scale, depth: p.depth };
-      });
-
-      // Las aristas lejanas primero y más tenues: eso da la profundidad.
-      const orden = edges
-        .map((e, i) => ({ i, d: (proj[e[0]]!.depth + proj[e[1]]!.depth) / 2 }))
-        .sort((a, b) => a.d - b.d);
-
-      for (const { i, d } of orden) {
-        const [a, b] = edges[i]!;
-        const alpha = 0.16 + Math.max(0, (d + 2.6) / 5.2) * 0.7;
-        ctx.beginPath();
-        ctx.moveTo(proj[a]!.x, proj[a]!.y);
-        ctx.lineTo(proj[b]!.x, proj[b]!.y);
-        ctx.strokeStyle = `rgba(${ACENTO},${Math.min(alpha, 0.9)})`;
-        ctx.lineWidth = d > 0 ? 1.3 : 0.8;
-        ctx.stroke();
+      for (let i = 0; i < verts.length; i++) {
+        const p = proyectar(verts[i]!, angle, pitch);
+        px[i] = cx + p.x * scale;
+        py[i] = cy + p.y * scale;
+        pd[i] = p.depth;
       }
 
-      const luz = proj[baliza];
-      if (luz) {
-        const t = reduced ? 0.5 : (Date.now() % 1400) / 1400;
-        ctx.beginPath();
-        ctx.arc(luz.x, luz.y, 2 + t * 9, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${ACENTO},${(1 - t) * 0.8})`;
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(luz.x, luz.y, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fill();
+      // A menos profundidad, más cerca: más opaco y grueso, y eso da el volumen.
+      // El corte de lo grueso deja fina sólo la cordillera del fondo.
+      // Las aristas se agrupan por opacidad y grosor para trazar cada grupo de
+      // una vez, sin ordenar ni crear un color por arista en cada fotograma.
+      for (let k = 0; k < edges.length; k++) {
+        const [a, b] = edges[k]!;
+        const d = (pd[a]! + pd[b]!) / 2;
+        const cerca = Math.min(1, Math.max(0, (3.2 - d) / 5.4));
+        const [base, rango] = PESO[tipos[k]!];
+        const nivel = Math.min(NIVELES - 1, Math.floor((base + cerca * rango) * NIVELES));
+        const grueso = d < 1.2 && tipos[k] !== "suelo" ? 1 : 0;
+        grupos[grueso * NIVELES + nivel]!.push(px[a]!, py[a]!, px[b]!, py[b]!);
       }
+      for (let g = 0; g < grupos.length; g++) {
+        const lineas = grupos[g]!;
+        if (!lineas.length) continue;
+        ctx.beginPath();
+        for (let j = 0; j < lineas.length; j += 4) {
+          ctx.moveTo(lineas[j]!, lineas[j + 1]!);
+          ctx.lineTo(lineas[j + 2]!, lineas[j + 3]!);
+        }
+        ctx.strokeStyle = `rgba(${ACENTO},${((g % NIVELES) + 0.5) / NIVELES})`;
+        ctx.lineWidth = g >= NIVELES ? 1.35 : 0.8;
+        ctx.stroke();
+        lineas.length = 0;
+      }
+
+      const lx = px[baliza]!, ly = py[baliza]!;
+      const t = reduced ? 0.5 : (Date.now() % 1400) / 1400;
+      ctx.beginPath();
+      ctx.arc(lx, ly, 2 + t * 9, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(${ACENTO},${(1 - t) * 0.8})`;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(lx, ly, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
 
       if (!reduced) angle += 0.0022;
       raf = requestAnimationFrame(draw);
