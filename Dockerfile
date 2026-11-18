@@ -20,6 +20,10 @@ RUN NEXT_STANDALONE=1 MODO_DEMO=1 JWT_SECRET=solo-para-compilar-no-se-usa-en-nin
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
+# Memoria acotada para un VPS de 1 GB con Mongo al lado: el heap no pasa de ~170 MB
+# en carga, y lo que crece es memoria nativa. MALLOC_ARENA_MAX sólo actúa con glibc
+# (pm2 en el VPS); aquí es Alpine y no estorba. Medidas en docs/rendimiento.md.
+ENV NODE_OPTIONS=--max-old-space-size=256 MALLOC_ARENA_MAX=2
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public

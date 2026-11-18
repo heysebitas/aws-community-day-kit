@@ -62,6 +62,14 @@ const nextConfig: NextConfig = {
   output: process.env.NEXT_STANDALONE === "1" ? "standalone" : undefined,
   serverExternalPackages: ["pdfkit", "mongodb-memory-server"],
   poweredByHeader: false,
+  // Comprime Node salvo que lo haga el proxy (nginx con gzip): así no se comprime dos
+  // veces. Sin proxy (Docker solo) hace falta. Ver docs/despliegue.md.
+  compress: process.env.COMPRIMIR_EN_PROXY !== "1",
+  // Next pasa `127.x` y `[::1]` a `localhost` en la URL que ve el proxy, pero compara
+  // la reescritura con la URL real del servidor: con HOSTNAME=127.0.0.1 la reescritura
+  // de next-intl al idioma base parece externa, vuelve a entrar y acaba en un 307 a sí
+  // misma. Sin normalizar, el proxy ve la misma URL que el router. Prueba en tests/proxy-host.test.ts.
+  skipProxyUrlNormalize: true,
   // `experimental.inlineCss` queda apagado: en la portada el HTML pasaba de 24 a 84 KB gzip (+60 KB, tope 25).
   // Medida y razón en docs/rendimiento.md.
   images: {

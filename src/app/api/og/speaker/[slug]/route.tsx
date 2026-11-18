@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import { SpeakerProfile } from "@/models/speaker-profile";
+import { SpeakerProfile, type ISpeakerProfile } from "@/models/speaker-profile";
 import { EventConfig } from "@/models/event-config";
 import fs from "fs";
 import path from "path";
@@ -14,6 +14,7 @@ import { getAuthUser } from "@/lib/auth";
 import { descargarImagen } from "@/lib/fetch-seguro";
 import { firmaInterna } from "@/lib/speaker-card";
 import { getIp, rateLimit } from "@/lib/rate-limit";
+import { CacheImagenes, respuestaPng } from "@/lib/cache-imagen";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,6 +39,10 @@ function loadAsset(filePath: string, mime: string) {
   }
   return uri;
 }
+
+// Las tarjetas ya dibujadas: unos cientos de KB cada una, con tope.
+const cache = new CacheImagenes(64, 32 * 1024 * 1024);
+const CACHE_CONTROL = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400";
 
 let fuenteBuf: ArrayBuffer | undefined;
 function cargarFuente(): ArrayBuffer {
@@ -123,6 +128,30 @@ export async function GET(
     return NextResponse.redirect(storedCardUrl, { status: 302 });
   }
 
+  const dibujar = () => dibujarTarjeta(profile, slug, conDominio, isPreview, _request.nextUrl.searchParams);
+
+  // La vista previa del editor y las propuestas sin aceptar no se guardan ni se
+  // dejan cachear fuera: dependen de la sesión o de la consulta.
+  if (!visible || isPreview) {
+    const response = await dibujar();
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
+  }
+
+  // Cambia cuando se edita el perfil (updatedAt) o el dominio de la tarjeta.
+  const prefijo = `${slug}:`;
+  const clave = `${prefijo}${new Date(profile.updatedAt as Date | string | undefined ?? 0).getTime()}:${conDominio ? 1 : 0}`;
+  if (!cache.leer(clave)) cache.olvidar(prefijo);
+  return respuestaPng(await cache.obtener(clave, dibujar), CACHE_CONTROL);
+}
+
+async function dibujarTarjeta(
+  profile: ISpeakerProfile,
+  slug: string,
+  conDominio: boolean,
+  isPreview: boolean,
+  sp: URLSearchParams,
+): Promise<Response> {
   // Co-speakers (max 3 → 4 total)
   const rawCoSpeakers = (profile.coSpeakers as CoSpeakerData[] | undefined) ?? [];
   const coSpeakers = rawCoSpeakers.slice(0, 3);
@@ -169,7 +198,6 @@ export async function GET(
   const qrDataUrl  = await generateQR(profileUrl);
 
   // Canvas editor overrides — only applied in single-speaker mode
-  const sp = _request.nextUrl.searchParams;
   const qTitle = isPreview && sp.has("titleCard")  ? sp.get("titleCard")!         : null;
   const qRole  = isPreview && sp.has("roleCard")   ? sp.get("roleCard")!          : null;
   const qCX    = isPreview && sp.has("contentX")   ? Number(sp.get("contentX"))   : null;
@@ -226,6 +254,5 @@ export async function GET(
     },
   );
 
-  response.headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
   return response;
 }

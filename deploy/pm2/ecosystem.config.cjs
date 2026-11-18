@@ -22,9 +22,13 @@ module.exports = {
       exec_mode: "fork",
       instances: 1,
 
-      env: { NODE_ENV: "production", PORT: 3000 },
+      // Heap con tope y pocas arenas de malloc: sin esto la memoria nativa
+      // crece hasta ~800 MB en el pico y no se devuelve. Con esto el pico medido
+      // es ~510 MB: el reinicio queda por encima, con margen (docs/rendimiento.md).
+      node_args: "--max-old-space-size=256",
+      env: { NODE_ENV: "production", PORT: 3000, MALLOC_ARENA_MAX: "2" },
 
-      max_memory_restart: "600M",
+      max_memory_restart: "700M",
       min_uptime: "20s",
       max_restarts: 10,
       restart_delay: 4000,

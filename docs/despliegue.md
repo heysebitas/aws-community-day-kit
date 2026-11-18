@@ -34,6 +34,38 @@ pm2 start deploy/pm2/ecosystem.config.cjs && pm2 save
 Detrás de nginx o de un CDN, dile al kit de dónde sale la IP real del
 visitante (ver [seguridad.md](seguridad.md)): de eso depende el límite de peticiones.
 
+### En un VPS de 1 GB, con Mongo en la misma máquina
+
+- **Node.** `ecosystem.config.cjs` ya pone `--max-old-space-size=256` y
+  `MALLOC_ARENA_MAX=2`: el heap no pasa de unos 170 MB con carga, y sin tope de
+  arenas la memoria nativa de glibc crecía hasta 800 MB y no se devolvía.
+  `max_memory_restart` queda por encima del pico medido para que pm2 no reinicie
+  a mitad del evento (cifras en [rendimiento.md](rendimiento.md#servidor)).
+- **mongod.** Por omisión la caché de WiredTiger es la mitad de la RAM menos 1 GB
+  (256 MB como mínimo) y no deja sitio a Node. En `/etc/mongod.conf`:
+
+  ```yaml
+  storage:
+    wiredTiger:
+      engineConfig:
+        cacheSizeGB: 0.25
+  ```
+
+  `compose.yaml` hace lo mismo con `--wiredTigerCacheSizeGB 0.25`.
+- **Swap.** 1 GB de swap evita que un pico mate a mongod o a Node.
+- **nginx.** `deploy/nginx/sitio.conf` mantiene conexiones abiertas con Node
+  (`upstream` con `keepalive`), cachea `/_next/static`, `/_next/image`, las
+  páginas con ISR y la API pública según la `Cache-Control` que manda Node, y
+  nunca lo que lleva la cookie de sesión, `/api/admin`, `/api/auth` ni el panel.
+  Las imágenes de los correos y las páginas ya cacheadas no llegan a Node.
+- **Compresión.** Node comprime con gzip y nginx no vuelve a comprimir lo que
+  llega comprimido, así que sirve tal cual. Si prefieres que comprima sólo nginx
+  (p. ej. para usar brotli, que necesita el módulo `ngx_brotli`), construye y
+  arranca con `COMPRIMIR_EN_PROXY=1`. Sin nginx delante (Docker solo) déjala sin
+  poner: si no, el sitio sale sin comprimir.
+- **HOSTNAME.** Next puede escuchar en `127.0.0.1` (lo natural detrás de nginx),
+  en `0.0.0.0` o en `localhost`.
+
 ## Docker
 
 ```bash
@@ -51,6 +83,9 @@ servicio.
   `compose.yaml` está comentado). Sin ella sale el certificado genérico.
 - **Imagen:** el build de Docker activa `output: "standalone"` (`NEXT_STANDALONE=1`); la imagen final sólo
   lleva `.next/standalone`, `.next/static` y `public`, corre sin root y arranca con `node server.js`.
+- **Memoria:** la imagen pone `NODE_OPTIONS=--max-old-space-size=256`. Con 1 GB en la
+  máquina, limita el contenedor (`--memory=600m` o `mem_limit` en compose) y la caché
+  de Mongo (ver arriba).
 - **Variables:** el resto (`MONGODB_URI`, `JWT_SECRET`…) se pasan al arrancar:
   `docker run --env-file .env.local -p 3000:3000 aws-community-day-kit`.
 - **Salud:** `GET /api/health` responde 200 si el proceso vive; con `?db=1`
