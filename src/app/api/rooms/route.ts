@@ -6,11 +6,11 @@ import { ruta } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export const GET = ruta(async () => {
   await connectDB();
   const rooms = await Room.find().sort({ order: 1, name: 1 }).lean();
   return Response.json({ rooms });
-}
+}, { etiqueta: "rooms GET" });
 
 export const POST = ruta(async (req: NextRequest) => {
   await requireAccess("programa", "editar", ["admin", "organizer"]);

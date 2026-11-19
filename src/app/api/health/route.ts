@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
@@ -13,7 +14,7 @@ const ESPERA_BASE_MS = 3000;
  * Salud del contenedor. Sin `?db=1` sólo dice que el proceso responde; con él
  * hace un `ping` a Mongo. Nunca devuelve datos ni el motivo del fallo.
  */
-export async function GET(request: Request) {
+export const GET = ruta(async (request: Request) => {
   // Holgado: el HEALTHCHECK de Docker y un monitor externo piden desde pocas IP.
   const limite = rateLimit(`health:${getIp(request)}`, 120, 60_000);
   if (!limite.ok) {
@@ -36,7 +37,8 @@ export async function GET(request: Request) {
       new Promise((_, rechazar) => setTimeout(() => rechazar(new Error("tiempo agotado")), ESPERA_BASE_MS).unref()),
     ]);
     return NextResponse.json({ ok: true }, { headers: SIN_CACHE });
-  } catch {
+  } catch (e) {
+    logError("health GET", e);
     return NextResponse.json({ ok: false }, { status: 503, headers: SIN_CACHE });
   }
-}
+}, { etiqueta: "health GET" });

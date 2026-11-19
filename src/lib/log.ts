@@ -1,3 +1,4 @@
+import { logError } from "@/lib/api";
 import "server-only";
 import { connectDB } from "@/lib/db";
 import { Log } from "@/models/log";
@@ -38,7 +39,8 @@ export async function createLog(params: CreateLogParams): Promise<void> {
     if (!userId || !userName || !userRole) return;
 
     await Log.create({ ...params, userId, userName, userRole });
-  } catch {
-    /* a propósito */
+  } catch (e) {
+    // Nunca lanza (ver arriba), pero sin esto un registro perdido no deja rastro.
+    logError("log de actividad", e);
   }
 }

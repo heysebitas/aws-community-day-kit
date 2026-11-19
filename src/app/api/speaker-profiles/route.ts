@@ -18,7 +18,7 @@ async function uniqueSlug(base: string): Promise<string> {
 }
 
 // Public: list published profiles (misma lógica cacheada que usa el home)
-export async function GET() {
+export const GET = ruta(async () => {
   try {
     const profiles = await getPublicSpeakers();
     return Response.json({ profiles });
@@ -26,7 +26,7 @@ export async function GET() {
     console.error("[speaker-profiles GET]", err);
     return Response.json({ error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "speaker-profiles GET" });
 
 // Admin: create profile
 export const POST = ruta(async (request: NextRequest) => {

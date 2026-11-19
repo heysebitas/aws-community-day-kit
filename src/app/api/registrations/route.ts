@@ -16,7 +16,7 @@ import { checkAlreadyVolunteer } from "@/lib/duplicate-check";
 import { rateLimit, getIp } from "@/lib/rate-limit";
 import { Passport } from "@/models/passport";
 import { verifyCaptcha } from "@/lib/captcha";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { devolverCupo, reservarCupo, sincronizarCupo } from "@/lib/cupo";
 
 // Lo que pinta el panel; el resto (campañas, `busqueda`, `__v`) no viaja.
@@ -198,7 +198,10 @@ export const POST = ruta(async (request: NextRequest) => {
       },
       { upsert: true },
     );
-  } catch { /* non-fatal — passport can be generated from admin later */ }
+  } catch (e) {
+    // No es fatal (el pasaporte se puede generar desde el panel), pero queda rastro.
+    logError("registrations POST pasaporte", e);
+  }
 
   // Skip email if: manual + skipEmail, or no email found
   const shouldSkipEmail = (manual && skipEmail) || !email;

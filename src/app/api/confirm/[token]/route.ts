@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Registration } from "@/models/registration";
@@ -23,15 +24,15 @@ function isExpired(): boolean {
   return Date.now() > new Date(EVENTO.confirmacionHasta).getTime();
 }
 
-export async function GET(
+export const GET = ruta(async (
   _req: NextRequest,
   { params }: { params: Promise<{ token: string }> },
-) {
+) => {
   try {
     const limite = rateLimit(`confirmacion:${getIp(_req)}`, 100, 15 * 60 * 1000);
     if (!limite.ok) {
       return Response.json(
-        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { code: "demasiados_intentos", error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
         { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
       );
     }
@@ -71,20 +72,21 @@ export async function GET(
       confirmedAt: confirmation.confirmedAt ?? null,
       deadline: EVENTO.confirmacionHasta,
     });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("confirm/[token] GET", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "confirm/[token] GET" });
 
-export async function POST(
+export const POST = ruta(async (
   req: NextRequest,
   { params }: { params: Promise<{ token: string }> },
-) {
+) => {
   try {
     const limite = rateLimit(`confirmacion:${getIp(req)}`, 100, 15 * 60 * 1000);
     if (!limite.ok) {
       return Response.json(
-        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { code: "demasiados_intentos", error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
         { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
       );
     }
@@ -94,7 +96,7 @@ export async function POST(
 
     await connectDB();
     const reg = await registroDelEnlace(token);
-    if (!reg) return Response.json({ error: "No encontrado" }, { status: 404 });
+    if (!reg) return Response.json({ code: "no_encontrado", error: "No encontrado" }, { status: 404 });
 
     if (reg.confirmation?.confirmed) {
       return Response.json({ error: "Ya confirmaste tu asistencia" }, { status: 409 });
@@ -134,7 +136,8 @@ export async function POST(
     });
 
     return Response.json({ ok: true, badgeFirstName, badgeLastName });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("confirm/[token] POST", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "confirm/[token] POST" });

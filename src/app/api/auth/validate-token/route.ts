@@ -1,10 +1,11 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { PasswordToken } from "@/models/password-token";
 import { User } from "@/models/user";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 
-export async function GET(request: NextRequest) {
+export const GET = ruta(async (request: NextRequest) => {
   const token = request.nextUrl.searchParams.get("token");
 
   if (!token) {
@@ -36,7 +37,8 @@ export async function GET(request: NextRequest) {
     const user = await User.findById(passwordToken.userId).select("email").lean();
 
     return Response.json({ valid: true, email: user?.email ?? null });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("auth/validate-token GET", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "auth/validate-token GET" });

@@ -114,7 +114,7 @@ export const GET = ruta(async (req: NextRequest) => {
 });
 
 // ── POST — new submission (public) ───────────────────────────────────────────
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   try {
     // El Call for Speakers cierra solo cuando pasa EVENTO.cfpCierre. Se comprueba
     // aca y no solo en el cliente: si dependiera del boton de la interfaz, una
@@ -240,4 +240,4 @@ export async function POST(request: NextRequest) {
     console.error("[POST /api/speakers]", err);
     return Response.json({ error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "speakers POST" });

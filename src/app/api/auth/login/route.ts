@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
@@ -12,7 +13,7 @@ import { normalizeEmail } from "@/lib/normalize";
 let hashDeRelleno: Promise<string> | undefined;
 const HASH_DE_RELLENO = () => (hashDeRelleno ??= bcrypt.hash("relleno", 12));
 
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   try {
     // La sede entera sale por una IP: por IP solo hay un tope alto contra barridos,
     // y los fallos se cuentan por IP y correo.
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     const rl = rateLimit(`login-ip:${ip}`, 100, 15 * 60 * 1000);
     if (!rl.ok) {
       return Response.json(
-        { error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
+        { code: "demasiados_intentos", error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
         { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
       );
     }
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       if (typeof parsed !== "object" || parsed === null) throw new Error("invalid body");
       body = parsed as Record<string, unknown>;
     } catch {
-      return Response.json({ error: "Solicitud inválida" }, { status: 400 });
+      return Response.json({ code: "solicitud_invalida", error: "Solicitud inválida" }, { status: 400 });
     }
     const { email, password, captchaToken } = body;
 
@@ -40,27 +41,27 @@ export async function POST(request: NextRequest) {
     const okCaptcha = await verifyCaptcha(typeof captchaToken === "string" ? captchaToken : "");
     if (!okCaptcha) {
       return Response.json(
-        { error: "Captcha inválido o expirado. Recárgalo e intenta de nuevo." },
+        { code: "captcha_invalido", error: "Captcha inválido o expirado. Recárgalo e intenta de nuevo." },
         { status: 400 },
       );
     }
 
     // Exige que email y password sean strings (evita inyección NoSQL y 500 con objetos).
     if (typeof email !== "string" || typeof password !== "string" || !email.trim() || !password || password.length > 200) {
-      return Response.json({ error: "Credenciales inválidas" }, { status: 401 });
+      return Response.json({ code: "credenciales_invalidas", error: "Credenciales inválidas" }, { status: 401 });
     }
 
     // El formato se valida en el servidor: una petición armada a mano se salta el del navegador.
     const checked = normalizeEmail(email);
     if (!checked.ok) {
-      return Response.json({ error: checked.reason }, { status: 400 });
+      return Response.json({ code: "correo_invalido", error: checked.reason }, { status: 400 });
     }
 
     const claveFallos = `login:${ip}:${checked.value}`;
     const bloqueo = isBlocked(claveFallos, 10);
     if (bloqueo.blocked) {
       return Response.json(
-        { error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
+        { code: "demasiados_intentos", error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
         { status: 429, headers: { "Retry-After": String(Math.ceil(bloqueo.retryAfterMs / 1000)) } },
       );
     }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
     const valid = await bcrypt.compare(password, user?.passwordHash || await HASH_DE_RELLENO());
     if (!user || !user.passwordHash || !valid) {
       recordFail(claveFallos, 10, 15 * 60 * 1000);
-      return Response.json({ error: "Credenciales inválidas" }, { status: 401 });
+      return Response.json({ code: "credenciales_invalidas", error: "Credenciales inválidas" }, { status: 401 });
     }
 
     clearFails(claveFallos);
@@ -91,7 +92,8 @@ export async function POST(request: NextRequest) {
     return Response.json({
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("auth/login POST", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "auth/login POST" });

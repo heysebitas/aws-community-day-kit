@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Passport } from "@/models/passport";
@@ -5,10 +6,10 @@ import { PassportEditToken } from "@/models/passport-edit-token";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 
 // POST (no GET) para que los prefetchers de correo no consuman el token de un solo uso.
-export async function POST(
+export const POST = ruta(async (
   _req: NextRequest,
   { params }: { params: Promise<{ token: string }> },
-) {
+) => {
   try {
     const limite = rateLimit(`confirmacion-pasaporte:${getIp(_req)}`, 30, 15 * 60 * 1000);
     if (!limite.ok) {
@@ -41,7 +42,8 @@ export async function POST(
     await doc.save();
 
     return Response.json({ ok: true, shortId: doc.shortId });
-  } catch {
-    return Response.json({ ok: false, error: "server" }, { status: 500 });
+  } catch (e) {
+    logError("confirm-passport-edit/[token] POST", e);
+    return Response.json({ ok: false, code: "error_interno", error: "server" }, { status: 500 });
   }
-}
+}, { etiqueta: "confirm-passport-edit/[token] POST" });

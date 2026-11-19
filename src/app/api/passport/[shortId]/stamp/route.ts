@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { isBlocked, recordFail } from "@/lib/rate-limit";
@@ -13,7 +14,7 @@ const VENTANA = 15 * 60 * 1000;
  * le dicta quien atiende. Los fallos se cuentan solo por pasaporte: en la sede
  * todos comparten una IP y un límite por IP bloquearía a todos.
  */
-export async function POST(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
+export const POST = ruta(async (req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) => {
   try {
     const { shortId } = await params;
     const { pin } = await leerCuerpo(req);
@@ -52,7 +53,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sho
     await SponsorPin.findByIdAndUpdate(sponsor._id, { $inc: { totalStamps: 1 } });
 
     return Response.json({ ok: true, sponsorName: sponsor.sponsorName });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("passport/[shortId]/stamp POST", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "passport/[shortId]/stamp POST" });

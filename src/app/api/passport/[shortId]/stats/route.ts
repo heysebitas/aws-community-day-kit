@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Passport } from "@/models/passport";
@@ -11,7 +12,7 @@ const HORA = 60 * 60 * 1000;
 const REDES = ["builderCenter", "linkedin", "instagram", "x", "github", "tiktok"];
 
 /** Cuenta las visitas a un pasaporte y los clics en sus redes. */
-export async function POST(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
+export const POST = ruta(async (req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) => {
   try {
     const { shortId } = await params;
     const { event, platform } = await leerCuerpo(req);
@@ -32,7 +33,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sho
     }
 
     return Response.json({ ok: false }, { status: 400 });
-  } catch {
+  } catch (e) {
+    logError("passport/[shortId]/stats POST", e);
     return Response.json({ ok: false }, { status: 500 });
   }
-}
+}, { etiqueta: "passport/[shortId]/stats POST" });

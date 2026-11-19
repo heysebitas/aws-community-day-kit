@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import QRCode from "qrcode";
 import { connectDB } from "@/lib/db";
@@ -6,10 +7,10 @@ import { generateRegistrationPDF } from "@/lib/pdf/registration";
 import { EVENTO } from "@/config";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 
-export async function GET(
+export const GET = ruta(async (
   _request: NextRequest,
   { params }: { params: Promise<{ qrCode: string }> },
-) {
+) => {
   try {
     const limite = rateLimit(`pase-pdf:${getIp(_request)}`, 300, 10 * 60 * 1000);
     if (!limite.ok) {
@@ -52,7 +53,8 @@ export async function GET(
         "Cache-Control": "private, max-age=3600",
       },
     });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("passes/[qrCode] GET", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "passes/[qrCode] GET" });

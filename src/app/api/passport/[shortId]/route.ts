@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { nanoid } from "nanoid";
 import { SITIO } from "@/config";
@@ -46,8 +47,9 @@ async function resolveOwnerContact(role: string, linkedId?: string): Promise<{ e
       const u = await User.findById(linkedId).select("email name").lean<{ email?: string; name?: string } | null>();
       return { email: (u?.email || "").trim(), name: u?.name || "" };
     }
-  } catch {
-    /* sin correo */
+  } catch (e) {
+    // Sin correo del dueño no se puede pedir confirmación; se sigue, con rastro.
+    logError("passport/[shortId] correo del dueño", e);
   }
   return { email: "", name: "" };
 }
@@ -58,21 +60,21 @@ const demasiados = (ms: number) => `Demasiados intentos. Intenta en ${Math.max(1
  * GET es lo público. Para entrar como dueño el PIN va en el cuerpo de un POST:
  * en la URL quedaría en los registros del servidor y en el historial.
  */
-export async function GET(req: NextRequest, ctx: { params: Promise<{ shortId: string }> }) {
+export const GET = ruta(async (req: NextRequest, ctx: { params: Promise<{ shortId: string }> }) => {
   return leer(req, ctx, null);
-}
+}, { etiqueta: "passport/[shortId] GET" });
 
-export async function POST(req: NextRequest, ctx: { params: Promise<{ shortId: string }> }) {
+export const POST = ruta(async (req: NextRequest, ctx: { params: Promise<{ shortId: string }> }) => {
   const { pin } = await leerCuerpo(req);
   return leer(req, ctx, typeof pin === "string" && pin ? pin : null);
-}
+}, { etiqueta: "passport/[shortId] POST" });
 
 async function leer(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }, pin: string | null) {
   try {
     const { shortId } = await params;
 
     const leido = await leerPasaporte(shortId);
-    if (!leido) return Response.json({ error: "Pasaporte no encontrado" }, { status: 404 });
+    if (!leido) return Response.json({ code: "pasaporte_no_encontrado", error: "Pasaporte no encontrado" }, { status: 404 });
     const { doc: passport, datos } = leido;
 
     if (!pin) return Response.json(datos);
@@ -82,17 +84,18 @@ async function leer(req: NextRequest, { params }: { params: Promise<{ shortId: s
 
     if (intento.bloqueado) {
       return Response.json(
-        { ...datos, rateLimited: true, retryAfterMs: intento.retryAfterMs, pinError: demasiados(intento.retryAfterMs), error: demasiados(intento.retryAfterMs) },
+        { ...datos, rateLimited: true, retryAfterMs: intento.retryAfterMs, pinError: demasiados(intento.retryAfterMs), code: "demasiados_intentos", error: demasiados(intento.retryAfterMs) },
         { status: 429, headers: { "Retry-After": String(Math.ceil(intento.retryAfterMs / 1000)) } },
       );
     }
-    return Response.json({ ...datos, pinError: "PIN incorrecto." }, { status: 401 });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+    return Response.json({ ...datos, pinError: "PIN incorrecto.", code: "pin_incorrecto" }, { status: 401 });
+  } catch (e) {
+    logError("passport/[shortId] leer", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
+export const PATCH = ruta(async (req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) => {
   try {
     const { shortId } = await params;
     const body = await leerCuerpo(req);
@@ -101,13 +104,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sh
 
     await connectDB();
     const passport = await Passport.findOne({ shortId }).select("viewPin photoUrl social linkedRegistrationId firstName role");
-    if (!passport) return Response.json({ error: "No encontrado" }, { status: 404 });
+    if (!passport) return Response.json({ code: "no_encontrado", error: "No encontrado" }, { status: 404 });
 
     const intento = comprobarPin(req, "pasaporte", shortId, pin, passport.viewPin);
     if (!intento.ok) {
       return intento.bloqueado
-        ? Response.json({ error: demasiados(intento.retryAfterMs) }, { status: 429 })
-        : Response.json({ error: "PIN incorrecto" }, { status: 401 });
+        ? Response.json({ code: "demasiados_intentos", error: demasiados(intento.retryAfterMs) }, { status: 429 })
+        : Response.json({ code: "pin_incorrecto", error: "PIN incorrecto" }, { status: 401 });
     }
 
     // Añadir algo donde no había nada se aplica ya. Cambiar o borrar lo que
@@ -137,7 +140,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sh
       const next = photoUrl.trim();
       // La foto sólo puede ser una subida al bucket: una URL ajena la cargaría
       // el navegador de cualquiera que abra el pasaporte.
-      if (next && !esDelBucket(next)) return Response.json({ error: "Foto no válida" }, { status: 400 });
+      if (next && !esDelBucket(next)) return Response.json({ code: "foto_invalida", error: "Foto no válida" }, { status: 400 });
       const cur = (passport.photoUrl ?? "").trim();
       if (next !== cur) {
         if (cur === "" && next !== "") addPhoto = next;
@@ -214,12 +217,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sh
         foto: porCampo.photo ?? "",
       });
       await sendEmail({ from: EMAIL_FROM, to: email, subject: correo.asunto, html: correo.html });
-    } catch {
-      /* el correo no es fatal */
+    } catch (e) {
+      // El correo no es fatal: los cambios ya se guardaron, pero queda rastro.
+      logError("passport/[shortId] PATCH correo", e);
     }
 
     return Response.json({ ok: true, applied, pending: fullList.map((e) => e.label), maskedEmail: maskEmail(email) });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("passport/[shortId] PATCH", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "passport/[shortId] PATCH" });

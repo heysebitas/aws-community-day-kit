@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextResponse } from "next/server";
 import { EVENTO, TEMA } from "@/config";
 import { getIp, rateLimit } from "@/lib/rate-limit";
@@ -30,7 +31,7 @@ function clamp(raw: string | null, fallback: number, min: number, max: number) {
   return Math.min(max, Math.max(min, Math.round(n)));
 }
 
-export async function GET(request: Request) {
+export const GET = ruta(async (request: Request) => {
   const limite = rateLimit(`email-map:${getIp(request)}`, 30, 60_000);
   if (!limite.ok) {
     return new NextResponse(null, {
@@ -70,7 +71,8 @@ export async function GET(request: Request) {
       return res;
     });
     return respuestaPng(png, cabeceras);
-  } catch {
+  } catch (e) {
+    logError("email-map GET", e);
     return new NextResponse(null, { status: 502 });
   }
-}
+}, { etiqueta: "email-map GET" });

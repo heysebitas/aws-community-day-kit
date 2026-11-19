@@ -8,18 +8,19 @@ import { revalidatePublic, AGENDA_TAG, SPEAKERS_TAG } from "@/lib/data/revalidat
 import { createLog } from "@/lib/log";
 import { resolverSala } from "@/lib/agenda-sala";
 import { horaDelEvento } from "@/config/fechas";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 
 const CACHE_PUBLICA = "public, s-maxage=60, stale-while-revalidate=300";
 
-export async function GET() {
+export const GET = ruta(async () => {
   try {
     const events = await getAgendaEvents();
     return Response.json({ events }, { headers: { "Cache-Control": CACHE_PUBLICA } });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("agenda GET", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "agenda GET" });
 
 export const POST = ruta(async (request: NextRequest) => {
   const user = await requireAccess("programa", "editar", ["admin", "organizer"]);

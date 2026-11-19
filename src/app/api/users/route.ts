@@ -9,7 +9,7 @@ import { armarInvitacion } from "@/lib/correo-invitacion";
 import { createLog } from "@/lib/log";
 import { sanearPermisos } from "@/lib/permisos";
 import { SITIO } from "@/config";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 
 export const GET = ruta(async () => {
   await requireAuth(["admin"]);
@@ -99,8 +99,9 @@ export const POST = ruta(async (request: NextRequest) => {
       subject: correo.asunto,
       html: correo.html,
     });
-  } catch {
-    // Email send failed — user still created
+  } catch (e) {
+    // El usuario ya está creado: que el correo falle no lo deshace, pero queda rastro.
+    logError("users POST correo de invitación", e);
   }
 
   await createLog({
