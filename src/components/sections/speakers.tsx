@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { esTrack, trackCorto, trackPublico } from "@/data/session-tracks";
-import Link from "next/link";
+import { EnlaceLigero as Link } from "@/components/ui/enlace-ligero";
 import { Foto } from "@/components/ui/foto";
 import { motion } from "motion/react";
 import { SectionHeading } from "@/components/ui/section-heading";

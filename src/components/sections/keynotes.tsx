@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { EnlaceLigero as Link } from "@/components/ui/enlace-ligero";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { ArrowRight } from "lucide-react";

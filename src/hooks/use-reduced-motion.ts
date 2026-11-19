@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
+import { esModesto } from "@/lib/dispositivo";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
 
-/** Lee la preferencia de movimiento reducido del sistema. */
+/** Movimiento reducido: la preferencia del sistema o un dispositivo modesto. */
 export function useReducedMotion() {
   const subscribe = useCallback((onChange: () => void) => {
     const mql = window.matchMedia(QUERY);
@@ -14,7 +15,7 @@ export function useReducedMotion() {
 
   return useSyncExternalStore(
     subscribe,
-    () => window.matchMedia(QUERY).matches,
+    () => window.matchMedia(QUERY).matches || esModesto(),
     () => false, // en el servidor se asume que no hay preferencia
   );
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { EnlaceLigero as Link } from "@/components/ui/enlace-ligero";
 import { cn } from "@/lib/utils";
 import type { Tone } from "./block-section";
 

@@ -234,6 +234,15 @@ html { scrollbar-color: var(--color-surface-600) var(--color-surface-900); }
   }
 }
 
+/* Dispositivo modesto (clase puesta antes de pintar, ver `dispositivo.ts`):
+   las animaciones infinitas se detienen con el mismo recorte que movimiento reducido. */
+html.modesto *,
+html.modesto *::before,
+html.modesto *::after {
+  animation-iteration-count: 1 !important;
+  animation-duration: 0.01ms !important;
+}
+
 /* `ScrollReveal` sale del servidor oculto para animar la entrada, pero sólo
    cuando hay JS (`.js` en el `<html>`, ver el layout). Sin JS, o con movimiento
    reducido, se queda en su sitio y visible desde el principio. */
