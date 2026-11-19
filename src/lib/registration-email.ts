@@ -2,6 +2,7 @@ import QRCode from "qrcode";
 import { EVENTO } from "@/config";
 import { armarCorreo } from "@/lib/email-plantillas";
 import { generateRegistrationPDF } from "@/lib/pdf/registration";
+import { CacheImagenes } from "@/lib/cache-imagen";
 import type { Attendance } from "@/models/registration";
 
 /**
@@ -19,6 +20,11 @@ export type BuiltEmail = {
   isVirtual: boolean;
 };
 
+/** Cambia al tocar el diseño del pase: invalida los PDF ya guardados. */
+const VERSION_PASE = "1";
+/** Los pases ya dibujados: un reenvío o un reintento no vuelve a pagar el PDF. */
+export const pasesPdf = new CacheImagenes(200, 32 * 1024 * 1024);
+
 export async function buildRegistrationEmail(name: string, qrCode: string, attendance: Attendance): Promise<BuiltEmail> {
   const isVirtual = attendance === "online";
   const datos = { nombre: name.trim().split(/\s+/)[0] ?? "", nombreCompleto: name };
@@ -29,13 +35,16 @@ export async function buildRegistrationEmail(name: string, qrCode: string, atten
     return { subject: correo.asunto, html: correo.html, attachments: [], isVirtual: true };
   }
 
-  const qrBuffer = await QRCode.toBuffer(qrCode, {
-    type: "png",
-    width: 400,
-    margin: 2,
-    color: { dark: "#111111", light: "#FFFFFF" },
+  // El nombre va en la clave: si lo corrigen, el PDF es otro.
+  const pdfBuffer = await pasesPdf.obtener(`${VERSION_PASE}|${qrCode}|${name.trim()}`, async () => {
+    const qrBuffer = await QRCode.toBuffer(qrCode, {
+      type: "png",
+      width: 400,
+      margin: 2,
+      color: { dark: "#111111", light: "#FFFFFF" },
+    });
+    return new Response(new Uint8Array(await generateRegistrationPDF(name, qrBuffer, qrCode)));
   });
-  const pdfBuffer = await generateRegistrationPDF(name, qrBuffer, qrCode);
 
   const correo = await armarCorreo("registro_presencial", datos, ["presencial"]);
   if (!correo) throw new Error("plantilla registro_presencial no disponible");
