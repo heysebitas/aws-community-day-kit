@@ -8,14 +8,15 @@ import { checkAlreadyAttendee } from "@/lib/duplicate-check";
 import { verifyCaptcha } from "@/lib/captcha";
 import { rateLimit, getIp } from "@/lib/rate-limit";
 import { ruta } from "@/lib/api";
+import { sinDocumento } from "@/lib/privacidad";
 import { devolverCupo, reservarCupo, sincronizarCupo } from "@/lib/cupo";
 
 export const GET = ruta(async () => {
-  await requireAccess("volunteers", "ver", ["admin", "organizer"]);
+  const user = await requireAccess("volunteers", "ver", ["admin", "organizer"]);
   await connectDB();
 
   const submissions = await VolunteerSubmission.find({}).sort({ submittedAt: -1 }).lean();
-  return Response.json({ submissions });
+  return Response.json({ submissions: submissions.map((s) => sinDocumento(s, user.role)) });
 });
 
 export const POST = ruta(async (request: NextRequest) => {

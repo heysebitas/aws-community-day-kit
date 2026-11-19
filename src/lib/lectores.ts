@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/db";
 import { Passport, type IPassport } from "@/models/passport";
 import { SponsorPin } from "@/models/sponsor-pin";
 import { nuevoPin } from "@/lib/pin";
+import { enlacesViejosVigentes } from "@/lib/identidad";
 import { getAuthUser } from "@/lib/auth";
 import type { IUser } from "@/models/user";
 
@@ -42,6 +43,14 @@ export async function leerPasaporte(shortId: string) {
   }
   const sponsors = await SponsorPin.find({ isActive: true }).select("_id sponsorName logoUrl").lean();
   return { doc, datos: { passport: publico(doc), sponsors, isOwner: false } };
+}
+
+/** Antes de la migración el pasaporte tenía otro identificador: mientras dura el evento sigue llevando al nuevo. */
+export async function shortIdNuevoDe(viejo: string): Promise<string | null> {
+  if (!enlacesViejosVigentes()) return null;
+  await connectDB();
+  const p = await Passport.findOne({ shortIdAnterior: viejo }).select("shortId").lean<{ shortId: string } | null>();
+  return p?.shortId ?? null;
 }
 
 /** El usuario como lo ve el cliente: lo que devuelve `/api/auth/me`. */

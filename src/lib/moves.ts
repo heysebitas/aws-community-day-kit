@@ -1,3 +1,4 @@
+import { nuevoShortId } from "@/lib/identidad";
 import { nanoid } from "nanoid";
 
 import { Registration, type Attendance } from "@/models/registration";
@@ -61,10 +62,10 @@ async function ensurePassport(reg: {
   roleOther: string | null;
   _id: { toString(): string };
 }): Promise<boolean> {
-  const existing = await Passport.findOne({ shortId: reg.qrCode }).select("_id").lean();
+  const existing = await Passport.findOne({ linkedRegistrationId: reg._id.toString() }).select("_id").lean();
   if (existing) return false;
   await Passport.create({
-    shortId: reg.qrCode,
+    shortId: nuevoShortId(),
     role: "attendee",
     firstName: reg.firstName || "Sin",
     lastName: reg.lastName || "Nombre",
@@ -125,7 +126,7 @@ export async function changeAttendance(
     await reg.save();
     done.push("Modalidad cambiada a online");
 
-    const del = await Passport.deleteMany({ shortId: reg.qrCode });
+    const del = await Passport.deleteMany({ linkedRegistrationId: reg._id.toString() });
     if (del.deletedCount) done.push(`${del.deletedCount} pasaporte(s) eliminado(s)`);
   }
 
@@ -252,7 +253,7 @@ export async function registrationToVolunteer(
     throw e;
   }
   const passports = await Passport.deleteMany({
-    $or: [{ linkedRegistrationId: id }, { shortId: reg.qrCode }],
+    linkedRegistrationId: id,
   });
   await Promise.all([sincronizarCupo("attendee"), sincronizarCupo("volunteer")]);
 

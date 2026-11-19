@@ -153,6 +153,7 @@ describe("registro: duplicados y cupo", () => {
 
 describe("el día del evento, de punta a punta", () => {
   let qr = "";
+  let corto = "";
   const scan = async (codigo: unknown) => {
     const { POST } = await import("@/app/api/check-in/scan/route");
     return leer(await POST(peticion("/api/check-in/scan", { qrCode: codigo })));
@@ -164,8 +165,10 @@ describe("el día del evento, de punta a punta", () => {
     qr = String(r.body.qrCode);
     const { Registration } = await import("@/models/registration");
     const { Passport } = await import("@/models/passport");
-    const pass = await Passport.findOne({ shortId: qr }).lean();
-    assert.ok(pass, "se crea el pasaporte con el mismo código");
+    const pass = await Passport.findOne({ linkedRegistrationId: String(r.body.id) }).lean();
+    assert.ok(pass, "se crea el pasaporte ligado al registro");
+    assert.notEqual(pass.shortId, qr, "el shortId no es el código del pase");
+    corto = pass.shortId;
     assert.equal(pass.linkedRegistrationId, String(r.body.id));
     assert.match(pass.viewPin ?? "", /\d{4,}/);
     // El correo sale tras responder; con «consola» queda en «sent».
@@ -241,13 +244,13 @@ describe("el día del evento, de punta a punta", () => {
     const { Passport } = await import("@/models/passport");
     await SponsorPin.collection.insertOne({ pin: "4321", sponsorName: "Patrocinador Ejemplo", isActive: true, totalStamps: 0 });
     const { POST: sellar } = await import("@/app/api/passport/[shortId]/stamp/route");
-    const ctx = conParams({ shortId: qr });
+    const ctx = conParams({ shortId: corto });
     assert.equal((await leer(await sellar(peticion("/x", {}), ctx))).status, 400);
     assert.equal((await leer(await sellar(peticion("/x", { pin: "0000" }), ctx))).status, 400);
     assert.equal((await leer(await sellar(peticion("/x", { pin: "4321" }), ctx))).status, 200);
     assert.equal((await leer(await sellar(peticion("/x", { pin: "4321" }), ctx))).status, 409);
     assert.equal((await leer(await sellar(peticion("/x", { pin: "4321" }), conParams({ shortId: "nadie" })))).status, 404);
-    const pass = await Passport.findOne({ shortId: qr }).lean();
+    const pass = await Passport.findOne({ shortId: corto }).lean();
     assert.equal(pass?.stamps?.length, 1);
 
     const { PATCH } = await import("@/app/api/passport/[shortId]/route");
@@ -258,10 +261,10 @@ describe("el día del evento, de punta a punta", () => {
       assert.equal((await parchar({ photoUrl: ajena })).status, 400, ajena);
     }
     assert.equal((await parchar({ photoUrl: "https://evil.example/a.png" })).status, 400);
-    assert.equal((await Passport.findOne({ shortId: qr }).lean())?.photoUrl ?? "", "");
+    assert.equal((await Passport.findOne({ shortId: corto }).lean())?.photoUrl ?? "", "");
     assert.equal((await leer(await PATCH(peticion("/x", { pin: "9999999", photoUrl: `${BUCKET}/a.png` }, "PATCH"), ctx))).status, 401);
     const ok = await parchar({ photoUrl: `${BUCKET}/pasaportes/a.png` });
     assert.equal(ok.status, 200, JSON.stringify(ok.body));
-    assert.equal((await Passport.findOne({ shortId: qr }).lean())?.photoUrl, `${BUCKET}/pasaportes/a.png`);
+    assert.equal((await Passport.findOne({ shortId: corto }).lean())?.photoUrl, `${BUCKET}/pasaportes/a.png`);
   });
 });

@@ -114,6 +114,7 @@ export const VARIABLES: Variable[] = [
   { clave: "qr", explica: "Su código QR como imagen, para pegarlo en el correo.", grupo: "Sus enlaces" },
   { clave: "confirmar", explica: "Para que confirme su asistencia. Sólo presencial.", grupo: "Sus enlaces" },
   { clave: "pasaporte", explica: "Su pasaporte digital, si ya tiene uno.", grupo: "Sus enlaces" },
+  { clave: "pin", explica: "El PIN de su pasaporte: con él lo edita y pide los sellos de los stands.", grupo: "Sus enlaces" },
   { clave: "encuesta", explica: "Su enlace personal a la encuesta. Se crea al mandarla.", grupo: "Sus enlaces" },
 
   { clave: "grupoWhatsapp", explica: "El grupo que le corresponde.", grupo: "Enlaces del panel" },

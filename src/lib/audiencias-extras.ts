@@ -48,8 +48,7 @@ export async function anadirPasaporte(gente: Destinatario[]): Promise<void> {
   }
 
   for (const d of gente) {
-    /** Dos caminos: el pasaporte apunta al registro, o el propio código QR es el identificador corto. */
-    const corto = porOrigen.get(d.id) ?? (d.publico === "asistentes" ? d.qrCode : undefined);
+    const corto = porOrigen.get(d.id);
     if (corto) d.valores.pasaporte = `${APP_URL}/pasaporte/${corto}`;
   }
 }

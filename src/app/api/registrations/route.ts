@@ -1,3 +1,4 @@
+import { nuevoShortId } from "@/lib/identidad";
 import { NextRequest } from "next/server";
 import mongoose from "mongoose";
 import { nanoid } from "nanoid";
@@ -175,16 +176,16 @@ export const POST = ruta(async (request: NextRequest) => {
   const name = `${data.firstName} ${data.lastName}`.trim();
   const email = data.email;
 
-  // Auto-create Passport for new registration (shortId = qrCode for seamless reuse)
+  // Auto-create Passport for new registration (shortId propio, distinto del qrCode)
   if (generatePassport !== false && data.attendance !== "online") try {
     const viewPin = nuevoPin();
     const firstName = data.firstName || "Sin";
     const lastName = data.lastName || "Nombre";
     await Passport.updateOne(
-      { shortId: qrCode },
+      { linkedRegistrationId: registration._id.toString() },
       {
         $setOnInsert: {
-          shortId: qrCode,
+          shortId: nuevoShortId(),
           role: "attendee",
           firstName,
           lastName,

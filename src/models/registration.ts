@@ -1,4 +1,5 @@
 import mongoose, { Schema, type Document, type Query } from "mongoose";
+import { nanoid } from "nanoid";
 
 /** Registro de una persona asistente. */
 
@@ -36,6 +37,8 @@ export interface IRegistration extends Document {
 
   // ── Operación del evento ──
   qrCode: string;
+  /** Va en el enlace de confirmación; distinto del `qrCode` y del `shortId` del pasaporte. */
+  tokenConfirmacion?: string;
   /** Palabras normalizadas para la búsqueda de la puerta; no se escribe a mano. */
   busqueda: string[];
   checkedIn: boolean;
@@ -155,6 +158,7 @@ const registrationSchema = new Schema<IRegistration>(
     },
 
     qrCode: { type: String, required: true, unique: true },
+    tokenConfirmacion: { type: String, default: () => nanoid(21), index: { unique: true, sparse: true } },
     busqueda: { type: [String], default: undefined },
     checkedIn: { type: Boolean, default: false, index: true },
     checkedInAt: { type: Date, default: null },

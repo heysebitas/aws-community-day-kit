@@ -40,7 +40,7 @@ Para **reportar** una vulnerabilidad: [SECURITY.md](../SECURITY.md).
 | `/api/registrations` | `POST` público | 50 cada 15 minutos |
 | `/api/volunteers` | `POST` público | 30 cada 15 minutos |
 | `/api/speakers` | `POST` | 8 cada 60 minutos |
-| `/api/upload/public-presign` | `POST` | 12 cada 10 minutos |
+| `/api/upload/public-presign` | `POST` | 12 cada 10 minutos, y captcha |
 | `/api/auth/login` | `POST` | 10 cada 15 minutos |
 | `/api/auth/create-password` y `/api/auth/validate-token` | `POST` y `GET` | 20 cada 15 minutos, en total |
 | `/api/passport/[shortId]/stats` | `POST` | 50 visitas al día; 50 clics por red y hora (sólo evita sobrecontar, no corta la petición) |
@@ -59,7 +59,29 @@ IP, y las imágenes de marca se piden en cada visita y desde los proxies de los 
   un límite genérico por IP podría rechazar esos reintentos. Una firma
   inválida se rechaza con `401` antes de tocar la base de datos.
 
+**Identidad del pasaporte**
+- Cada persona registrada tiene tres identificadores y no se intercambian:
+  `qrCode` (la puerta y el pase: `/api/passes`), `shortId` (lo que se comparte
+  del pasaporte y va en el QR de la escarapela) y `tokenConfirmacion` (el
+  enlace de confirmación). Ver un pasaporte compartido no da el pase ni la confirmación.
+- El PIN del pasaporte no se imprime en la escarapela: llega en el correo del
+  pase. Viaja en el cuerpo de un `POST` (entrar como dueño, sellar, editar), nunca en la URL.
+- Los enlaces de confirmación enviados antes de separar los identificadores
+  (que llevan el `qrCode`) y las páginas de pasaporte con el `shortId` viejo
+  siguen valiendo hasta `fecha.fin` del evento; después, no.
+- Las respuestas con el QR de entrada llevan `Cache-Control: private`.
+- `GET /api/volunteers` quita `documentNumber` a quien no es admin ni organizador;
+  `POST /api/check-in/scan` sólo admite los roles `admin`, `organizer` y `volunteer`
+  (la cuenta de stand, `badges`, recibe 403).
+
 **Archivos**
+- `POST /api/upload/public-presign` exige captcha (el widget está en la foto del
+  formulario de speakers): sin él cualquiera llenaba el bucket.
+- Ciclo de vida de `cfs/photos/`: una foto sube antes de enviar el formulario, así
+  que las abandonadas quedan sin referencia. Regla: una regla de ciclo de vida del
+  bucket borra lo de `cfs/photos/` con más de 30 días que ninguna propuesta, speaker
+  o pasaporte nombre; antes de activarla, lista las URL en uso (`photoUrl` de
+  speakers y pasaportes) y pruébala en un bucket de ensayo. No se borra nada a mano.
 - Las subidas van directo al bucket con una URL firmada que fija tipo y
   tamaño; sólo se aceptan los formatos esperados.
 - Una URL de foto sólo se acepta si apunta a tu bucket.

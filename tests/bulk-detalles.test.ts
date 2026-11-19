@@ -54,17 +54,20 @@ describe("passports/generate", () => {
     const { Registration } = await import("@/models/registration");
     const { Passport } = await import("@/models/passport");
     const N = 1200;
-    await Registration.collection.insertMany(
+    const insertados = await Registration.collection.insertMany(
       Array.from({ length: N }, (_, i) => ({
         firstName: i === 0 ? "" : `Nombre${i}`, lastName: `Apellido${i}`, email: `p${i}@ejemplo.test`,
         qrCode: `QR-${i}`, entityName: i % 2 ? `Entidad${i}` : null, role: "student",
       })),
     );
     // Uno ya existente sin PIN y uno manual que no se debe tocar (falla por duplicado, como antes).
+    const idDe = (i: number) => String(insertados.insertedIds[i]);
     await Passport.collection.insertMany([
-      { shortId: "QR-1", role: "attendee", firstName: "Viejo", viewPin: null, isManual: false },
-      { shortId: "QR-2", role: "attendee", firstName: "Manual", viewPin: "1234", isManual: true },
+      { shortId: "QR-1", role: "attendee", firstName: "Viejo", viewPin: null, isManual: false, linkedRegistrationId: idDe(1) },
+      { shortId: "QR-2", role: "attendee", firstName: "Manual", viewPin: "1234", isManual: true, linkedRegistrationId: idDe(2) },
     ]);
+    // El pasaporte de cada persona se encuentra por su registro, no por un código parecido.
+    const deQr = (i: number) => Passport.findOne({ linkedRegistrationId: idDe(i) }).lean();
 
     let llamadas = 0;
     const original = Passport.bulkWrite.bind(Passport);
@@ -85,7 +88,7 @@ describe("passports/generate", () => {
     assert.deepEqual(body, { ok: true, created: N - 2, skipped: 1, failed: 1 });
     assert.equal(await Passport.countDocuments({}), N);
 
-    const p5 = await Passport.findOne({ shortId: "QR-5" }).lean();
+    const p5 = await deQr(5);
     assert.equal(p5?.firstName, "Nombre5");
     assert.equal(p5?.lastName, "Apellido5");
     assert.equal(p5?.company, "Entidad5");
@@ -93,19 +96,19 @@ describe("passports/generate", () => {
     assert.equal(p5?.isManual, false);
     assert.match(p5?.viewPin ?? "", /^\d{4}$/);
     assert.ok(p5?.linkedRegistrationId);
-    assert.equal((await Passport.findOne({ shortId: "QR-0" }).lean())?.firstName, "Sin");
+    assert.equal((await deQr(0))?.firstName, "Sin");
 
-    const viejo = await Passport.findOne({ shortId: "QR-1" }).lean();
+    const viejo = await deQr(1);
     assert.equal(viejo?.firstName, "Nombre1");
     assert.match(viejo?.viewPin ?? "", /^\d{4}$/);
-    const manual = await Passport.findOne({ shortId: "QR-2" }).lean();
+    const manual = await deQr(2);
     assert.equal(manual?.firstName, "Manual");
     assert.equal(manual?.viewPin, "1234");
 
     // Repetir no crea nada ni cambia los PIN.
     const r2 = await POST(post("/api/admin/passports/generate", { role: "attendee" }));
     assert.deepEqual(await r2.json(), { ok: true, created: 0, skipped: N - 1, failed: 1 });
-    assert.equal((await Passport.findOne({ shortId: "QR-5" }).lean())?.viewPin, p5?.viewPin);
+    assert.equal((await deQr(5))?.viewPin, p5?.viewPin);
   });
 });
 

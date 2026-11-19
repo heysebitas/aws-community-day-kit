@@ -20,12 +20,9 @@ const TARGETS = {
     label: "asistentes",
     /** Los pasaportes cuelgan del registro: se van con él o quedan huérfanos. */
     async run() {
-      const regs = await Registration.find({}).select("qrCode _id").lean();
+      const regs = await Registration.find({}).select("_id").lean();
       const ids = regs.map((r) => String(r._id));
-      const codes = regs.map((r) => r.qrCode).filter(Boolean);
-      const passports = await Passport.deleteMany({
-        $or: [{ linkedRegistrationId: { $in: ids } }, { shortId: { $in: codes } }],
-      });
+      const passports = await Passport.deleteMany({ linkedRegistrationId: { $in: ids } });
       const main = await Registration.deleteMany({});
       await sincronizarCupo("attendee");
       return {
