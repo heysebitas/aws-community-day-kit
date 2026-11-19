@@ -82,9 +82,9 @@ export function PasaporteVista({ shortId, inicial }: { shortId: string; inicial?
           {/* Bottom logo — links to home */}
           <Link
             href="/"
-            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, marginTop: 28, textDecoration: "none", opacity: .55, transition: "opacity .2s" }}
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, marginTop: 28, textDecoration: "none", opacity: .85, transition: "opacity .2s" }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = ".55"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = ".85"; }}
           >
             {EVENTO.marca.mascota && (
               <img src={EVENTO.marca.mascota} alt="" aria-hidden="true" style={{ height: 76, width: "auto", marginBottom: 4 }} />
