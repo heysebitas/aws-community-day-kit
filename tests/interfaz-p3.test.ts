@@ -14,7 +14,8 @@ test("la FAQ usa details/summary y no desmonta las respuestas", () => {
 test("la barra de progreso usa animation-timeline con respaldo", () => {
   const src = leer("src/components/ui/scroll-progress.tsx");
   assert.match(src, /CSS\.supports\("animation-timeline/);
-  assert.match(src, /useScroll/);
+  assert.match(src, /addEventListener\("scroll"/);
+  assert.doesNotMatch(src, /from "motion/);
 });
 
 test("el globo cancela el rAF al salir de pantalla", () => {
