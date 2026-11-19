@@ -152,6 +152,7 @@ docs/            la documentación
 | Colores | [docs/temas.md](docs/temas.md) |
 | Tu país: documentos, teléfono, ley de datos | [docs/paises.md](docs/paises.md) |
 | El panel: roles, permisos y secciones | [docs/panel.md](docs/panel.md) |
+| El día del evento: cuentas, red compartida y qué hacer si algo cae | [docs/dia-del-evento.md](docs/dia-del-evento.md) |
 | MongoDB Atlas, Amazon DocumentDB, PostgreSQL | [docs/base-de-datos.md](docs/base-de-datos.md) |
 | Resend o Amazon SES | [docs/correo.md](docs/correo.md) |
 | Publicarlo | [docs/despliegue.md](docs/despliegue.md) |

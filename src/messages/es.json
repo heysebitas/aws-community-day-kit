@@ -417,16 +417,14 @@
     "config_notify_label": "Notificación [[anio_siguiente]]",
     "config_notify_hint": "Botón de aviso de la próxima edición — puede ser un Google Form o newsletter.",
     "escarapelas": "Escarapelas",
-    "escaneo": {
-      "sesion": "Sesión cerrada",
-      "sesion_detalle": "Tu sesión se abrió en otro dispositivo. Inicia sesión otra vez.",
-      "permiso": "Sin permiso",
-      "permiso_detalle": "Tu cuenta no puede hacer esto. Avisa a quien organiza.",
-      "reintenta": "Reintenta",
-      "reintenta_detalle": "No hubo respuesta del servidor. Vuelve a escanear; si sigue, usa el modo manual.",
-      "no_encontrado": "No encontrado",
-      "no_encontrado_detalle": "Esta escarapela no está en pasaportes"
-    }
+    "escaneo_sesion": "Sesión cerrada",
+    "escaneo_sesion_detalle": "Tu sesión se abrió en otro dispositivo. Inicia sesión otra vez.",
+    "escaneo_permiso": "Sin permiso",
+    "escaneo_permiso_detalle": "Tu cuenta no puede hacer esto. Avisa a quien organiza.",
+    "escaneo_reintenta": "Reintenta",
+    "escaneo_reintenta_detalle": "No hubo respuesta del servidor. Vuelve a escanear; si sigue, usa el modo manual.",
+    "escaneo_no_encontrado": "No encontrado",
+    "escaneo_no_encontrado_detalle": "Esta escarapela no está en pasaportes"
   },
   "Login": {
     "heading": "acceso",

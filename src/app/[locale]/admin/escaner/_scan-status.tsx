@@ -24,7 +24,7 @@ type Traductor = (clave: string) => string;
 
 /** Lo que se muestra ante un fallo que no es «no encontrado»: sin sesión, sin permiso o reintentar. */
 export function resultadoDeFallo(fallo: FalloEscaneo | "reintenta", t: Traductor): ScanResult {
-  return { outcome: fallo === "no_encontrado" ? "not_found" : "error", primary: t(`escaneo.${fallo}`), secondary: t(`escaneo.${fallo}_detalle`) };
+  return { outcome: fallo === "no_encontrado" ? "not_found" : "error", primary: t(`escaneo_${fallo}`), secondary: t(`escaneo_${fallo}_detalle`) };
 }
 
 // Card grande de resultado tras escanear / registrar manualmente.

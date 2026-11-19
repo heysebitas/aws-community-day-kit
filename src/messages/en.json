@@ -417,16 +417,14 @@
     "config_notify_label": "Notification for [[anio_siguiente]]",
     "config_notify_hint": "Notification button for the next edition — it can be a Google Form or a newsletter.",
     "escarapelas": "Badges",
-    "escaneo": {
-      "sesion": "Signed out",
-      "sesion_detalle": "Your session was opened on another device. Sign in again.",
-      "permiso": "No permission",
-      "permiso_detalle": "Your account can't do this. Tell the organizers.",
-      "reintenta": "Try again",
-      "reintenta_detalle": "The server did not answer. Scan again; if it persists, use manual mode.",
-      "no_encontrado": "Not found",
-      "no_encontrado_detalle": "This badge is not in the passports"
-    }
+    "escaneo_sesion": "Signed out",
+    "escaneo_sesion_detalle": "Your session was opened on another device. Sign in again.",
+    "escaneo_permiso": "No permission",
+    "escaneo_permiso_detalle": "Your account can't do this. Tell the organizers.",
+    "escaneo_reintenta": "Try again",
+    "escaneo_reintenta_detalle": "The server did not answer. Scan again; if it persists, use manual mode.",
+    "escaneo_no_encontrado": "Not found",
+    "escaneo_no_encontrado_detalle": "This badge is not in the passports"
   },
   "Login": {
     "heading": "access",

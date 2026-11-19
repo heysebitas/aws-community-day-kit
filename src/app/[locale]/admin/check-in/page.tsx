@@ -161,11 +161,11 @@ export default function CheckInPage() {
         setResult({ outcome: "not_found" });
         playSound("not_found");
       } else {
-        setResult({ outcome: "error", aviso: t(`escaneo.${estado}`), detalle: t(`escaneo.${estado}_detalle`) });
+        setResult({ outcome: "error", aviso: t(`escaneo_${estado}`), detalle: t(`escaneo_${estado}_detalle`) });
         playSound("not_found");
       }
     } catch {
-      setResult({ outcome: "error", aviso: t("escaneo.reintenta"), detalle: t("escaneo.reintenta_detalle") });
+      setResult({ outcome: "error", aviso: t("escaneo_reintenta"), detalle: t("escaneo_reintenta_detalle") });
     }
     setProcessing(false);
   };

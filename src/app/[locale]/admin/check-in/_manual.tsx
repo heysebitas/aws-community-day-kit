@@ -78,10 +78,10 @@ export function ManualCheckIn({ onCheckedIn }: { onCheckedIn?: (total: number) =
       } else if (estado === "no_encontrado") {
         setResult({ outcome: "not_found", name: hit.name });
       } else {
-        setResult({ outcome: "error", aviso: t(`escaneo.${estado}`), detalle: t(`escaneo.${estado}_detalle`) });
+        setResult({ outcome: "error", aviso: t(`escaneo_${estado}`), detalle: t(`escaneo_${estado}_detalle`) });
       }
     } catch {
-      setResult({ outcome: "error", aviso: t("escaneo.reintenta"), detalle: t("escaneo.reintenta_detalle") });
+      setResult({ outcome: "error", aviso: t("escaneo_reintenta"), detalle: t("escaneo_reintenta_detalle") });
     } finally {
       setChecking(false);
     }

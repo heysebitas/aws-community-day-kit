@@ -61,6 +61,8 @@ const nextConfig: NextConfig = {
   // `next start` (pm2, el despliegue por SSH) no está soportado con standalone.
   output: process.env.NEXT_STANDALONE === "1" ? "standalone" : undefined,
   serverExternalPackages: ["pdfkit", "mongodb-memory-server"],
+  // Solo es para pruebas y la demo: no debe entrar al standalone.
+  outputFileTracingExcludes: { "*": ["node_modules/mongodb-memory-server/**", "node_modules/mongodb-memory-server-core/**"] },
   poweredByHeader: false,
   // Comprime Node salvo que lo haga el proxy (nginx con gzip): así no se comprime dos
   // veces. Sin proxy (Docker solo) hace falta. Ver docs/despliegue.md.
