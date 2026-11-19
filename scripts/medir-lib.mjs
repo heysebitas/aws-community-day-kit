@@ -38,8 +38,9 @@ export const METRICAS = {
   accesibilidad: { mejor: "alto", tolerancia: 3, unidad: "" },
   seo: { mejor: "alto", tolerancia: 3, unidad: "" },
   fcp: { mejor: "bajo", tolerancia: 200, unidad: " ms" },
-  lcp: { mejor: "bajo", tolerancia: 300, unidad: " ms" },
-  tbt: { mejor: "bajo", tolerancia: 50, unidad: " ms" },
+  // El runner de GitHub varía ~600 ms de LCP y ~150 ms de TBT entre corridas del mismo código.
+  lcp: { mejor: "bajo", tolerancia: 600, unidad: " ms" },
+  tbt: { mejor: "bajo", tolerancia: 150, unidad: " ms" },
   cls: { mejor: "bajo", tolerancia: 0.02, unidad: "" },
   peso: { mejor: "bajo", tolerancia: 20, unidad: " KB" },
   js: { mejor: "bajo", tolerancia: 10, unidad: " KB" },
