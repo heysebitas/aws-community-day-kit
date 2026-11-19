@@ -99,10 +99,9 @@ export function CodeLines({
           )}
           aria-hidden="true"
         >
+          {/* El número va en un pseudo-elemento: es decoración, no texto que leer. */}
           {lines.map((line) => (
-            <div key={line.number} className="tabular-nums">
-              {line.number}
-            </div>
+            <div key={line.number} data-n={line.number} className="tabular-nums before:content-[attr(data-n)]" />
           ))}
         </div>
 
