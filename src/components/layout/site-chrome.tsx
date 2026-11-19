@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { MotionConfig } from "motion/react";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { HashScroll } from "@/components/layout/hash-scroll";
+import { AvisoNavegador } from "@/components/layout/aviso-navegador";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 
 /** Decide si se pintan la barra y el pie, según la ruta. */
@@ -36,6 +37,7 @@ export function SiteChrome({
     <MotionConfig reducedMotion="user">
       {!pelada && <ScrollProgress />}
       {!pelada && <HashScroll />}
+      {!esAdmin && <AvisoNavegador />}
       {!pelada && navbar}
       {children}
       {!pelada && footer}

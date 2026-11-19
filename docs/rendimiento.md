@@ -11,7 +11,14 @@ npm run medir -- --url http://localhost:3000 --comparar
 ```
 
 Mide `/`, `/speakers`, `/registro` y `/directorio` en móvil, 3 pasadas y mediana
-(`--pasadas`, `--rutas /,/en`). Escribe `medidas/actual.json` con rendimiento,
+(`--pasadas`, `--rutas /,/en`), y además lo que usa el staff con el móvil el día del
+evento: `/admin` y `/admin/check-in` (con la sesión de la demo, `demo@example.com`) y
+el pasaporte `/pasaporte/demo00000001`. Esas tres van con throttling real (`devtools`)
+y CPU 6×; las públicas, con el simulado. Sigue siendo un aviso en el CI.
+
+Si la herramienta falla en una página (`NO_NAVSTART`, respuesta que no es 200), la
+reintenta una vez y, si vuelve a fallar, la anota como «sin medir» en
+`medidas/actual.json` (`sinMedir: true`, `motivo`) en vez de tumbar el job. Escribe `medidas/actual.json` con rendimiento,
 accesibilidad, SEO, FCP, LCP, TBT, CLS, peso (KB) y JS de primera carga (KB gzip,
 sacado de los `<script>` del HTML y de `.next/`). `--guardar-base` lo guarda también
 como `medidas/linea-base.json`; `--comparar` lo contrasta con ella y sale con
@@ -19,6 +26,15 @@ código 1 si hay regresiones (tolerancias en `scripts/medir-lib.mjs`).
 
 Sin Chromium o sin `lighthouse` el script lo dice y sale con código distinto de 0.
 Con `CHROME_PATH` se indica el navegador.
+
+## Reposo del panel
+
+`tests/e2e/reposo.spec.mjs` abre el dashboard de `/admin` 5 s sin tocar nada y falla
+si el hilo principal está ocupado más del 15 % (`Performance.getMetrics` por CDP).
+
+## Navegadores mínimos
+
+Ver [navegadores.md](navegadores.md).
 
 ## Fuentes
 

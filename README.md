@@ -159,6 +159,7 @@ docs/            la documentación
 | Cuando algo falla | [docs/troubleshooting.md](docs/troubleshooting.md) |
 | Cómo funciona por dentro | [docs/arquitectura.md](docs/arquitectura.md) · [docs/datos.md](docs/datos.md) |
 | Correr las pruebas | [docs/pruebas.md](docs/pruebas.md) |
+| Navegadores mínimos | [docs/navegadores.md](docs/navegadores.md) |
 | De una edición a la siguiente | [docs/nueva-edicion.md](docs/nueva-edicion.md) |
 | Todas las capturas | [docs/galeria.md](docs/galeria.md) |
 
