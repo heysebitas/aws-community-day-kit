@@ -99,10 +99,10 @@ export const POST = ruta(async (
     if (!reg) return Response.json({ code: "no_encontrado", error: "No encontrado" }, { status: 404 });
 
     if (reg.confirmation?.confirmed) {
-      return Response.json({ error: "Ya confirmaste tu asistencia" }, { status: 409 });
+      return Response.json({ code: "ya_confirmado", error: "Ya confirmaste tu asistencia" }, { status: 409 });
     }
     if (isExpired()) {
-      return Response.json({ error: "El periodo de confirmación terminó" }, { status: 410 });
+      return Response.json({ code: "confirmacion_cerrada", error: "El periodo de confirmación terminó" }, { status: 410 });
     }
 
     const { firsts, lasts } = badgeNameOptions(reg.firstName, reg.lastName);
@@ -111,7 +111,7 @@ export const POST = ruta(async (
     const badgeLastName = (body.badgeLastName ?? "").trim().toUpperCase();
 
     if (!firsts.includes(badgeFirstName) || !lasts.includes(badgeLastName)) {
-      return Response.json({ error: "Selección de nombre inválida" }, { status: 400 });
+      return Response.json({ code: "seleccion_invalida", error: "Selección de nombre inválida" }, { status: 400 });
     }
 
     const now = new Date();

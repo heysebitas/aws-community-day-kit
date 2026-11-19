@@ -5,7 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/turnstile";
-import { useAuth } from "@/contexts/auth-context";
+import { ErrorApi, useAuth } from "@/contexts/auth-context";
+import { textoDeError } from "@/lib/errores-cliente";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { DotHeading } from "@/components/ui/dot-heading";
 import { normalizeEmail } from "@/lib/normalize";
@@ -17,6 +18,7 @@ const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 export function LoginForm() {
   const t = useTranslations("Login");
   const tf = useTranslations("Forms");
+  const tErr = useTranslations("Errores");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -74,7 +76,7 @@ export function LoginForm() {
       router.replace(localePath(locale, "/admin"));
       // loading se queda en true mientras Next navega
     } catch (err) {
-      setError((err as Error).message);
+      setError(err instanceof ErrorApi ? textoDeError(tErr, err.datos, tErr("error_interno")) : tErr("sin_conexion"));
       setCaptchaToken("");
       captchaRef.current?.reset();
       setLoading(false);

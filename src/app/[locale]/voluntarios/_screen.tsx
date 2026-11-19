@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { textoDeError } from "@/lib/errores-cliente";
 import Link from "next/link";
 import { FormShell } from "@/components/forms/form-shell";
 import { SuccessScreen, type SummaryRow } from "@/components/forms/success-screen";
@@ -23,6 +24,7 @@ export function VoluntariosScreen({
 }) {
   const locale = useLocale() === "en" ? "en" : "es";
   const t = useTranslations("Forms");
+  const tErr = useTranslations("Errores");
   const [resumen, setResumen] = useState<SummaryRow[] | null>(null);
   // Lo enviado se guarda para armar la credencial de la pantalla de gracias.
   const [enviado, setEnviado] = useState<Record<string, unknown>>({});
@@ -38,8 +40,8 @@ export function VoluntariosScreen({
       body: JSON.stringify({ data: values, captchaToken }),
     });
     if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error);
+      const data = await res.json().catch(() => ({}));
+      throw new Error(textoDeError(tErr, data, tErr("error_interno")));
     }
     setEnviado(values);
     setResumen(filas);

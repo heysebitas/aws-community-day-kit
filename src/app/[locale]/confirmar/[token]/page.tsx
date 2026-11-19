@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { textoDeError } from "@/lib/errores-cliente";
 import { Calendar, Clock, MapPin, ArrowRight } from "lucide-react";
 import { useCountdown } from "@/hooks/use-countdown";
 import { avatarUrl } from "@/lib/avatar";
@@ -47,6 +49,7 @@ async function fireConfetti() {
 
 export default function ConfirmarPage() {
   const params = useParams();
+  const tErr = useTranslations("Errores");
   const token = String(params.token ?? "");
   const locale = String(params.locale ?? "es");
 
@@ -86,8 +89,8 @@ export default function ConfirmarPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ badgeFirstName: selected.first, badgeLastName: selected.last }),
       });
-      const json = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok || !json.ok) throw new Error(json.error || "No se pudo confirmar");
+      const json = await res.json().catch(() => ({})) as { ok?: boolean; code?: string; error?: string };
+      if (!res.ok || !json.ok) throw new Error(textoDeError(tErr, json, tErr("error_interno")));
       setJustConfirmed(true);
       setData((d) => d ? { ...d, status: "confirmed", badgeFirstName: selected.first, badgeLastName: selected.last } : d);
       setTimeout(fireConfetti, 120);
@@ -96,7 +99,7 @@ export default function ConfirmarPage() {
     } finally {
       setSubmitting(false);
     }
-  }, [selected, token]);
+  }, [selected, token, tErr]);
 
   const role = data ? (ROLE_BADGE[data.role] ?? ROLE_BADGE.attendee!) : ROLE_BADGE.attendee!;
   const isConfirmed = data?.status === "confirmed";

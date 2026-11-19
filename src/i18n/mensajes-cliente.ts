@@ -21,6 +21,7 @@ export const MENSAJES_COMUN = [
   "FAQ",
   "Registration",
   "Comunidades",
+  "Errores",
 ] as const;
 
 /**
@@ -29,11 +30,11 @@ export const MENSAJES_COMUN = [
  * `"todo"` lleva el catálogo entero.
  */
 export const MENSAJES_RUTA = {
-  registro: ["Forms", "Strip"],
-  voluntarios: ["Forms", "Strip"],
-  speakers: ["Forms", "Strip", "CFP", "Speakers"],
-  pasaporte: ["Passport"],
-  confirmar: [],
+  registro: ["Forms", "Strip", "Errores"],
+  voluntarios: ["Forms", "Strip", "Errores"],
+  speakers: ["Forms", "Strip", "CFP", "Speakers", "Errores"],
+  pasaporte: ["Passport", "Errores"],
+  confirmar: ["Errores"],
   "confirmar-cambios": [],
   directorio: ["Speakers", "Directorio"],
   admin: "todo",

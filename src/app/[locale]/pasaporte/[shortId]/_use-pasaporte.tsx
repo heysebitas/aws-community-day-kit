@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { pedirJson } from "@/lib/pedir-json";
+import { textoDeError } from "@/lib/errores-cliente";
 import { SOCIAL_PLATFORMS, usernameFromLink, cleanUsername, type PassportData, type Sponsor, type SocialPlatformId, type calcular } from "./_social";
 
 type RespuestaPasaporte = {
   passport?: PassportData; sponsors?: Sponsor[]; isOwner?: boolean;
-  error?: string; pinError?: string; rateLimited?: boolean;
+  code?: string; error?: string; pinError?: string; rateLimited?: boolean;
 };
-type RespuestaSello = { sponsorName?: string; error?: string };
+type RespuestaSello = { sponsorName?: string; code?: string; error?: string };
 type RespuestaRedes = { pending?: string[]; maskedEmail?: string; unverified?: boolean };
 
 /** Estado de arranque; sirve para pintar la pantalla sin pedir nada (pruebas). */
@@ -20,6 +21,7 @@ export type Inicial = Partial<{
 
 export function usePasaporte(shortId: string, inicial: Inicial = {}) {
   const t = useTranslations("Passport");
+  const tErr = useTranslations("Errores");
   const [passport, setPassport]   = useState<PassportData | null>(inicial.passport ?? null);
   const [sponsors, setSponsors]   = useState<Sponsor[]>(inicial.sponsors ?? []);
   const [loading, setLoading]     = useState(inicial.loading ?? !(inicial.passport || inicial.notFound));
@@ -71,8 +73,8 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
           setSocialDraft({ builderCenter: s.builderCenter ?? "", linkedin: s.linkedin ?? "", instagram: s.instagram ?? "", x: s.x ?? "", github: s.github ?? "", tiktok: s.tiktok ?? "" });
         }
       }
-      if (res.status === 429 || data.rateLimited) { setPinBlocked(true); setPinError(data.error ?? t("too_many")); }
-      else if (withPin && !data.isOwner && data.pinError) { setPinError(data.pinError); if (data.rateLimited) { setPinBlocked(true); clearOwnerCookie(); } }
+      if (res.status === 429 || data.rateLimited) { setPinBlocked(true); setPinError(textoDeError(tErr, data, t("too_many"))); }
+      else if (withPin && !data.isOwner && data.pinError) { setPinError(textoDeError(tErr, { code: data.code, error: data.pinError }, data.pinError)); if (data.rateLimited) { setPinBlocked(true); clearOwnerCookie(); } }
     } catch { setNotFound(true); }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- depende del pasaporte pedido; t y los setters no deben relanzarla
   }, [shortId]);
@@ -133,7 +135,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
         const sv = readOwnerCookie(); if (sv) await loadPassport(sv);
         setTimeout(() => { setShowStampModal(false); setStampResult(null); setStampDigits(["","","",""]); }, 2000);
       } else {
-        setStampResult({ ok: false, msg: data.error || "PIN incorrecto" });
+        setStampResult({ ok: false, msg: textoDeError(tErr, data, tErr("pin_incorrecto")) });
         setStampDigits(["","","",""]);
       }
     } catch { setStampResult({ ok: false, msg: t("connection_error") }); setStampDigits(["","","",""]); }
@@ -171,7 +173,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
       const data = res.data;
       if (res.status === 0) { setStampResult({ ok: false, msg: t("connection_error") }); return; }
       if (res.ok) { setStampResult({ ok: true, msg: t("stamp_added", { sponsor: data.sponsorName ?? "" }) }); setStampDigits(["","","",""]); const sv = readOwnerCookie(); if (sv) await loadPassport(sv); }
-      else        { setStampResult({ ok: false, msg: data.error || t("redeem_error") }); setStampDigits(["","","",""]); }
+      else        { setStampResult({ ok: false, msg: textoDeError(tErr, data, t("redeem_error")) }); setStampDigits(["","","",""]); }
     } catch { setStampResult({ ok: false, msg: t("connection_error") }); }
     finally { setStamping(false); }
   }

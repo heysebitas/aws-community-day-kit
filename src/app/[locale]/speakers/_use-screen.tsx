@@ -13,11 +13,13 @@ import { normalizeLink } from "@/lib/normalize";
 import { toSlug } from "@/lib/slug";
 import { pedirJson } from "@/lib/pedir-json";
 import { type Lang, type CoSpeaker, type TextosPorIdioma } from "./_shared";
+import { textoDeError } from "@/lib/errores-cliente";
 import { enfocarPrimerInvalido } from "@/components/forms/foco";
 import { EVENTO } from "@/config";
 
 export function useSpeakersScreen(pasoInicial: number, textos: TextosPorIdioma) {
   const tf = useTranslations("Forms");
+  const tErr = useTranslations("Errores");
   const locale = useLocale();
   const [lang, setLang] = useState<Lang>("es");
   const t = textos[lang];
@@ -284,7 +286,7 @@ export function useSpeakersScreen(pasoInicial: number, textos: TextosPorIdioma) 
         errorPorDefecto: "Error al enviar",
       });
       if (!res.ok) {
-        err("submit", res.error ?? "Error al enviar");
+        err("submit", res.status === 0 ? tErr("sin_conexion") : textoDeError(tErr, res.data, tErr("error_interno")));
         captchaRef.current?.reset();
         setCaptchaToken(null);
         return;

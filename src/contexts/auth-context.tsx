@@ -33,6 +33,13 @@ const AuthContext = createContext<AuthContextValue>({
   refresh: async () => {},
 });
 
+/** Un fallo de la API con su cuerpo `{ code, error }`, para que quien lo atrape lo traduzca. */
+export class ErrorApi extends Error {
+  constructor(readonly datos: { code?: string; error?: string; requestId?: string }) {
+    super(datos.error ?? "Error");
+  }
+}
+
 export function useAuth() {
   return useContext(AuthContext);
 }
@@ -67,7 +74,7 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
         // If the user WAS authenticated and now isn't, redirect to login
         if (hadUser) {
           const locale = idiomaDeRuta(pathname);
-          router.replace(`/${locale}/admin/login`);
+          router.replace(`/${locale}/admin/login?aviso=sesion`);
         }
       }
     } catch {
@@ -98,7 +105,7 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
           setUser(null);
           wasAuthenticated.current = false;
           const locale = idiomaDeRuta(pathname);
-          router.replace(`/${locale}/admin/login`);
+          router.replace(`/${locale}/admin/login?aviso=sesion`);
         }
       } catch {
         // Network error — don't log out, just skip
@@ -135,8 +142,8 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, captchaToken }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new ErrorApi(data);
     setUser(data.user);
     wasAuthenticated.current = true;
   };

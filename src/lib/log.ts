@@ -1,5 +1,5 @@
-import { logError } from "@/lib/api";
 import "server-only";
+import { logError } from "@/lib/api";
 import { connectDB } from "@/lib/db";
 import { Log } from "@/models/log";
 import { getAuthUser } from "@/lib/auth";

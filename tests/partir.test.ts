@@ -46,7 +46,8 @@ describe("speakers", () => {
     test(`paso ${paso} del formulario`, async (t) => {
       if (!(await cfpAbierto())) return t.skip("el CFP de la edición ya cerró");
       const { SpeakersScreen } = await import("@/app/[locale]/speakers/_screen");
-      comparar(`speakers-paso-${paso}`, html(crear(SpeakersScreen, { formOnly: true, pasoInicial: paso })));
+      const { textosPostulacion } = await import("@/app/[locale]/speakers/_textos");
+      comparar(`speakers-paso-${paso}`, html(crear(SpeakersScreen, { formOnly: true, pasoInicial: paso, textos: await textosPostulacion() })));
     });
   }
 });
