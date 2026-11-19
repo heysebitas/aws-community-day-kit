@@ -18,6 +18,13 @@ export interface Conteo {
 const BOTONCITO =
   "border-2 px-2 py-0.5 font-mono text-[11px] transition-colors";
 
+/** Siempre con el total de la audiencia a la vista: «Audiencia de 650: 300 enviados · quedan 350». */
+function resumenEnvio(enviados: number, fallidos: number, restantes: number, total: number): string {
+  return `Audiencia de ${total}: ${enviados} enviados` +
+    (fallidos ? `, ${fallidos} fallidos` : "") +
+    (restantes ? ` · quedan ${restantes}` : "");
+}
+
 export function EditorAudiencia({
   slug,
   audiencia,
@@ -132,31 +139,53 @@ export function EditorAudiencia({
 
     setEnviando(true);
     setAviso(null);
+    // Cada llamada manda una tanda; se encadenan hasta que no quede nadie.
+    let enviados = 0, fallidos = 0, desde = 0;
+    let esperado = conteo.total;
+    let total = conteo.total;
+    let hechoAlgo = false;
     try {
-      const r = await fetch("/api/admin/campanas/enviar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plantilla: slug,
-          audiencia,
-          evitarRepetidos,
-          adjuntarPase: usa.has("pase") || usa.has("qr") ? adjuntarPase : false,
-          excluirRespondidos: usa.has("encuesta") ? excluirRespondidos : false,
-          // El número que había en pantalla. Si al resolver sale más gente, el
-          // servidor rechaza el envío en vez de mandarlo a quien no se vio.
-          totalEsperado: conteo.total,
-        }),
-      });
-      const d = await r.json();
-      if (!r.ok) { setAviso(d.error as string); return; }
-      onEnviado(d);
-      setAviso(
-        `${d.enviados} enviados` +
-        (d.fallidos ? `, ${d.fallidos} fallidos` : "") +
-        (d.restantes ? ` · quedan ${d.restantes}, vuelve a darle para la siguiente tanda` : ""),
-      );
+      for (;;) {
+        const r = await fetch("/api/admin/campanas/enviar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plantilla: slug,
+            audiencia,
+            evitarRepetidos,
+            // Sin el filtro, la posición por la que sigue; con él, la lista se acorta sola.
+            ...(evitarRepetidos ? {} : { desde }),
+            adjuntarPase: usa.has("pase") || usa.has("qr") ? adjuntarPase : false,
+            excluirRespondidos: usa.has("encuesta") ? excluirRespondidos : false,
+            // El número que había en pantalla. Si al resolver sale más gente, el
+            // servidor rechaza el envío en vez de mandarlo a quien no se vio.
+            totalEsperado: esperado,
+          }),
+        });
+        const d = await r.json();
+        if (!r.ok) {
+          setAviso(`${resumenEnvio(enviados, fallidos, 0, total)}${hechoAlgo ? " · " : ""}${d.error as string}`);
+          if (hechoAlgo) onEnviado({ enviados, fallidos, restantes: 0 });
+          return;
+        }
+        hechoAlgo = true;
+        enviados += d.enviados as number;
+        fallidos += d.fallidos as number;
+        total = d.totalAudiencia as number;
+        const restantes = d.restantes as number;
+        setAviso(resumenEnvio(enviados, fallidos, restantes, total));
+        // Con el filtro, la siguiente tanda ve la audiencia ya recortada.
+        desde = d.siguiente as number;
+        esperado = evitarRepetidos ? restantes : total;
+        // Una tanda que no mandó a nadie no avanza: repetirla sería un bucle.
+        if (!restantes || !(d.enviados as number)) {
+          onEnviado({ enviados, fallidos, restantes });
+          return;
+        }
+      }
     } catch {
       setAviso("El envío se cortó. Mira el historial antes de repetirlo.");
+      if (hechoAlgo) onEnviado({ enviados, fallidos, restantes: 0 });
     } finally {
       setEnviando(false);
     }

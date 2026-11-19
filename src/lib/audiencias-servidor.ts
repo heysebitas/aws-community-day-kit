@@ -68,7 +68,7 @@ async function resolverSegmento(
 
   switch (segmento.publico) {
     case "asistentes": {
-      const q = Registration.find(consulta).select("firstName lastName email attendance qrCode");
+      const q = Registration.find(consulta).select("firstName lastName email attendance qrCode").sort({ _id: 1 });
       if (limite) q.limit(limite);
       return (await q.lean()).map((r) => {
         const nombre = `${r.firstName} ${r.lastName}`.trim();
@@ -101,7 +101,7 @@ async function resolverSegmento(
     }
 
     case "speakers": {
-      const q = SpeakerProfile.find(consulta).select("name email talkTitle sessionType speakerType slug");
+      const q = SpeakerProfile.find(consulta).select("name email talkTitle sessionType speakerType slug").sort({ _id: 1 });
       if (limite) q.limit(limite);
       return (await q.lean()).map((s) => {
         const online = ["online", "virtual"].includes(s.sessionType ?? "");
@@ -124,7 +124,7 @@ async function resolverSegmento(
     }
 
     case "voluntarios": {
-      const q = VolunteerSubmission.find(consulta).select("firstName lastName email");
+      const q = VolunteerSubmission.find(consulta).select("firstName lastName email").sort({ _id: 1 });
       if (limite) q.limit(limite);
       return (await q.lean()).map((v) => {
         const nombre = `${v.firstName} ${v.lastName}`.trim();
@@ -141,7 +141,7 @@ async function resolverSegmento(
     }
 
     case "equipo": {
-      const q = User.find(consulta).select("name email");
+      const q = User.find(consulta).select("name email").sort({ _id: 1 });
       if (limite) q.limit(limite);
       return (await q.lean()).map((u) => {
         const nombre = (u.name as string) ?? "";
