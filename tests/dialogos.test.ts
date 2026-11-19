@@ -135,8 +135,9 @@ describe("sin JavaScript", () => {
   });
 
   test("todo bloque que sale con opacity:0 es .scroll-reveal, que sin .js se muestra", () => {
+    // La entrada la anima el CSS (`html.js .scroll-reveal`): sin JS no hay nada que ocultar.
     const html = renderToStaticMarkup(createElement(ScrollReveal, null, "hola"));
-    assert.match(html, /style="opacity:0"/);
+    assert.match(html, /class="[^"]*\bscroll-reveal\b/);
     for (const m of html.matchAll(/<[^>]*opacity:\s*0[^>]*>/g)) assert.match(m[0], /class="[^"]*\bscroll-reveal\b/);
   });
 });
