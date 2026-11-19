@@ -98,6 +98,10 @@ test("el nivel de una sección", () => {
 - El rendimiento con carga real: eso se mide en el entorno del evento, con el
   sitio ya montado.
 
+Los códigos de error de la API y su traducción (`Errores` en `src/messages`) los
+comprueba `tests/errores-codigos.test.ts`: una ruta no puede devolver un `code`
+sin texto en todos los idiomas.
+
 ## e2e y accesibilidad (Playwright + axe)
 
 Las pruebas de `tests/e2e/*.spec.mjs` miran la demo en producción con axe

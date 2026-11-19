@@ -31,6 +31,7 @@ description: "Úsala cuando crees o revises una ruta de la API en src/app/api/ p
    - usa `SOLO_ROL`, `CODIGOS` o `PARAMS` sólo si de verdad aplica.
    Una ruta privada nueva no necesita una fila: la tabla la considera privada y comprueba que el fuente llame a una guarda de permisos.
 7. **Revisa los errores.** No reveles datos internos en la respuesta. Deja que `ruta()` traduzca `AuthError` y `EntradaInvalida`; registra el resto con la etiqueta de la ruta.
+   Las respuestas de error llevan `{ code, error }` (`code` se traduce en el cliente con `Errores.<code>` de `src/messages`; `error` en español sigue por compatibilidad) y `x-request-id`. Un `catch` que se traga un fallo lo escribe con `logError(etiqueta, e)`, que añade el id; si el silencio es deliberado, se comenta.
 
 ## Comprobación final
 
