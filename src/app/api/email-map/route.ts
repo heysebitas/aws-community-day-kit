@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { EVENTO, TEMA } from "@/config";
 import { getIp, rateLimit } from "@/lib/rate-limit";
+import { CacheImagenes, respuestaPng } from "@/lib/cache-imagen";
 
 export const runtime = "nodejs";
 
 /** Mapa del venue para los correos. */
+
+/** Un PNG por tamaño pedido, con tope para que `w`×`h` arbitrarios no llenen la memoria. */
+const cache = new CacheImagenes(40, 20 * 1024 * 1024);
 
 /** Centro por defecto: el venue, con las coordenadas ya verificadas. */
 const { lat, lon } = EVENTO.coordenadas;
@@ -57,15 +61,16 @@ export async function GET(request: Request) {
     STYLE.map((s) => `&style=${encodeURIComponent(s)}`).join("") +
     `&key=${key}`;
 
-  const res = await fetch(url);
-  if (!res.ok) return new NextResponse(null, { status: 502 });
-
-  return new NextResponse(await res.arrayBuffer(), {
-    headers: {
-      "Content-Type": "image/png",
-      // El mapa de un evento con fecha fija no cambia. Que Gmail y compañía lo
-      // cacheen es lo que evita una llamada a Google por cada apertura.
-      "Cache-Control": "public, max-age=604800, immutable",
-    },
-  });
+  // El mapa de un evento no cambia: una llamada a Google por tamaño, no por apertura.
+  const cabeceras = "public, max-age=604800, immutable";
+  try {
+    const png = await cache.obtener(`${w}x${h}`, async () => {
+      const res = await fetch(url, { signal: AbortSignal.timeout(Number(process.env.HTTP_TIMEOUT_MS) || 10_000) });
+      if (!res.ok) throw new Error(`Google respondió ${res.status}`);
+      return res;
+    });
+    return respuestaPng(png, cabeceras);
+  } catch {
+    return new NextResponse(null, { status: 502 });
+  }
 }

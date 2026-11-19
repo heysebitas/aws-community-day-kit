@@ -53,7 +53,9 @@ async function conectar(): Promise<typeof mongoose> {
   if (!uri) throw new Error("MONGODB_URI no está definida. Copia .env.example a .env.local, o corre `npm run demo`.");
 
   const conn = await mongoose.connect(uri, opciones(uri));
-  if (DEMO && !process.env.MONGODB_URI) {
+  // En el build de la imagen la base es la de memoria pero vacía: si no, el HTML
+  // prerenderizado se llevaría los nombres de ejemplo a producción.
+  if (DEMO && !process.env.MONGODB_URI && process.env.BUILD_SIN_SEMILLA !== "1") {
     const { sembrarDemo } = await import("@/lib/demo");
     await sembrarDemo();
   }

@@ -57,8 +57,8 @@ export const POST = ruta(async (request: NextRequest) => {
 
   // Modo directo (genérico de respaldo): el admin fija la contraseña; sin correo ni token.
   if (typeof password === "string" && password.length > 0) {
-    if (password.length < 8) {
-      return Response.json({ error: "La contraseña debe tener al menos 8 caracteres" }, { status: 400 });
+    if (password.length < 10) {
+      return Response.json({ error: "La contraseña debe tener al menos 10 caracteres" }, { status: 400 });
     }
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await User.create({ name, email: email.toLowerCase().trim(), role, allowedBadges: allowed, permisos: acceso, passwordHash });

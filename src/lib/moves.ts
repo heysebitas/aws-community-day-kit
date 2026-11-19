@@ -8,6 +8,7 @@ import { sendEmail, EMAIL_FROM } from "@/lib/correo";
 import { buildRegistrationEmail } from "@/lib/registration-email";
 import { roleLabelOf } from "@/data/attendee-form";
 import { createLog } from "@/lib/log";
+import { sincronizarCupo } from "@/lib/cupo";
 import { nuevoPin } from "@/lib/pin";
 
 /**
@@ -216,7 +217,7 @@ export async function registrationToVolunteer(
     };
   }
 
-  await VolunteerSubmission.create({
+  const creada = await VolunteerSubmission.create({
     firstName: reg.firstName,
     lastName: reg.lastName,
     email: reg.email,
@@ -242,10 +243,18 @@ export async function registrationToVolunteer(
     submittedAt: new Date(),
   });
 
+  // Sin transacciones (la base puede no ser replica set): si el borrado falla,
+  // se deshace el alta para no dejar a la persona en las dos listas.
+  try {
+    await Registration.findByIdAndDelete(id);
+  } catch (e) {
+    await VolunteerSubmission.findByIdAndDelete(creada._id).catch(() => {});
+    throw e;
+  }
   const passports = await Passport.deleteMany({
     $or: [{ linkedRegistrationId: id }, { shortId: reg.qrCode }],
   });
-  await Registration.findByIdAndDelete(id);
+  await Promise.all([sincronizarCupo("attendee"), sincronizarCupo("volunteer")]);
 
   const done = [
     "Postulación de voluntario creada",
@@ -287,6 +296,7 @@ export async function volunteerToRegistration(
 
   const existing = await Registration.findOne({ email: vol.email }).select("_id").lean();
   const done: string[] = [];
+  let creada: InstanceType<typeof Registration> | null = null;
 
   if (existing) {
     done.push("Ya existía como asistente, no se duplicó");
@@ -309,15 +319,23 @@ export async function volunteerToRegistration(
       isManual: true,
       emailStatus: "skipped",
     });
+    creada = reg;
     done.push(`Registro de asistente creado (${attendance === "online" ? "online" : "presencial"})`);
-
-    if (attendance === "in-person" && (await ensurePassport(reg))) {
-      done.push("Pasaporte creado");
-    }
   }
 
+  // Sin transacciones (la base puede no ser replica set): si el borrado falla,
+  // se deshace el alta para no dejar a la persona en las dos listas.
+  try {
+    await VolunteerSubmission.findByIdAndDelete(id);
+  } catch (e) {
+    if (creada) await Registration.findByIdAndDelete(creada._id).catch(() => {});
+    throw e;
+  }
+  if (creada && attendance === "in-person" && (await ensurePassport(creada))) {
+    done.push("Pasaporte creado");
+  }
   const passports = await Passport.deleteMany({ linkedRegistrationId: id });
-  await VolunteerSubmission.findByIdAndDelete(id);
+  await Promise.all([sincronizarCupo("attendee"), sincronizarCupo("volunteer")]);
   done.push("Postulación de voluntario eliminada");
   if (passports.deletedCount) done.push(`${passports.deletedCount} pasaporte(s) de voluntario eliminado(s)`);
 

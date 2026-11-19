@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { sincronizarCupo } from "@/lib/cupo";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { Registration } from "@/models/registration";
@@ -29,6 +30,7 @@ export const DELETE = ruta(async (
   });
 
   await Registration.findByIdAndDelete(id);
+  await sincronizarCupo("attendee");
 
   await createLog({
     userId: user._id.toString(),
