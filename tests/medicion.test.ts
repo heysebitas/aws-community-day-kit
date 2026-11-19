@@ -6,7 +6,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import {
+  banderasDePerfil,
   comparar,
+  cookieDeSesion,
+  errorDeLighthouse,
   extraerLighthouse,
   formatearComparacion,
   jsDePrimeraCarga,
@@ -15,6 +18,23 @@ import {
 } from "../scripts/medir-lib.mjs";
 
 describe("medición", () => {
+  test("perfil real (devtools, CPU 6×) solo para panel y pasaporte", () => {
+    assert.deepEqual(banderasDePerfil("/"), []);
+    assert.deepEqual(banderasDePerfil("/admin"), ["--throttling-method=devtools", "--throttling.cpuSlowdownMultiplier=6"]);
+    assert.equal(banderasDePerfil("/pasaporte/demo00000001").length, 2);
+  });
+
+  test("errorDeLighthouse detecta NO_NAVSTART y la falta de puntuación", () => {
+    assert.match(errorDeLighthouse({ runtimeError: { code: "NO_NAVSTART", message: "x" } }) ?? "", /NO_NAVSTART/);
+    assert.ok(errorDeLighthouse({ categories: { performance: { score: null } } }));
+    assert.equal(errorDeLighthouse({ categories: { performance: { score: 0.9 } } }), null);
+  });
+
+  test("cookieDeSesion junta nombre=valor y descarta atributos", () => {
+    assert.equal(cookieDeSesion(["a=1; Path=/; HttpOnly", "b=2; Secure"]), "a=1; b=2");
+    assert.equal(cookieDeSesion(undefined), "");
+  });
+
   test("mediana: impar, par, vacío y valores no numéricos", () => {
     assert.equal(mediana([3, 1, 2]), 2);
     assert.equal(mediana([4, 1, 3, 2]), 2.5);

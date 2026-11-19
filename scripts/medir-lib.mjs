@@ -6,7 +6,31 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
-export const RUTAS = ["/", "/speakers", "/registro", "/directorio"];
+export const RUTAS_PUBLICAS = ["/", "/speakers", "/registro", "/directorio"];
+
+/** Lo que usa el staff con el móvil el día del evento: panel (con sesión de la demo) y un pasaporte. Se miden con throttling real (devtools) y CPU 6×. */
+export const RUTAS_REAL = ["/admin", "/admin/check-in", "/pasaporte/demo00000001"];
+export const RUTAS_CON_SESION = ["/admin", "/admin/check-in"];
+export const CPU_REAL = 6;
+
+export const RUTAS = [...RUTAS_PUBLICAS, ...RUTAS_REAL];
+
+/** Banderas de Lighthouse según la ruta: simulado para las públicas, devtools con CPU 6× para las reales. */
+export function banderasDePerfil(ruta) {
+  return RUTAS_REAL.includes(ruta) ? ["--throttling-method=devtools", `--throttling.cpuSlowdownMultiplier=${CPU_REAL}`] : [];
+}
+
+/** Lighthouse sale con código 0 aunque no haya medido (NO_NAVSTART, etc.): el fallo viene en `runtimeError`. */
+export function errorDeLighthouse(lhr) {
+  if (lhr?.runtimeError?.code && lhr.runtimeError.code !== "NO_ERROR") return `${lhr.runtimeError.code}: ${lhr.runtimeError.message ?? ""}`.slice(0, 300);
+  if (lhr?.categories?.performance?.score == null) return "sin puntuación de rendimiento";
+  return null;
+}
+
+/** La cookie de sesión (`nombre=valor`) a partir de las cabeceras Set-Cookie de la respuesta del login. */
+export function cookieDeSesion(setCookies) {
+  return (setCookies ?? []).map((c) => c.split(";")[0]).filter(Boolean).join("; ");
+}
 
 /** Qué sentido es «peor» en cada métrica y cuánto cambio se tolera antes de marcarlo. */
 export const METRICAS = {
@@ -116,6 +140,9 @@ export function formatearComparacion(filas) {
 export function formatearTabla(paginas) {
   const cols = Object.keys(METRICAS);
   const lineas = [["página", ...cols].join("\t")];
-  for (const [ruta, m] of Object.entries(paginas)) lineas.push([ruta, ...cols.map((c) => (m[c] == null ? "-" : num(m[c])))].join("\t"));
+  for (const [ruta, m] of Object.entries(paginas)) {
+    if (m.sinMedir) lineas.push(`${ruta}\tsin medir: ${m.motivo ?? "?"}`);
+    else lineas.push([ruta, ...cols.map((c) => (m[c] == null ? "-" : num(m[c])))].join("\t"));
+  }
   return lineas.join("\n");
 }

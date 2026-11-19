@@ -16,6 +16,7 @@
     "close_menu": "Cerrar menú",
     "menu": "Menú de navegación",
     "skip_to_content": "Saltar al contenido",
+    "navegador_viejo": "Tu navegador es antiguo y el sitio puede verse mal. Actualízalo: necesitamos Chrome 111, Safari 16.4 o Firefox 128 o más nuevos.",
     "back_to_top": "Volver arriba"
   },
   "Strip": {
