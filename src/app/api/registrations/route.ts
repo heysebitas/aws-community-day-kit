@@ -39,7 +39,7 @@ export const GET = ruta(async (request: NextRequest) => {
     const [ms, id] = cursor.split("_");
     const fecha = new Date(Number(ms));
     if (!id || !mongoose.isValidObjectId(id) || Number.isNaN(fecha.getTime())) {
-      return Response.json({ error: "Cursor inválido" }, { status: 400 });
+      return Response.json({ code: "entrada_invalida", error: "Cursor inválido" }, { status: 400 });
     }
     filtro.$or = [{ createdAt: { $lt: fecha } }, { createdAt: fecha, _id: { $lt: id } }];
   }
