@@ -10,7 +10,7 @@ import { createLog } from "@/lib/log";
 import { ruta } from "@/lib/api";
 import { leerCuerpo } from "@/lib/cuerpo";
 
-export async function GET() {
+export const GET = ruta(async () => {
   await connectDB();
   const config = await EventConfig.findOne().lean() as Record<string, unknown> | null;
 
@@ -38,7 +38,7 @@ export async function GET() {
       tarjetaDominio:   (config?.tarjetaDominio as boolean | undefined) !== false,
     } : {}),
   });
-}
+}, { etiqueta: "event-config GET" });
 
 /** Estos enlaces salen como `href` en el sitio: sólo http(s), o vacío. */
 function urlWeb(valor: unknown): string {

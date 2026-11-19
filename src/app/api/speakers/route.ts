@@ -9,7 +9,7 @@ import { valoresDeLaPropuesta } from "@/lib/correo-propuesta";
 import { armarCorreo } from "@/lib/email-plantillas";
 import { SpeakerProfile, isProfileStatus } from "@/models/speaker-profile";
 import { EVENTO } from "@/config";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { leerCuerpo } from "@/lib/cuerpo";
 import { buildSlugFromNames, parseSpeakerInput } from "@/lib/speaker-input";
 
@@ -114,18 +114,18 @@ export const GET = ruta(async (req: NextRequest) => {
 });
 
 // ── POST — new submission (public) ───────────────────────────────────────────
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   try {
     // El Call for Speakers cierra solo cuando pasa EVENTO.cfpCierre. Se comprueba
     // aca y no solo en el cliente: si dependiera del boton de la interfaz, una
     // peticion hecha a mano seguiria entrando despues del cierre anunciado.
     if (Date.now() > new Date(EVENTO.cfpCierre).getTime()) {
-      return Response.json({ error: "La convocatoria de speakers está cerrada." }, { status: 403 });
+      return Response.json({ code: "cfp_cerrado", error: "La convocatoria de speakers está cerrada." }, { status: 403 });
     }
 
     const limite = rateLimit(`postulacion:${getIp(request)}`, 40, 60 * 60 * 1000);
     if (!limite.ok) {
-      return Response.json({ error: "Demasiadas postulaciones seguidas. Intenta más tarde." }, { status: 429 });
+      return Response.json({ code: "demasiados_intentos", error: "Demasiadas postulaciones seguidas. Intenta más tarde." }, { status: 429 });
     }
 
     await connectDB();
@@ -136,12 +136,12 @@ export async function POST(request: NextRequest) {
     const captchaToken = typeof body.captchaToken === "string" ? body.captchaToken : "";
     const captchaOk = await verifyCaptcha(captchaToken);
     if (!captchaOk) {
-      return Response.json({ error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
+      return Response.json({ code: "captcha_invalido", error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
     }
 
     const parsed = parseSpeakerInput(body);
     if (!parsed.ok) {
-      return Response.json({ error: parsed.error }, { status: 400 });
+      return Response.json({ code: "datos_invalidos", error: parsed.error }, { status: 400 });
     }
 
     const {
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
       const dup = await SpeakerProfile.findOne({ email });
       if (dup) {
         return Response.json(
-          { error: "Ya tienes una postulación enviada con este correo" },
+          { code: "postulacion_duplicada", error: "Ya tienes una postulación enviada con este correo" },
           { status: 409 },
         );
       }
@@ -232,12 +232,12 @@ export async function POST(request: NextRequest) {
         html: correo.html,
       });
     } catch (mailErr) {
-      console.error("[POST /api/speakers] acuse de recibo", mailErr);
+      logError("[POST /api/speakers] acuse de recibo", mailErr);
     }
 
     return Response.json({ id: profile._id, slug: profile.slug }, { status: 201 });
   } catch (err) {
-    console.error("[POST /api/speakers]", err);
-    return Response.json({ error: "Error interno" }, { status: 500 });
+    logError("[POST /api/speakers]", err);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "speakers POST" });

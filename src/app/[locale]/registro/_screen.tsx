@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { textoDeError } from "@/lib/errores-cliente";
 import { FormShell } from "@/components/forms/form-shell";
 import type { SummaryRow } from "@/components/forms/success-screen";
 import { RegistroForm, type Responses } from "./_form";
@@ -25,6 +27,7 @@ export function RegistroScreen({
   closedLead: string;
 }) {
   const router = useRouter();
+  const tErr = useTranslations("Errores");
 
   const handleSubmit = async (values: Responses, captchaToken: string, resumen: SummaryRow[]) => {
     const res = await fetch("/api/registrations", {
@@ -33,8 +36,8 @@ export function RegistroScreen({
       body: JSON.stringify({ data: values, captchaToken }),
     });
     if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error);
+      const data = await res.json().catch(() => ({}));
+      throw new Error(textoDeError(tErr, data, tErr("error_interno")));
     }
 
     // El nombre y la modalidad viajan a la pantalla de gracias por

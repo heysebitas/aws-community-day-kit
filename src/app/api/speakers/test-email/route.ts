@@ -7,7 +7,7 @@ import { generateSpeakerPDF } from "@/lib/pdf/speaker";
 import { generateInternationalSpeakerPDF } from "@/lib/pdf/speaker-international";
 import { Setting } from "@/models/setting";
 import { SITIO, SLUG } from "@/config";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { leerCuerpo } from "@/lib/cuerpo";
 
 export const dynamic = "force-dynamic";
@@ -69,7 +69,7 @@ export const POST = ruta(async (request: NextRequest) => {
     return Response.json({ ok: true });
   } catch (e) {
     if (e instanceof AuthError) throw e;
-    console.error("[test-email]", e);
+    logError("[test-email]", e);
     return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 });

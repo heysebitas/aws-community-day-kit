@@ -14,7 +14,7 @@ export const POST = ruta(async (request: NextRequest) => {
   const type = textoDe(cuerpo, "type");
 
   if (!shortId || !type || !["lunch", "snack"].includes(type)) {
-    return NextResponse.json({ error: "shortId y type ('lunch'|'snack') requeridos" }, { status: 400 });
+    return NextResponse.json({ code: "datos_invalidos", error: "shortId y type ('lunch'|'snack') requeridos" }, { status: 400 });
   }
 
   await connectDB();

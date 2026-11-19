@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { connectDB } from "@/lib/db";
 import { getAuthUser, clearAuthCookie } from "@/lib/auth";
 import { Session } from "@/models/session";
@@ -7,7 +8,7 @@ import { createLog } from "@/lib/log";
 // Borra también lo que el navegador guarde del panel (cookies y almacenamiento local).
 const CABECERAS = { "Clear-Site-Data": '"cookies", "storage"' };
 
-export async function POST() {
+export const POST = ruta(async () => {
   try {
     const user = await getAuthUser();
     if (user) {
@@ -24,8 +25,10 @@ export async function POST() {
     }
     await clearAuthCookie();
     return Response.json({ ok: true }, { headers: CABECERAS });
-  } catch {
+  } catch (e) {
+    // Aunque falle el borrado en la base, la cookie se limpia: el cierre de sesión no puede fallarle a la persona.
+    logError("auth/logout POST", e);
     await clearAuthCookie();
     return Response.json({ ok: true }, { headers: CABECERAS });
   }
-}
+}, { etiqueta: "auth/logout POST" });

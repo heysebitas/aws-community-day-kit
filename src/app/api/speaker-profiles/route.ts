@@ -5,7 +5,7 @@ import { SpeakerProfile } from "@/models/speaker-profile";
 import { getPublicSpeakers } from "@/lib/data/speakers";
 import { revalidatePublic, SPEAKERS_TAG, AGENDA_TAG } from "@/lib/data/revalidate";
 import { createLog } from "@/lib/log";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { toSlug } from "@/lib/slug";
 
 async function uniqueSlug(base: string): Promise<string> {
@@ -18,15 +18,15 @@ async function uniqueSlug(base: string): Promise<string> {
 }
 
 // Public: list published profiles (misma lógica cacheada que usa el home)
-export async function GET() {
+export const GET = ruta(async () => {
   try {
     const profiles = await getPublicSpeakers();
     return Response.json({ profiles });
   } catch (err) {
-    console.error("[speaker-profiles GET]", err);
+    logError("[speaker-profiles GET]", err);
     return Response.json({ error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "speaker-profiles GET" });
 
 // Admin: create profile
 export const POST = ruta(async (request: NextRequest) => {

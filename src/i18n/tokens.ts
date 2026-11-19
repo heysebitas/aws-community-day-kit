@@ -31,6 +31,7 @@ export function tokensDe(idioma: Idioma): Record<string, string> {
     organiza: e.organiza,
     dominio: DOMINIO,
     cupos: String(e.cupos),
+    prefijo_tel: PAIS.telefono.prefijo,
 
     sede: e.sede.nombre,
     direccion: e.sede.direccion,

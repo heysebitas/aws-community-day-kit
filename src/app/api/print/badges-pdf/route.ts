@@ -8,7 +8,7 @@ import { PrintConfig } from "@/models/print-config";
 import { pdfToBuffer } from "@/lib/pdf/common";
 import { resolver, tokensDe } from "@/i18n/tokens";
 import { EVENTO, IDIOMA_BASE, SITIO } from "@/config";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { leerCuerpo, listaDeTextos } from "@/lib/cuerpo";
 
 const APP_URL = SITIO;
@@ -47,7 +47,10 @@ async function drawBadgeSide(pdf: InstanceType<typeof PDFDocument>, p: Person, x
       const idTxt = p.shortId.slice(0, 6).toUpperCase(); // el PIN no se imprime: va en el correo
       pdf.font("Helvetica").fontSize(Math.max(5, qrSize * 0.1)).fillColor("#555555")
         .text(idTxt, qx, qy + qrSize + 2, { width: qrSize, align: "center", lineBreak: false });
-    } catch { /* sin QR */ }
+    } catch (e) {
+      // Sin QR la escarapela sale igual, pero queda rastro.
+      logError("print/badges-pdf QR", e);
+    }
     textW = w - qrSize - w * 0.05;
   }
 
@@ -132,7 +135,10 @@ async function drawBadgeStacked(pdf: InstanceType<typeof PDFDocument>, p: Person
       const idTxt = p.shortId.slice(0, 6).toUpperCase(); // el PIN no se imprime: va en el correo
       pdf.font("Helvetica").fontSize(Math.max(5, qrSize * 0.12)).fillColor("#555555")
         .text(idTxt, qx, ty + qrSize + 2, { width: qrSize, align: "center", lineBreak: false });
-    } catch { /* sin QR */ }
+    } catch (e) {
+      // Sin QR la escarapela sale igual, pero queda rastro.
+      logError("print/badges-pdf QR", e);
+    }
   }
 }
 

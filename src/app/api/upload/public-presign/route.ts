@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { randomUUID } from "crypto";
 import { EVENTO } from "@/config";
@@ -8,7 +9,7 @@ import { verifyCaptcha } from "@/lib/captcha";
 import { leerCuerpo } from "@/lib/cuerpo";
 
 /** URL firmada para la foto de quien postula como speaker. */
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   try {
     if (Date.now() > new Date(EVENTO.cfpCierre).getTime()) {
       return Response.json({ error: "La convocatoria está cerrada" }, { status: 403 });
@@ -34,7 +35,8 @@ export async function POST(request: NextRequest) {
       ...(await presignSubida(key, v.tipo, v.tamano)),
       publicUrl: `${S3_PUBLIC_URL}/${key}`,
     });
-  } catch {
-    return Response.json({ error: "Error al generar la URL de subida" }, { status: 500 });
+  } catch (e) {
+    logError("upload/public-presign POST", e);
+    return Response.json({ code: "subida_fallida", error: "Error al generar la URL de subida" }, { status: 500 });
   }
-}
+}, { etiqueta: "upload/public-presign POST" });

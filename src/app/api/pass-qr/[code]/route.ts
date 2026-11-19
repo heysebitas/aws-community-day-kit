@@ -1,3 +1,4 @@
+import { ruta, logError } from "@/lib/api";
 import { NextRequest } from "next/server";
 import QRCode from "qrcode";
 import { getIp, rateLimit } from "@/lib/rate-limit";
@@ -8,10 +9,10 @@ const cache = new CacheImagenes(200, 8 * 1024 * 1024);
 
 // QR público (PNG) de un código, para mostrarlo inline en correos (sin auth, como /api/passes).
 // Codifica el código tal cual — mismo contenido que el pase de registro.
-export async function GET(
+export const GET = ruta(async (
   req: NextRequest,
   { params }: { params: Promise<{ code: string }> },
-) {
+) => {
   const limite = rateLimit(`pass-qr:${getIp(req)}`, 120, 60_000);
   if (!limite.ok) {
     return Response.json(
@@ -34,7 +35,8 @@ export async function GET(
       return new Response(new Uint8Array(buf));
     });
     return respuestaPng(png, "private, max-age=86400");
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("pass-qr/[code] GET", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "pass-qr/[code] GET" });

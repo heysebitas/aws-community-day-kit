@@ -1,3 +1,4 @@
+import { ruta } from "@/lib/api";
 import { ImageResponse } from "next/og";
 import { Banner, CabeceraCorreo, Icono, PieCorreo, fuentes } from "@/lib/marca";
 import { CacheImagenes, respuestaPng } from "@/lib/cache-imagen";
@@ -32,7 +33,7 @@ function dibujo(pieza: string, lado: number): (() => ImageResponse) | null {
  * Las imágenes de marca, generadas: `/api/marca/banner`, `/correo-cabecera`,
  * `/correo-pie` e `/icono?t=192`. Los dibujos están en `src/lib/marca.tsx`.
  */
-export async function GET(req: Request, { params }: { params: Promise<{ pieza: string }> }) {
+export const GET = ruta(async (req: Request, { params }: { params: Promise<{ pieza: string }> }) => {
   const { pieza } = await params;
   const pedido = Number(new URL(req.url).searchParams.get("t"));
   const lado = pieza === "icono" && [48, 180, 192, 512].includes(pedido) ? pedido : 192;
@@ -54,4 +55,4 @@ export async function GET(req: Request, { params }: { params: Promise<{ pieza: s
   const dibujar = dibujo(pieza, lado);
   if (!dibujar) return new Response("No existe", { status: 404 });
   return respuestaPng(await cache.obtener(clave, dibujar), CACHE_CONTROL);
-}
+}, { etiqueta: "marca/[pieza] GET" });

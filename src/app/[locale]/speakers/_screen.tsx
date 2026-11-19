@@ -8,15 +8,15 @@ import { DotHeading } from "@/components/ui/dot-heading";
 import { localePath } from "@/lib/utils";
 import { ChevronRight, ChevronLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { type Lang } from "./_shared";
+import { type Lang, type TextosPorIdioma } from "./_shared";
 import { useSpeakersScreen } from "./_use-screen";
 import { PasoCharla } from "./_paso-charla";
 import { PasoPerfil } from "./_paso-perfil";
 import { PasoFinal } from "./_paso-final";
 import { ConvocatoriaCerrada } from "./_cerrada";
 
-export function SpeakersScreen({ formOnly = false, pasoInicial = 0 }: { formOnly?: boolean; pasoInicial?: number }) {
-  const s = useSpeakersScreen(pasoInicial);
+export function SpeakersScreen({ formOnly = false, pasoInicial = 0, textos }: { formOnly?: boolean; pasoInicial?: number; textos: TextosPorIdioma }) {
+  const s = useSpeakersScreen(pasoInicial, textos);
   const { locale, lang, setLang, t, step, dir, cfsOpen, form, formRef, captchaToken, hasCaptcha, goNext, goBack, submitting, submitted, summaryRows, handleSubmit, variants } = s;
   // ── Estado del Call for Speakers (controlado desde el admin) ────────────────
   if (cfsOpen === null) {

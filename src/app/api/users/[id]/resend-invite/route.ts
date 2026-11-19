@@ -6,7 +6,7 @@ import { PasswordToken } from "@/models/password-token";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
 import { armarInvitacion } from "@/lib/correo-invitacion";
 import { createLog } from "@/lib/log";
-import { SITIO } from "@/config";
+import { IDIOMA_BASE, SITIO } from "@/config";
 import { ruta } from "@/lib/api";
 
 export const POST = ruta(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
@@ -30,7 +30,7 @@ export const POST = ruta(async (request: NextRequest, { params }: { params: Prom
   });
 
   const appUrl = SITIO;
-  const createPasswordUrl = `${appUrl}/es/admin/create-password?token=${token}`;
+  const createPasswordUrl = `${appUrl}/${IDIOMA_BASE}/admin/create-password?token=${token}`;
 
   const correo = await armarInvitacion(user.name, user.role, createPasswordUrl);
   await sendEmail({

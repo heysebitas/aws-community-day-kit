@@ -1,3 +1,4 @@
+import { logError } from "@/lib/api";
 import { createHmac } from "node:crypto";
 import { SITIO } from "@/config";
 import { SpeakerProfile } from "@/models/speaker-profile";
@@ -31,7 +32,8 @@ export async function subirTarjetaDeSpeaker(slug: string): Promise<string | null
 
     await SpeakerProfile.updateOne({ slug }, { cardApproved: true, cardImageUrl });
     return cardImageUrl;
-  } catch {
+  } catch (e) {
+    logError("speaker-card", e);
     return null;
   }
 }

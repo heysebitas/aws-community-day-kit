@@ -1,3 +1,4 @@
+import { ruta } from "@/lib/api";
 import { NextResponse } from "next/server";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 import { fuenteDisponible, gifDeLaVentana } from "./gif";
@@ -6,7 +7,7 @@ export const runtime = "nodejs";
 
 /** El reloj animado que va dentro de los correos. */
 
-export async function GET(request: Request) {
+export const GET = ruta(async (request: Request) => {
   // Muy holgado: Gmail y otros piden las imágenes desde pocas IP de su proxy, y la
   // CPU ya la acota la caché (un GIF por ventana), no este límite.
   const limite = rateLimit(`countdown:${getIp(request)}`, 1200, 60_000);
@@ -28,4 +29,4 @@ export async function GET(request: Request) {
       "Cache-Control": "public, max-age=5",
     },
   });
-}
+}, { etiqueta: "countdown GET" });

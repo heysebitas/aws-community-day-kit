@@ -1,3 +1,4 @@
+import { ruta } from "@/lib/api";
 import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
@@ -90,10 +91,10 @@ type CoSpeakerData = {
 
 // ── Route handler ─────────────────────────────────────────────────────────────
 
-export async function GET(
+export const GET = ruta(async (
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
-) {
+) => {
   const limite = rateLimit(`imagen-speaker:${getIp(_request)}`, 120, 10 * 60 * 1000);
   if (!limite.ok) {
     return Response.json(
@@ -143,7 +144,7 @@ export async function GET(
   const clave = `${prefijo}${new Date(profile.updatedAt as Date | string | undefined ?? 0).getTime()}:${conDominio ? 1 : 0}`;
   if (!cache.leer(clave)) cache.olvidar(prefijo);
   return respuestaPng(await cache.obtener(clave, dibujar), CACHE_CONTROL);
-}
+}, { etiqueta: "og/speaker/[slug] GET" });
 
 async function dibujarTarjeta(
   profile: ISpeakerProfile,

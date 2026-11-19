@@ -6,7 +6,7 @@ import { createLog } from "@/lib/log";
 import { sendEmail, MARKETING_EMAIL_FROM } from "@/lib/correo";
 import { armarCorreo } from "@/lib/email-plantillas";
 import type { ProfileStatus } from "@/models/speaker-profile";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { leerCuerpo, textoDe } from "@/lib/cuerpo";
 
 /** La marca que impide que la campaña en masa vuelva a escribirle. */
@@ -65,7 +65,8 @@ export const PATCH = ruta(async (
         profile.sentSpeakerCampaigns = [...(profile.sentSpeakerCampaigns ?? []), CAMPANA_RECHAZO];
         await profile.save();
       }
-    } catch {
+    } catch (e) {
+      logError("speakers/[id]/status correo de rechazo", e);
       // El cambio de estado ya está hecho y no se deshace: que un fallo del
       // correo impida mover la propuesta sería peor. Se avisa y ya.
       correoEnviado = false;

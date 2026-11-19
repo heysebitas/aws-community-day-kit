@@ -16,7 +16,7 @@ export const POST = ruta(async (request: NextRequest) => {
   const room = textoOpcional(cuerpo, "room");
 
   if (!shortId || !sessionId) {
-    return NextResponse.json({ error: "shortId y sessionId requeridos" }, { status: 400 });
+    return NextResponse.json({ code: "datos_invalidos", error: "shortId y sessionId requeridos" }, { status: 400 });
   }
 
   await connectDB();

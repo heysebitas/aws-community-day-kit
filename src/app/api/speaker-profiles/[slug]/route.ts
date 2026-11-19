@@ -4,23 +4,24 @@ import { requireAccess, requireDelete } from "@/lib/auth";
 import { SpeakerProfile } from "@/models/speaker-profile";
 import { revalidatePublic, SPEAKERS_TAG, AGENDA_TAG } from "@/lib/data/revalidate";
 import { createLog } from "@/lib/log";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 
 // Public: single profile by slug
-export async function GET(
+export const GET = ruta(async (
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
-) {
+) => {
   try {
     await connectDB();
     const { slug } = await params;
     const profile = await SpeakerProfile.findOne({ slug, isPublic: true }).lean();
-    if (!profile) return Response.json({ error: "No encontrado" }, { status: 404 });
+    if (!profile) return Response.json({ code: "no_encontrado", error: "No encontrado" }, { status: 404 });
     return Response.json({ profile });
-  } catch {
-    return Response.json({ error: "Error interno" }, { status: 500 });
+  } catch (e) {
+    logError("speaker-profiles/[slug] GET", e);
+    return Response.json({ code: "error_interno", error: "Error interno" }, { status: 500 });
   }
-}
+}, { etiqueta: "speaker-profiles/[slug] GET" });
 
 // Admin: partial update (isPublic, status, roomId, track…)
 export const PATCH = ruta(async (

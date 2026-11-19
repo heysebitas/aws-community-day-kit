@@ -1,3 +1,4 @@
+import { ruta } from "@/lib/api";
 import { NextRequest } from "next/server";
 import { Webhook } from "svix";
 import { connectDB } from "@/lib/db";
@@ -13,7 +14,7 @@ const POR_EVENTO: Record<string, { envio: EstadoEnvio; motivo: string | null }> 
   "email.complained": { envio: "queja", motivo: "Marcado como spam" },
 };
 
-export async function POST(request: NextRequest) {
+export const POST = ruta(async (request: NextRequest) => {
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
   if (!webhookSecret) {
     return Response.json({ error: "Webhook secret not configured" }, { status: 500 });
@@ -31,7 +32,8 @@ export async function POST(request: NextRequest) {
     const wh = new Webhook(webhookSecret);
     event = wh.verify(payload, headers) as typeof event;
   } catch {
-    return Response.json({ error: "Invalid signature" }, { status: 401 });
+    // Deliberado: una firma inválida es ruido de internet, no un fallo nuestro; no se registra.
+    return Response.json({ code: "firma_invalida", error: "Invalid signature" }, { status: 401 });
   }
 
   const { type, data } = event;
@@ -66,4 +68,4 @@ export async function POST(request: NextRequest) {
   ]);
 
   return Response.json({ ok: true });
-}
+}, { etiqueta: "webhooks/resend POST" });

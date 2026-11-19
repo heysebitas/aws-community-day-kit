@@ -1,3 +1,4 @@
+import { ruta } from "@/lib/api";
 import { toSlug } from "@/lib/slug";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
@@ -6,11 +7,11 @@ import { getIp, rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export const GET = ruta(async (req: NextRequest) => {
   const limite = rateLimit(`slug-speaker:${getIp(req)}`, 120, 15 * 60 * 1000);
   if (!limite.ok) {
     return NextResponse.json(
-      { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+      { code: "demasiados_intentos", error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
       { status: 429, headers: { "Retry-After": String(Math.ceil(limite.retryAfterMs / 1000)) } },
     );
   }
@@ -26,4 +27,4 @@ export async function GET(req: NextRequest) {
   const exists = await SpeakerProfile.exists({ slug });
 
   return NextResponse.json({ available: !exists, slug });
-}
+}, { etiqueta: "speaker-profiles/check-slug GET" });

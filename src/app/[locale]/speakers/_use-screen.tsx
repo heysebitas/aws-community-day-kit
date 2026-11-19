@@ -12,15 +12,17 @@ import { Wifi, MapPin, GraduationCap, BookOpen, Layers, Cpu } from "lucide-react
 import { normalizeLink } from "@/lib/normalize";
 import { toSlug } from "@/lib/slug";
 import { pedirJson } from "@/lib/pedir-json";
-import { T, type Lang, type CoSpeaker } from "./_shared";
+import { type Lang, type CoSpeaker, type TextosPorIdioma } from "./_shared";
+import { textoDeError } from "@/lib/errores-cliente";
 import { enfocarPrimerInvalido } from "@/components/forms/foco";
 import { EVENTO } from "@/config";
 
-export function useSpeakersScreen(pasoInicial: number) {
+export function useSpeakersScreen(pasoInicial: number, textos: TextosPorIdioma) {
   const tf = useTranslations("Forms");
+  const tErr = useTranslations("Errores");
   const locale = useLocale();
   const [lang, setLang] = useState<Lang>("es");
-  const t = T[lang];
+  const t = textos[lang];
   const [step, setStep] = useState(pasoInicial);
   // Indicativo del teléfono; el número se guarda sin él y se une al enviar.
   const [dialCode, setDialCode] = useState(DEFAULT_COUNTRY.code);
@@ -284,7 +286,7 @@ export function useSpeakersScreen(pasoInicial: number) {
         errorPorDefecto: "Error al enviar",
       });
       if (!res.ok) {
-        err("submit", res.error ?? "Error al enviar");
+        err("submit", res.status === 0 ? tErr("sin_conexion") : textoDeError(tErr, res.data, tErr("error_interno")));
         captchaRef.current?.reset();
         setCaptchaToken(null);
         return;

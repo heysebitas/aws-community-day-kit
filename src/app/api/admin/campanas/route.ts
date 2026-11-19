@@ -50,6 +50,6 @@ export const GET = ruta(async () => {
 });
 
 /** Acá no se manda nada. */
-export async function POST() {
+export const POST = ruta(async () => {
   return Response.json({ error: "Para enviar, usa /api/admin/campanas/enviar" }, { status: 405 });
-}
+}, { etiqueta: "admin/campanas POST" });

@@ -16,7 +16,7 @@ import { checkAlreadyVolunteer } from "@/lib/duplicate-check";
 import { rateLimit, getIp } from "@/lib/rate-limit";
 import { Passport } from "@/models/passport";
 import { verifyCaptcha } from "@/lib/captcha";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 import { devolverCupo, reservarCupo, sincronizarCupo } from "@/lib/cupo";
 
 // Lo que pinta el panel; el resto (campañas, `busqueda`, `__v`) no viaja.
@@ -39,7 +39,7 @@ export const GET = ruta(async (request: NextRequest) => {
     const [ms, id] = cursor.split("_");
     const fecha = new Date(Number(ms));
     if (!id || !mongoose.isValidObjectId(id) || Number.isNaN(fecha.getTime())) {
-      return Response.json({ error: "Cursor inválido" }, { status: 400 });
+      return Response.json({ code: "entrada_invalida", error: "Cursor inválido" }, { status: 400 });
     }
     filtro.$or = [{ createdAt: { $lt: fecha } }, { createdAt: fecha, _id: { $lt: id } }];
   }
@@ -61,12 +61,12 @@ export const POST = ruta(async (request: NextRequest) => {
   try {
     const crudo: unknown = await request.json();
     if (!crudo || typeof crudo !== "object" || Array.isArray(crudo)) {
-      return Response.json({ error: "Datos de formulario inválidos" }, { status: 400 });
+      return Response.json({ code: "datos_invalidos", error: "Datos de formulario inválidos" }, { status: 400 });
     }
     body = crudo as Record<string, unknown>;
   } catch {
     // Un cuerpo que no es JSON es una entrada inválida, no un fallo del servidor.
-    return Response.json({ error: "Datos de formulario inválidos" }, { status: 400 });
+    return Response.json({ code: "datos_invalidos", error: "Datos de formulario inválidos" }, { status: 400 });
   }
   const manual = Boolean(body.manual);
   const skipEmail = Boolean(body.skipEmail);
@@ -76,7 +76,7 @@ export const POST = ruta(async (request: NextRequest) => {
   // —lo que bloquea un `{$gt: ""}`—, lo recorta y lo valida contra el catálogo.
   const input = (body.data ?? {}) as Record<string, unknown>;
   if (typeof input !== "object" || Array.isArray(input)) {
-    return Response.json({ error: "Datos de formulario inválidos" }, { status: 400 });
+    return Response.json({ code: "datos_invalidos", error: "Datos de formulario inválidos" }, { status: 400 });
   }
 
   // If manual, require auth
@@ -91,7 +91,7 @@ export const POST = ruta(async (request: NextRequest) => {
     const rl = rateLimit(`reg:${getIp(request)}`, 300, 15 * 60 * 1000);
     if (!rl.ok) {
       return Response.json(
-        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { code: "demasiados_intentos", error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
         { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
       );
     }
@@ -99,7 +99,7 @@ export const POST = ruta(async (request: NextRequest) => {
     const captchaToken = typeof body.captchaToken === "string" ? body.captchaToken : "";
     const captchaOk = await verifyCaptcha(captchaToken);
     if (!captchaOk) {
-      return Response.json({ error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
+      return Response.json({ code: "captcha_invalido", error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
     }
   }
 
@@ -111,14 +111,14 @@ export const POST = ruta(async (request: NextRequest) => {
   if (!manual) {
     const form = await Form.findOne({ formType: "attendee", isOpen: true });
     if (!form) {
-      return Response.json({ error: "El registro no está disponible" }, { status: 404 });
+      return Response.json({ code: "formulario_no_disponible", error: "El registro no está disponible" }, { status: 404 });
     }
     maxSubmissions = form.maxSubmissions;
   }
 
   const parsed = parseRegistrationInput(input, { manual });
   if ("error" in parsed) {
-    return Response.json({ error: parsed.error }, { status: 400 });
+    return Response.json({ code: "datos_invalidos", error: parsed.error }, { status: 400 });
   }
   const data = parsed.data;
 
@@ -126,7 +126,7 @@ export const POST = ruta(async (request: NextRequest) => {
   const existing = await Registration.findOne({ email: data.email });
   if (existing) {
     return Response.json(
-      { error: "Este correo ya está registrado en el evento" },
+      { code: "correo_ya_registrado", error: "Este correo ya está registrado en el evento" },
       { status: 409 },
     );
   }
@@ -136,13 +136,13 @@ export const POST = ruta(async (request: NextRequest) => {
   if (!manual) {
     const cross = await checkAlreadyVolunteer(data.email);
     if (cross.blocked) {
-      return Response.json({ error: cross.error }, { status: 409 });
+      return Response.json({ code: "ya_postulo_voluntario", error: cross.error }, { status: 409 });
     }
   }
 
   // El cupo se toma al final, ya sin motivo para rechazar: un 409 no gasta cupo.
   if (!(await reservarCupo("attendee", maxSubmissions))) {
-    return Response.json({ error: "Se alcanzó el límite de registros" }, { status: 400 });
+    return Response.json({ code: "cupo_lleno", error: "Se alcanzó el límite de registros" }, { status: 400 });
   }
 
   const qrCode = nanoid(12);
@@ -164,7 +164,7 @@ export const POST = ruta(async (request: NextRequest) => {
     await devolverCupo("attendee", maxSubmissions);
     if ((e as { code?: number }).code === 11000) {
       return Response.json(
-        { error: "Este correo ya está registrado en el evento" },
+        { code: "correo_ya_registrado", error: "Este correo ya está registrado en el evento" },
         { status: 409 },
       );
     }
@@ -198,7 +198,10 @@ export const POST = ruta(async (request: NextRequest) => {
       },
       { upsert: true },
     );
-  } catch { /* non-fatal — passport can be generated from admin later */ }
+  } catch (e) {
+    // No es fatal (el pasaporte se puede generar desde el panel), pero queda rastro.
+    logError("registrations POST pasaporte", e);
+  }
 
   // Skip email if: manual + skipEmail, or no email found
   const shouldSkipEmail = (manual && skipEmail) || !email;
