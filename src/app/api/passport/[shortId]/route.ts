@@ -2,8 +2,7 @@ import { NextRequest } from "next/server";
 import { nanoid } from "nanoid";
 import { SITIO } from "@/config";
 import { connectDB } from "@/lib/db";
-import { Passport, type IPassport } from "@/models/passport";
-import { SponsorPin } from "@/models/sponsor-pin";
+import { Passport } from "@/models/passport";
 import { Registration } from "@/models/registration";
 import { VolunteerSubmission } from "@/models/volunteer-submission";
 import { SpeakerProfile } from "@/models/speaker-profile";
@@ -11,14 +10,14 @@ import { User } from "@/models/user";
 import { PassportEditToken } from "@/models/passport-edit-token";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
 import { armarCorreoObligatorio } from "@/lib/email-plantillas";
-import { comprobarPin, nuevoPin } from "@/lib/pin";
+import { comprobarPin } from "@/lib/pin";
+import { leerPasaporte, SOCIAL_KEYS } from "@/lib/lectores";
 import { esDelBucket } from "@/lib/subidas";
 import { maskEmail } from "@/lib/utils";
 import { leerCuerpo } from "@/lib/cuerpo";
 
 /** El pasaporte digital. */
 
-const SOCIAL_KEYS = ["builderCenter", "linkedin", "instagram", "x", "github", "tiktok"] as const;
 const FIELD_LABELS: Record<string, string> = {
   builderCenter: "Builder Center", linkedin: "LinkedIn", instagram: "Instagram",
   x: "X / Twitter", github: "GitHub", tiktok: "TikTok", photo: "Foto",
@@ -26,26 +25,6 @@ const FIELD_LABELS: Record<string, string> = {
 
 const sanitizeUser = (v: unknown) =>
   typeof v === "string" ? v.trim().replace(/^@+/, "").replace(/\s+/g, "").slice(0, 80) : "";
-
-/** Lo único que sale al público. El resto del documento es operación interna. */
-function publico(p: IPassport) {
-  const clicks = p.stats?.clicks;
-  return {
-    shortId: p.shortId,
-    role: p.role,
-    firstName: p.firstName,
-    lastName: p.lastName,
-    company: p.company ?? "",
-    jobTitle: p.jobTitle ?? "",
-    photoUrl: p.photoUrl ?? "",
-    social: Object.fromEntries(SOCIAL_KEYS.map((k) => [k, p.social?.[k] ?? ""])),
-    stats: {
-      views: p.stats?.views ?? 0,
-      clicks: clicks instanceof Map ? Object.fromEntries(clicks) : (clicks ?? {}),
-    },
-    stamps: (p.stamps ?? []).map((s) => ({ sponsorId: s.sponsorId, sponsorName: s.sponsorName, stampedAt: s.stampedAt })),
-  };
-}
 
 /** A quién avisarle de un cambio: el correo de la persona detrás del pasaporte. */
 async function resolveOwnerContact(role: string, linkedId?: string): Promise<{ email: string; name: string }> {
@@ -80,17 +59,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
     const { shortId } = await params;
     const pin = req.nextUrl.searchParams.get("pin");
 
-    await connectDB();
-    const passport = await Passport.findOne({ shortId });
-    if (!passport) return Response.json({ error: "Pasaporte no encontrado" }, { status: 404 });
-
-    if (!passport.viewPin) {
-      passport.viewPin = nuevoPin();
-      await passport.save();
-    }
-
-    const sponsors = await SponsorPin.find({ isActive: true }).select("_id sponsorName logoUrl").lean();
-    const datos = { passport: publico(passport), sponsors, isOwner: false };
+    const leido = await leerPasaporte(shortId);
+    if (!leido) return Response.json({ error: "Pasaporte no encontrado" }, { status: 404 });
+    const { doc: passport, datos } = leido;
 
     if (!pin) return Response.json(datos);
 

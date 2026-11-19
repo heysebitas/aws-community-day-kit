@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import type { Permiso } from "@/lib/permisos";
 import { idiomaDeRuta } from "@/lib/utils";
 
-interface AuthUser {
+export interface AuthUser {
   id: string;
   name: string;
   email: string;
@@ -39,12 +39,18 @@ export function useAuth() {
 
 const SESSION_CHECK_INTERVAL = 10_000; // 10s
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+/**
+ * `inicial` es la sesión que el servidor ya leyó de la cookie: con ella el
+ * primer pintado no espera a `/api/auth/me`. Sin ella (o `null`) se pregunta
+ * a la API, como siempre.
+ */
+export function AuthProvider({ children, inicial }: { children: React.ReactNode; inicial?: AuthUser | null }) {
+  const [user, setUser] = useState<AuthUser | null>(inicial ?? null);
+  const [loading, setLoading] = useState(!inicial);
+  const primeraVez = useRef(true);
   const router = useRouter();
   const pathname = usePathname();
-  const wasAuthenticated = useRef(false);
+  const wasAuthenticated = useRef(!!inicial);
 
   const refresh = useCallback(async () => {
     try {
@@ -73,7 +79,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initial check
   useEffect(() => {
+    if (primeraVez.current) {
+      primeraVez.current = false;
+      if (inicial) return;
+    }
     refresh();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `inicial` sólo cuenta en el primer montaje
   }, [refresh]);
 
   // Periodic session validation — detects when another device takes over

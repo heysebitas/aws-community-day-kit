@@ -22,7 +22,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
   const t = useTranslations("Passport");
   const [passport, setPassport]   = useState<PassportData | null>(inicial.passport ?? null);
   const [sponsors, setSponsors]   = useState<Sponsor[]>(inicial.sponsors ?? []);
-  const [loading, setLoading]     = useState(inicial.loading ?? true);
+  const [loading, setLoading]     = useState(inicial.loading ?? !(inicial.passport || inicial.notFound));
   const [notFound, setNotFound]   = useState(inicial.notFound ?? false);
 
   const [isOwner, setIsOwner]             = useState(inicial.isOwner ?? false);
@@ -78,7 +78,10 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
   }, [shortId]);
 
   useEffect(() => {
-    (async () => { setLoading(true); await loadPassport(readOwnerCookie() ?? undefined); setLoading(false); })();
+    const pin = readOwnerCookie() ?? undefined;
+    // El servidor ya trajo el pasaporte público: sólo se vuelve a pedir si hay PIN guardado.
+    if ((inicial.passport || inicial.notFound) && !pin) return;
+    (async () => { if (!inicial.passport) setLoading(true); await loadPassport(pin); setLoading(false); })();
   // eslint-disable-next-line react-hooks/exhaustive-deps -- solo otro pasaporte vuelve a cargar
   }, [shortId]);
 
