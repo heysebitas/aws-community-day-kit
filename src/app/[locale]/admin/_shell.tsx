@@ -10,7 +10,7 @@ import { localePath, idiomaDeRuta } from "@/lib/utils";
 import { alcanza, seccionDeRuta } from "@/lib/permisos";
 
 function AdminGate({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, sesionTomada } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const locale = idiomaDeRuta(pathname);
@@ -29,7 +29,8 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
     if (!user && !isPublicPage) {
-      router.replace(localePath(locale, "/admin/login"));
+      // Si otro dispositivo tomó la sesión, el login lo dice; si no, este replace pisaba el aviso.
+      router.replace(localePath(locale, sesionTomada ? "/admin/login?aviso=sesion" : "/admin/login"));
     } else if (user && isLoginPage) {
       // Ya está autenticado: no mostrar el login.
       router.replace(localePath(locale, "/admin"));
@@ -42,7 +43,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
       // de errores en vez de un «no es para ti».
       router.replace(localePath(locale, "/admin"));
     }
-  }, [loading, user, router, locale, isPublicPage, isLoginPage, isBadgesScanner, sinPermiso]);
+  }, [loading, user, sesionTomada, router, locale, isPublicPage, isLoginPage, isBadgesScanner, sinPermiso]);
 
   // Public admin pages (login, create-password) render without sidebar
   if (isPublicPage) {

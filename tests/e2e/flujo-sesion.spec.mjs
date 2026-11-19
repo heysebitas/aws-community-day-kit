@@ -18,6 +18,8 @@ test("al abrir la misma cuenta en otro dispositivo, el primero vuelve al login c
     await entrar(primero);
 
     await entrar(await b.newPage());
+    // Con la pestaña oculta el panel no consulta; al volver a primer plano comprueba al momento.
+    await primero.bringToFront();
 
     // El panel comprueba la sesión cada 10 s.
     await primero.waitForURL(/\/admin\/login\?aviso=sesion/, { timeout: 40_000 });

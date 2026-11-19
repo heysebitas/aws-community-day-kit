@@ -23,11 +23,14 @@ interface AuthContextValue {
   login: (email: string, password: string, captchaToken?: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  /** La sesión se cerró porque se abrió en otro dispositivo: el login lo avisa. */
+  sesionTomada: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
+  sesionTomada: false,
   login: async () => {},
   logout: async () => {},
   refresh: async () => {},
@@ -54,6 +57,7 @@ const SESSION_CHECK_INTERVAL = 10_000; // 10s
 export function AuthProvider({ children, inicial }: { children: React.ReactNode; inicial?: AuthUser | null }) {
   const [user, setUser] = useState<AuthUser | null>(inicial ?? null);
   const [loading, setLoading] = useState(!inicial);
+  const [sesionTomada, setSesionTomada] = useState(false);
   const primeraVez = useRef(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -68,6 +72,7 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
         wasAuthenticated.current = true;
       } else {
         const hadUser = wasAuthenticated.current;
+        if (hadUser) setSesionTomada(true);
         setUser(null);
         wasAuthenticated.current = false;
 
@@ -102,6 +107,7 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
       try {
         const res = await fetch("/api/auth/me");
         if (!res.ok) {
+          setSesionTomada(true);
           setUser(null);
           wasAuthenticated.current = false;
           const locale = idiomaDeRuta(pathname);
@@ -144,6 +150,7 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new ErrorApi(data);
+    setSesionTomada(false);
     setUser(data.user);
     wasAuthenticated.current = true;
   };
@@ -155,7 +162,7 @@ export function AuthProvider({ children, inicial }: { children: React.ReactNode;
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refresh }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refresh, sesionTomada }}>
       {children}
     </AuthContext.Provider>
   );

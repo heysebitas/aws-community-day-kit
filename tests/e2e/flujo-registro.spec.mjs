@@ -27,7 +27,8 @@ test("registro → confirmación → check-in en el panel", async ({ page, reque
         firstName: "Ana", lastName: apellido, email: correo, attendance: "online",
         role: "Prueba", entityType: "none", acceptCoc: true, acceptPrivacy: true,
       },
-      captchaToken: "demo",
+      // La demo acepta cualquier token, pero cada uno vale una sola vez (también en el reintento).
+      captchaToken: `demo-${marca}`,
     },
   });
   expect(res.status(), await res.text()).toBeLessThan(300);
@@ -61,7 +62,7 @@ test("registro → confirmación → check-in en el panel", async ({ page, reque
   await page.getByPlaceholder("Buscar por nombre, apellido o documento...").fill(apellido);
   await page.getByRole("button", { name: new RegExp(apellido, "i") }).first().click();
   await page.getByRole("button", { name: "HACER CHECK-IN" }).click();
-  await expect(page.getByRole("status")).toBeVisible();
+  await expect(page.getByRole("status").first()).toBeVisible();
 
   const despues = await page.request.get("/api/registrations?limit=50");
   const { registrations: ahora } = await despues.json();
