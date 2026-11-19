@@ -412,6 +412,7 @@
     "register": "register for free"
   },
   "Panel": {
+    "correo_ya_registrado": "That email is already registered for the event. Use another one or check the existing registration.",
     "config_dia_title": "Event day · [[fecha_dia]]",
     "config_post_title": "After the event · from the day after [[fecha_dia]]",
     "config_notify_label": "Notification for [[anio_siguiente]]",

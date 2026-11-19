@@ -5,6 +5,7 @@ import { Registration } from "@/models/registration";
 import { sendEmail, EMAIL_FROM } from "@/lib/correo";
 import { buildRegistrationEmail } from "@/lib/registration-email";
 import { ruta } from "@/lib/api";
+import { normalizeEmail } from "@/lib/normalize";
 
 export const POST = ruta(async (
   request: NextRequest,
@@ -15,7 +16,7 @@ export const POST = ruta(async (
 
   const { id } = await params;
   const body = await request.json().catch(() => ({}));
-  const newEmail = body.email as string | undefined;
+  const newEmail = typeof body.email === "string" ? body.email : undefined;
 
   const registration = await Registration.findById(id);
   if (!registration) {
@@ -24,8 +25,19 @@ export const POST = ruta(async (
 
   // Corrección del correo cuando rebotó.
   if (newEmail) {
-    registration.email = newEmail;
-    await registration.save();
+    const check = normalizeEmail(newEmail);
+    if (!check.ok) return Response.json({ error: check.reason }, { status: 400 });
+    if (check.value !== registration.email) {
+      registration.email = check.value;
+      try {
+        await registration.save();
+      } catch (e) {
+        if ((e as { code?: number }).code === 11000) {
+          return Response.json({ error: "Ese correo ya está registrado en el evento" }, { status: 409 });
+        }
+        throw e;
+      }
+    }
   }
 
   const email = registration.email;

@@ -204,7 +204,7 @@ export default function UsersPage() {
 
   const handleCreateGeneric = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (genForm.password.length < 8) { toast("La contraseña debe tener al menos 8 caracteres", "error"); return; }
+    if (genForm.password.length < 10) { toast("La contraseña debe tener al menos 10 caracteres", "error"); return; }
     setCreatingGen(true);
     try {
       const res = await fetch("/api/users", {
@@ -455,7 +455,7 @@ export default function UsersPage() {
             required
           />
           <Input
-            label="Contraseña (mín. 8 caracteres)"
+            label="Contraseña (mín. 10 caracteres)"
             type="text"
             value={genForm.password}
             onChange={(e) => setGenForm({ ...genForm, password: e.target.value })}

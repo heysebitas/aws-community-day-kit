@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { sincronizarCupo } from "@/lib/cupo";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { Registration } from "@/models/registration";
@@ -26,6 +27,7 @@ const TARGETS = {
         $or: [{ linkedRegistrationId: { $in: ids } }, { shortId: { $in: codes } }],
       });
       const main = await Registration.deleteMany({});
+      await sincronizarCupo("attendee");
       return {
         deleted: main.deletedCount ?? 0,
         extra: passports.deletedCount ? `${passports.deletedCount} pasaporte(s)` : "",
@@ -40,6 +42,7 @@ const TARGETS = {
         linkedRegistrationId: { $in: vols.map((v) => String(v._id)) },
       });
       const main = await VolunteerSubmission.deleteMany({});
+      await sincronizarCupo("volunteer");
       return {
         deleted: main.deletedCount ?? 0,
         extra: passports.deletedCount ? `${passports.deletedCount} pasaporte(s)` : "",

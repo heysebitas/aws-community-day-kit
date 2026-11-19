@@ -15,6 +15,7 @@ import { rateLimit, getIp } from "@/lib/rate-limit";
 import { Passport } from "@/models/passport";
 import { verifyCaptcha } from "@/lib/captcha";
 import { ruta } from "@/lib/api";
+import { devolverCupo, reservarCupo, sincronizarCupo } from "@/lib/cupo";
 
 // Lo que pinta el panel; el resto (campañas, `busqueda`, `__v`) no viaja.
 const CAMPOS_PANEL =
@@ -102,6 +103,7 @@ export const POST = ruta(async (request: NextRequest) => {
 
   await connectDB();
 
+  let maxSubmissions: number | null = null;
   // Las preguntas son fijas; el formulario guardado sólo dice si el registro
   // está abierto. Un alta manual entra aunque esté cerrado.
   if (!manual) {
@@ -109,12 +111,7 @@ export const POST = ruta(async (request: NextRequest) => {
     if (!form) {
       return Response.json({ error: "El registro no está disponible" }, { status: 404 });
     }
-    if (form.maxSubmissions) {
-      const count = await Registration.countDocuments({});
-      if (count >= form.maxSubmissions) {
-        return Response.json({ error: "Se alcanzó el límite de registros" }, { status: 400 });
-      }
-    }
+    maxSubmissions = form.maxSubmissions;
   }
 
   const parsed = parseRegistrationInput(input, { manual });
@@ -141,6 +138,11 @@ export const POST = ruta(async (request: NextRequest) => {
     }
   }
 
+  // El cupo se toma al final, ya sin motivo para rechazar: un 409 no gasta cupo.
+  if (!(await reservarCupo("attendee", maxSubmissions))) {
+    return Response.json({ error: "Se alcanzó el límite de registros" }, { status: 400 });
+  }
+
   const qrCode = nanoid(12);
 
   // El índice único cierra la carrera entre el findOne y el create.
@@ -157,6 +159,7 @@ export const POST = ruta(async (request: NextRequest) => {
       } : {}),
     });
   } catch (e) {
+    await devolverCupo("attendee", maxSubmissions);
     if ((e as { code?: number }).code === 11000) {
       return Response.json(
         { error: "Este correo ya está registrado en el evento" },
@@ -165,6 +168,8 @@ export const POST = ruta(async (request: NextRequest) => {
     }
     throw e;
   }
+
+  if (manual) await sincronizarCupo("attendee");
 
   const name = `${data.firstName} ${data.lastName}`.trim();
   const email = data.email;

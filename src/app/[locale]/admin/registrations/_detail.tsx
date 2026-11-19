@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { useTranslations } from "next-intl";
 import {
   ArrowRightLeft, Check, HeartHandshake, MapPin, MonitorPlay,
   QrCode as QrIcon, RefreshCw, Ticket, Trash2,
@@ -39,6 +40,7 @@ export function RegistrationDetail({
 }) {
   const { toast } = useToast();
   const [qrDataUrl, setQrDataUrl] = useState("");
+  const tPanel = useTranslations("Panel");
   const [resending, setResending] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [move, setMove] = useState<MoveKind | null>(null);
@@ -71,7 +73,7 @@ export function RegistrationDetail({
       });
       const data = await res.json();
       if (!res.ok) {
-        toast(data.error || "Error al reenviar", "error");
+        toast(res.status === 409 ? tPanel("correo_ya_registrado") : data.error || "Error al reenviar", "error");
         return;
       }
       toast("Correo reenviado correctamente", "success");

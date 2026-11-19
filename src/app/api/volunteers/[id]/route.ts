@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { sincronizarCupo } from "@/lib/cupo";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { VolunteerSubmission } from "@/models/volunteer-submission";
@@ -25,6 +26,7 @@ export const DELETE = ruta(async (
   // Borra en cascada su pasaporte de voluntario (si el admin lo generó)
   const passportResult = await Passport.deleteMany({ linkedRegistrationId: id });
   await VolunteerSubmission.findByIdAndDelete(id);
+  await sincronizarCupo("volunteer");
 
   await createLog({
     userId: user._id.toString(),
