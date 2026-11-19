@@ -8,7 +8,7 @@ import { sendEmail, EMAIL_FROM } from "@/lib/correo";
 import { armarInvitacion } from "@/lib/correo-invitacion";
 import { createLog } from "@/lib/log";
 import { sanearPermisos } from "@/lib/permisos";
-import { SITIO } from "@/config";
+import { IDIOMA_BASE, SITIO } from "@/config";
 import { ruta, logError } from "@/lib/api";
 
 export const GET = ruta(async () => {
@@ -89,7 +89,7 @@ export const POST = ruta(async (request: NextRequest) => {
 
   // Send invitation email
   const appUrl = SITIO;
-  const createPasswordUrl = `${appUrl}/es/admin/create-password?token=${token}`;
+  const createPasswordUrl = `${appUrl}/${IDIOMA_BASE}/admin/create-password?token=${token}`;
 
   try {
     const correo = await armarInvitacion(name, role, createPasswordUrl);
