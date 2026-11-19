@@ -133,7 +133,13 @@ export const POST = ruta(async (request: NextRequest) => {
       return Response.json({ error: "No hay nadie en esa audiencia" }, { status: 400 });
     }
 
-    const tanda = todos.slice(0, TOPE_POR_TANDA);
+    // Sin el filtro de repetidos nadie queda marcado, así que la siguiente
+    // tanda se pide por posición. Con el filtro, la lista ya se acorta sola.
+    const desde = evitarRepetidos ? 0 : Math.max(0, Math.trunc(Number(body.desde)) || 0);
+    const tanda = todos.slice(desde, desde + TOPE_POR_TANDA);
+    if (!tanda.length) {
+      return Response.json({ error: "No queda nadie después de esa posición" }, { status: 400 });
+    }
     const resumen = resumenAudiencia(audiencia);
 
     // La campaña se crea antes de mandar. Si la función se muere a mitad, lo
@@ -188,6 +194,7 @@ export const POST = ruta(async (request: NextRequest) => {
       correos.push({
         from: MARKETING_EMAIL_FROM,
         to: d.email,
+        clave: `campana:${campana._id}:${d.email.toLowerCase()}`,
         subject: correo.asunto,
         html: correo.html,
         ...(adjuntos ? { attachments: adjuntos } : {}),
@@ -233,13 +240,12 @@ export const POST = ruta(async (request: NextRequest) => {
       details: `${enviados} enviados · ${fallidos} fallidos · ${resumen}`,
     });
 
-    // `restantes` sólo tiene sentido con el filtro de repetidos puesto: sin
-    // él, volver a llamar le escribiría otra vez a los de esta tanda.
-    // Los que fallaron cuentan: no quedaron marcados, así que vuelven a salir
-    // en la siguiente tanda.
+    // Con el filtro, los que fallaron no quedaron marcados y vuelven a salir en
+    // la siguiente tanda, así que cuentan. Sin él, lo que queda es lo que está
+    // después de lo procesado.
     const restantes = evitarRepetidos
       ? Math.max(0, todos.length - hechos) + fallidos
-      : 0;
+      : Math.max(0, todos.length - desde - hechos);
 
     return Response.json({
       ok: true,
@@ -247,6 +253,8 @@ export const POST = ruta(async (request: NextRequest) => {
       enviados: enviados,
       fallidos,
       restantes,
+      /** Dónde seguir sin el filtro de repetidos: el `desde` de la siguiente llamada. */
+      siguiente: desde + hechos,
       // Para que el panel pueda decir «eran 412, mandé 300, quedan 112».
       totalAudiencia: todos.length,
       motivos: [...motivos].slice(0, 5),

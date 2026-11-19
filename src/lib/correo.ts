@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { DOMINIO, EVENTO } from "@/config";
 import { armarMime } from "@/lib/correo-mime";
 
@@ -30,6 +31,8 @@ export interface SendEmailOptions {
   subject: string;
   html: string;
   attachments?: EmailAttachment[];
+  /** Identifica este envío a este destinatario; el proveedor no lo repite si se reintenta. */
+  clave?: string;
 }
 
 export interface SendEmailResult {
@@ -51,14 +54,46 @@ const fallo = (e: unknown): SendEmailResult => ({ id: null, error: e instanceof 
 
 // ── Resend ───────────────────────────────────────────────────────────────────
 
-async function resend(ruta: string, cuerpo: unknown): Promise<{ ok: boolean; json: unknown; status: number }> {
-  const res = await fetch(`https://api.resend.com${ruta}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY ?? ""}`, "Content-Type": "application/json" },
-    body: JSON.stringify(cuerpo),
-    signal: AbortSignal.timeout(Number(process.env.HTTP_TIMEOUT_MS) || 10_000),
-  });
-  return { ok: res.ok, status: res.status, json: await res.json().catch(() => ({})) };
+const INTENTOS = 3;
+const TOPE_ESPERA_MS = 30_000;
+
+/** Lo que dice `Retry-After` (segundos), en ms; `null` si no viene o no se entiende. */
+function esperaPedida(res: Response): number | null {
+  const v = res.headers.get("retry-after");
+  if (v === null || v.trim() === "") return null;
+  const seg = Number(v);
+  return Number.isFinite(seg) && seg >= 0 ? Math.min(seg * 1000, TOPE_ESPERA_MS) : null;
+}
+
+/**
+ * Pide a Resend. Ante 429 y 5xx reintenta hasta `INTENTOS` veces, con espera
+ * exponencial o la que mande `Retry-After`; la misma `Idempotency-Key` en cada
+ * intento evita que un envío que sí salió se mande dos veces.
+ */
+async function resend(
+  ruta: string,
+  cuerpo: unknown,
+  clave: string = crypto.randomUUID(),
+): Promise<{ ok: boolean; json: unknown; status: number }> {
+  const base = Number(process.env.CORREO_REINTENTO_MS ?? 1000);
+  for (let intento = 1; ; intento++) {
+    const res = await fetch(`https://api.resend.com${ruta}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY ?? ""}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": clave,
+      },
+      body: JSON.stringify(cuerpo),
+      signal: AbortSignal.timeout(Number(process.env.HTTP_TIMEOUT_MS) || 10_000),
+    });
+    const reintentable = res.status === 429 || res.status >= 500;
+    if (!reintentable || intento >= INTENTOS) {
+      return { ok: res.ok, status: res.status, json: await res.json().catch(() => ({})) };
+    }
+    await res.body?.cancel().catch(() => {});
+    await sleep(esperaPedida(res) ?? Math.min(base * 2 ** (intento - 1), TOPE_ESPERA_MS));
+  }
 }
 
 const paraResend = ({ from, to, subject, html, attachments }: SendEmailOptions) => ({
@@ -66,14 +101,18 @@ const paraResend = ({ from, to, subject, html, attachments }: SendEmailOptions) 
 });
 
 async function enviarResend(email: SendEmailOptions): Promise<SendEmailResult> {
-  const { ok, json, status } = await resend("/emails", paraResend(email));
+  const { ok, json, status } = await resend("/emails", paraResend(email), email.clave);
   const j = json as { id?: string; message?: string };
   return ok && j.id ? { id: j.id, error: null } : { id: null, error: j.message || `Resend respondió ${status}` };
 }
 
 /** Un lote de hasta 100. Los ids vuelven en el orden en que se mandaron. */
 async function loteResend(emails: SendEmailOptions[]): Promise<SendEmailResult[]> {
-  const { ok, json, status } = await resend("/emails/batch", emails.map(paraResend));
+  // Una clave por lote: sale de las de cada correo, o es nueva si alguno no trae.
+  const clave = emails.every((e) => e.clave)
+    ? `lote:${createHash("sha256").update(emails.map((e) => e.clave).join("|")).digest("hex")}`
+    : undefined;
+  const { ok, json, status } = await resend("/emails/batch", emails.map(paraResend), clave);
   if (!ok) {
     const motivo = (json as { message?: string }).message || `Resend respondió ${status}`;
     return emails.map(() => ({ id: null, error: motivo }));

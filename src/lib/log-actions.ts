@@ -23,6 +23,7 @@ type Entry = { label: string; group: LogGroup };
 export const LOG_ACTIONS: Record<string, Entry> = {
   // ── Personas ──
   REGISTRATION_MANUAL: { label: "Registro manual", group: "personas" },
+  REGISTRATION_EMAIL_RESENT: { label: "Correos de registro reenviados", group: "personas" },
   REGISTRATION_DELETED: { label: "Registro eliminado", group: "peligro" },
   REGISTRATION_MOVED_TO_VOLUNTEER: { label: "Movido a voluntarios", group: "personas" },
   REGISTRATION_ATTENDANCE_CHANGED: { label: "Cambio de modalidad", group: "personas" },

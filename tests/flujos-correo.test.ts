@@ -12,6 +12,7 @@ const SECRETO = "whsec_" + Buffer.from("secreto-de-prueba-para-svix-0001").toStr
 
 before(async () => {
   console.log = () => {};
+  process.env.CORREO_REINTENTO_MS = "5";
   await montarEntorno("flujos-correo");
 });
 after(async () => {
@@ -212,9 +213,9 @@ describe("campañas", () => {
     let lotes = 0;
     globalThis.fetch = (async (_u: unknown, init?: RequestInit) => {
       lotes++;
-      const correos = JSON.parse(String(init?.body)) as unknown[];
-      // El segundo lote de 50 se cae; el primero y el tercero salen.
-      if (lotes === 2) return new Response(JSON.stringify({ message: "caído" }), { status: 500 });
+      const correos = JSON.parse(String(init?.body)) as { to: string }[];
+      // El segundo lote de 50 se cae (también en los reintentos); el primero y el tercero salen.
+      if (correos[0]!.to === "camp50@ejemplo.test") return new Response(JSON.stringify({ message: "caído" }), { status: 500 });
       return new Response(JSON.stringify({ data: correos.map((_, k) => ({ id: `id-${lotes}-${k}` })) }), { status: 200 });
     }) as typeof fetch;
     try {

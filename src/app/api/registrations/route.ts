@@ -7,6 +7,7 @@ import { requireAccess } from "@/lib/auth";
 import { Form } from "@/models/form";
 import { Registration } from "@/models/registration";
 import { enviarCorreoRegistro, despuesDeResponder } from "@/lib/registro-correo";
+import { cola } from "@/lib/cola";
 import { parseRegistrationInput } from "@/lib/registration-input";
 import { roleLabelOf } from "@/data/attendee-form";
 import { createLog } from "@/lib/log";
@@ -202,9 +203,9 @@ export const POST = ruta(async (request: NextRequest) => {
   const shouldSkipEmail = (manual && skipEmail) || !email;
 
   if (!shouldSkipEmail && email) {
-    // Se responde ya: el correo sale después y deja su estado en el registro.
+    // Se responde ya: el PDF y el correo salen por la cola y dejan su estado en el registro.
     const id = registration._id.toString();
-    despuesDeResponder(() => enviarCorreoRegistro(id, name, email, data.attendance));
+    despuesDeResponder(() => cola.encolar(() => enviarCorreoRegistro(id, name, email, data.attendance), "correo de registro"));
   } else {
     registration.emailStatus = "skipped";
     await registration.save();

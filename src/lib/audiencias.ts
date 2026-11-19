@@ -90,6 +90,12 @@ export const PUBLICOS: DefinicionPublico[] = [
         { valor: "in-person", etiqueta: "Presencial" },
         { valor: "online", etiqueta: "Online" },
       ]),
+      enLista("correo", "emailStatus", "Correo de confirmación", [
+        { valor: "failed", etiqueta: "Falló" },
+        { valor: "pending", etiqueta: "Pendiente" },
+        { valor: "sent", etiqueta: "Enviado" },
+        { valor: "skipped", etiqueta: "Omitido" },
+      ]),
       booleano("confirmado", "confirmation.confirmed", "Confirmó asistencia"),
       booleano("checkin", "checkedIn", "Hizo check-in", "Sólo tiene sentido después del evento."),
       enLista("rol", "role", "Rol", ROLES.map((r) => ({ valor: r.value, etiqueta: labelOf(r) }))),

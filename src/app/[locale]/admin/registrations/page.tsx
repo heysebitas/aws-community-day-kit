@@ -109,6 +109,42 @@ function RegistrationsAdminPageInner() {
   const totalVirtual = registrations.filter((r) => r.attendance === "online").length;
   const totalPresencial = registrations.length - totalVirtual;
 
+  const [reenviando, setReenviando] = useState(false);
+  // Una tanda por llamada, hasta que no quede nadie que no haya fallado ya otra vez.
+  const reenviarFallidos = async () => {
+    const ok = await confirm({
+      title: `Reenviar ${emailsFailed} ${emailsFailed === 1 ? "correo fallido" : "correos fallidos"}`,
+      message: "Se vuelve a mandar la confirmación (con su pase) a quien no la recibió. Quien ya la recibió no se toca.",
+      confirmLabel: "Reenviar",
+    });
+    if (!ok) return;
+    setReenviando(true);
+    let enviados = 0, fallidos = 0, desde = 0;
+    try {
+      for (;;) {
+        const res = await fetch("/api/admin/registrations/reenviar-fallidos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ desde }),
+        });
+        const d = await res.json();
+        if (!res.ok) { toast(d.error ?? "No se pudo reenviar", "error"); break; }
+        enviados += d.enviados as number;
+        fallidos += d.fallidos as number;
+        desde = d.siguiente as number;
+        const salieron = new Set(d.idsEnviados as string[]);
+        setRegistrations((prev) => prev.map((r) =>
+          salieron.has(r.id) ? { ...r, emailStatus: "sent", emailError: null } : r));
+        if (!d.restantes) break;
+      }
+      toast(`${enviados} reenviados${fallidos ? `, ${fallidos} siguen fallando` : ""}`, fallidos ? "error" : "success");
+    } catch {
+      toast("El reenvío se cortó. Mira cuántos siguen fallidos antes de repetirlo.", "error");
+    } finally {
+      setReenviando(false);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     const ok = await confirm({
       title: "Eliminar registro",
@@ -248,6 +284,14 @@ function RegistrationsAdminPageInner() {
             className="ml-2 underline underline-offset-2"
           >
             Ver cuáles
+          </button>
+          <button
+            type="button"
+            disabled={reenviando}
+            onClick={reenviarFallidos}
+            className="ml-2 underline underline-offset-2 disabled:opacity-50"
+          >
+            {reenviando ? "Reenviando…" : "Reenviar fallidos"}
           </button>
         </Aviso>
       )}
