@@ -21,7 +21,8 @@ test("las reglas de especulación son prefetch moderado en /* sin las rutas con 
 
 test("el layout publica las reglas como speculationrules", () => {
   const src = leer("src/app/[locale]/layout.tsx");
-  assert.match(src, /type="speculationrules"/);
+  assert.match(src, /type:'speculationrules'/);
+  assert.match(src, /contains\('modesto'\)/);
   assert.match(src, /reglasEspeculativas\(\)/);
 });
 

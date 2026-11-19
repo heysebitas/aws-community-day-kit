@@ -19,6 +19,7 @@ import { cfpAbierto } from "@/hooks/cfp-abierto";
 import { EventConfigProvider } from "@/components/providers/event-config-provider";
 import { EventJsonLd } from "@/components/seo/json-ld";
 import { BfcacheReset } from "@/components/effects/bfcache-reset";
+import { SCRIPT_MODESTO } from "@/lib/dispositivo";
 import { reglasEspeculativas } from "@/lib/speculation-rules";
 import { contacto } from "@evento/contacto";
 
@@ -121,6 +122,8 @@ export default async function LocaleLayout({ children, params }: Props) {
       <head>
         {/* `js` va antes de pintar: el CSS oculta lo que anima sólo si hay JS. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* `modesto` también va antes de pintar: el CSS detiene las animaciones infinitas. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_MODESTO }} />
       </head>
       <body className="min-h-full bg-surface-900 font-sans text-surface-100">
         <a
@@ -131,7 +134,8 @@ export default async function LocaleLayout({ children, params }: Props) {
         </a>
         {DEMO && <script dangerouslySetInnerHTML={{ __html: VISTA_PREVIA_TEMA }} />}
         <BfcacheReset />
-        <script type="speculationrules" dangerouslySetInnerHTML={{ __html: JSON.stringify(reglasEspeculativas()) }} />
+        {/* Sin precarga especulativa en dispositivos modestos. */}
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.classList.contains('modesto')||document.body.append(Object.assign(document.createElement('script'),{type:'speculationrules',text:${JSON.stringify(JSON.stringify(reglasEspeculativas()))}}))` }} />
         <NextIntlClientProvider messages={pick(mensajes, MENSAJES_COMUN)}>
           <EventConfigProvider value={config}>
             <SiteChrome

@@ -61,3 +61,7 @@ semilla de la demo más 20 000 registros, Mongo fuera del contenedor y `autocann
   lo siguiente. Bajar el heap a 192 MB o el semiespacio no lo cambió.
 - Con nginx delante (`deploy/nginx/sitio.conf`), la portada y las imágenes ya
   cacheadas no llegan a Node.
+
+## Modo modesto
+
+Si el dispositivo es modesto (`deviceMemory` ≤ 2, `hardwareConcurrency` ≤ 4, ahorro de datos o red 2g/3g), un script del `<head>` pone `modesto` en `<html>` antes de pintar. Es automático y no hay interruptor. Con él los canvas pintan un solo fotograma (como con movimiento reducido), el CSS detiene las animaciones infinitas, los enlaces de la portada y la navegación no precargan y no se publican las reglas especulativas. La lógica está en `src/lib/dispositivo.ts`. Para probarlo, en DevTools emula red 3g o `Save-Data`, o en la consola `Object.defineProperty(navigator, "deviceMemory", { value: 1 })` y recarga; comprueba la clase `modesto` en `<html>`.
