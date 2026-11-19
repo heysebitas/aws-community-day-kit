@@ -34,7 +34,8 @@ export function cookieDeSesion(setCookies) {
 
 /** Qué sentido es «peor» en cada métrica y cuánto cambio se tolera antes de marcarlo. */
 export const METRICAS = {
-  rendimiento: { mejor: "alto", tolerancia: 3, unidad: "" },
+  // La puntuación de rendimiento varía ~8 puntos entre corridas en el runner.
+  rendimiento: { mejor: "alto", tolerancia: 8, unidad: "" },
   accesibilidad: { mejor: "alto", tolerancia: 3, unidad: "" },
   seo: { mejor: "alto", tolerancia: 3, unidad: "" },
   fcp: { mejor: "bajo", tolerancia: 200, unidad: " ms" },
