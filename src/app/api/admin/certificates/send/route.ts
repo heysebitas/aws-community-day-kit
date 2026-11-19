@@ -5,6 +5,7 @@ import { VolunteerSubmission } from "@/models/volunteer-submission";
 import { generateVolunteerCertificate } from "@/lib/pdf/certificate";
 import { armarCorreoObligatorio } from "@/lib/email-plantillas";
 import { sendEmail, sleep, EMAIL_FROM } from "@/lib/correo";
+import { tomarCerrojo, soltarCerrojo } from "@/models/email-cerrojo";
 import { createLog } from "@/lib/log";
 import { SLUG } from "@/config";
 import { ruta } from "@/lib/api";
@@ -14,6 +15,8 @@ export const maxDuration = 300;
 
 /** 100 × ~1 s entra en `maxDuration`. */
 const TOPE_IDS = 100;
+/** Debe superar `maxDuration`: si la función muere sin soltarlo, caduca solo. */
+const CADUCA_CERROJO_MS = 6 * 60_000;
 
 // Envía el certificado (PDF adjunto) a los voluntarios seleccionados (1 o varios).
 export const POST = ruta(async (req: NextRequest) => {
@@ -27,8 +30,14 @@ export const POST = ruta(async (req: NextRequest) => {
   }
   await connectDB();
 
+  // Dos envíos a la vez mandarían el certificado dos veces a la misma persona.
+  const cerrojo = "certificados";
+  if (!(await tomarCerrojo(cerrojo, actor.name ?? "", CADUCA_CERROJO_MS))) {
+    return NextResponse.json({ error: "Ya se están enviando certificados. Espera a que termine." }, { status: 409 });
+  }
+  try {
   const vols = await VolunteerSubmission.find({ _id: { $in: ids }, approved: true })
-    .select("firstName lastName email certName")
+    .select("firstName lastName email certName certSentAt")
     .lean();
 
   // Envío individual (el batch de Resend NO soporta adjuntos) con marcado
@@ -38,13 +47,14 @@ export const POST = ruta(async (req: NextRequest) => {
   for (const v of vols) {
     const email = v.email;
     const name = (v.certName || `${v.firstName} ${v.lastName}`).trim();
-    if (!email || !name) { skipped++; continue; }
+    if (!email || !name || v.certSentAt) { skipped++; continue; }
 
     const pdf = await generateVolunteerCertificate(name);
     const correo = await armarCorreoObligatorio("voluntario_certificado", { nombre: name.split(" ")[0]!, nombreCompleto: name });
     const res = await sendEmail({
       from: EMAIL_FROM,
       to: email,
+      clave: `certificado:${v._id}`,
       subject: correo.asunto,
       html: correo.html,
       attachments: [{ filename: `certificado-${SLUG}.pdf`, content: pdf.toString("base64") }],
@@ -65,4 +75,7 @@ export const POST = ruta(async (req: NextRequest) => {
   });
 
   return NextResponse.json({ sentCount, failedCount, skipped });
+  } finally {
+    await soltarCerrojo(cerrojo).catch(() => {});
+  }
 });
