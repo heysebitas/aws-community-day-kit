@@ -23,7 +23,7 @@ async function totalDentro(): Promise<number> {
 }
 
 export const POST = ruta(async (request: NextRequest) => {
-  const user = await requireAnyAccess(["checkin", "escaner_checkin"], "editar");
+  const user = await requireAnyAccess(["checkin", "escaner_checkin"], "editar", ["admin", "organizer", "volunteer"]);
   // El código va directo al filtro de Mongo: si no es texto, `{"$ne":null}`
   // marcaría presente al primero que hubiera en la puerta.
   const cuerpo = await leerCuerpo(request);

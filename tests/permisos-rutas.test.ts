@@ -50,6 +50,7 @@ const PUBLICAS: Record<string, { motivo: string; marca?: string }> = {
   "GET /pass-qr/[code]": { motivo: "imagen" },
   "GET /passes/[qrCode]": { motivo: "pase", marca: LIMITE },
   "GET /passport/[shortId]": { motivo: "pasaporte", marca: "comprobarPin(" },
+  "POST /passport/[shortId]": { motivo: "pasaporte", marca: "comprobarPin(" },
   "PATCH /passport/[shortId]": { motivo: "pasaporte", marca: "comprobarPin(" },
   // El PIN del stand hace de llave y los fallos se cuentan por IP y por pasaporte.
   "POST /passport/[shortId]/stamp": { motivo: "pin", marca: "isBlocked(" },

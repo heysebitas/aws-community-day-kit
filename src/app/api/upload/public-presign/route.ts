@@ -4,6 +4,7 @@ import { EVENTO } from "@/config";
 import { getIp, rateLimit } from "@/lib/rate-limit";
 import { presignSubida, S3_PUBLIC_URL, s3Key } from "@/lib/s3";
 import { extensionDe, validarSubida } from "@/lib/subidas";
+import { verifyCaptcha } from "@/lib/captcha";
 import { leerCuerpo } from "@/lib/cuerpo";
 
 /** URL firmada para la foto de quien postula como speaker. */
@@ -21,7 +22,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { contentType, size } = await leerCuerpo(request);
+    const { contentType, size, captchaToken } = await leerCuerpo(request);
+    if (!(await verifyCaptcha(typeof captchaToken === "string" ? captchaToken : ""))) {
+      return Response.json({ error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
+    }
     const v = validarSubida(contentType, size, "foto");
     if (!v.ok) return Response.json({ error: v.error }, { status: 400 });
 

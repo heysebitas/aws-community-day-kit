@@ -1,9 +1,10 @@
 import QRCode from "qrcode";
-import { EVENTO } from "@/config";
+import { EVENTO, SITIO } from "@/config";
 import { armarCorreo } from "@/lib/email-plantillas";
 import { generateRegistrationPDF } from "@/lib/pdf/registration";
 import { CacheImagenes } from "@/lib/cache-imagen";
-import type { Attendance } from "@/models/registration";
+import { Registration, type Attendance } from "@/models/registration";
+import { Passport } from "@/models/passport";
 
 /**
  * El correo de confirmación de un registro. Lo mandan el registro nuevo y el
@@ -24,6 +25,15 @@ export type BuiltEmail = {
 const VERSION_PASE = "1";
 /** Los pases ya dibujados: un reenvío o un reintento no vuelve a pagar el PDF. */
 export const pasesPdf = new CacheImagenes(200, 32 * 1024 * 1024);
+
+/** El enlace y el PIN del pasaporte de quien tiene este pase; vacío si aún no tiene. */
+async function pasaporteDe(qrCode: string): Promise<Record<string, string>> {
+  const reg = await Registration.findOne({ qrCode }).select("_id").lean();
+  if (!reg) return {};
+  const p = await Passport.findOne({ linkedRegistrationId: String(reg._id) }).select("shortId viewPin").lean<{ shortId: string; viewPin?: string } | null>();
+  if (!p) return {};
+  return { pasaporte: `${SITIO}/pasaporte/${p.shortId}`, pin: p.viewPin ?? "" };
+}
 
 export async function buildRegistrationEmail(name: string, qrCode: string, attendance: Attendance): Promise<BuiltEmail> {
   const isVirtual = attendance === "online";
@@ -46,7 +56,9 @@ export async function buildRegistrationEmail(name: string, qrCode: string, atten
     return new Response(new Uint8Array(await generateRegistrationPDF(name, qrBuffer, qrCode)));
   });
 
-  const correo = await armarCorreo("registro_presencial", datos, ["presencial"]);
+  // El PIN no va en la escarapela: sale por aquí, junto al enlace del pasaporte.
+  const propio = await pasaporteDe(qrCode);
+  const correo = await armarCorreo("registro_presencial", { ...datos, ...propio }, ["presencial"]);
   if (!correo) throw new Error("plantilla registro_presencial no disponible");
 
   return {

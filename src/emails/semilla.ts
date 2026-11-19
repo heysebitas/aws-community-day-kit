@@ -282,6 +282,9 @@ const TODAS: Semilla[] = [
         { etiqueta: "Dirección", valor: "{direccion}" },
       ] },
       { id: id(), tipo: "boton", texto: "Cómo llegar", enlace: "{comoLlegar}", contorno: true },
+      { id: id(), tipo: "datos", filas: [{ etiqueta: "PIN de tu pasaporte", valor: "{pin}" }] },
+      { id: id(), tipo: "parrafo", texto: "Guárdalo: no va en tu escarapela. Lo pides para editar tu pasaporte y para que los stands te pongan sellos." },
+      { id: id(), tipo: "boton", texto: "Ver mi pasaporte", enlace: "{pasaporte}", contorno: true },
     ],
   },
 

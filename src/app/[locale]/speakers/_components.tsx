@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useContext, useId, useState } from "react";
+import { createContext, useContext, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Turnstile, type TurnstileHandle } from "@/components/ui/turnstile";
 import { prepararImagen, ponerCabeceras } from "@/lib/imagen-cliente";
 
 // ── Iconos sociales ───────────────────────────────────────────────────────────
@@ -131,14 +132,21 @@ export function PhotoUpload({ value, onChange, className }: { value: string; onC
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [err, setErr] = useState<string | null>(null);
+  // La subida pública pide captcha: un token sirve para una sola subida.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const hasCaptcha = !!(siteKey && siteKey !== "xxx");
+  const captchaRef = useRef<TurnstileHandle>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const upload = async (original: File) => {
+    if (hasCaptcha && !captchaToken) { setErr("Verificando… intenta de nuevo en unos segundos"); return; }
     if (original.size > 8 * 1024 * 1024) { setErr("Máximo 8 MB"); return; }
     if (!["image/jpeg", "image/png", "image/webp"].includes(original.type)) { setErr("Solo JPG, PNG o WEBP"); return; }
     setErr(null); setUploading(true); setProgress(0);
     try {
       const file = await prepararImagen(original);
-      const res = await fetch("/api/upload/public-presign", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentType: file.type, size: file.size }) });
+      const res = await fetch("/api/upload/public-presign", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentType: file.type, size: file.size, captchaToken: captchaToken ?? "" }) });
+      setCaptchaToken(null); captchaRef.current?.reset();
       if (!res.ok) throw new Error("Error al obtener URL");
       const { uploadUrl, publicUrl, headers } = await res.json() as { uploadUrl: string; publicUrl: string; headers: Record<string, string> };
       await new Promise<void>((resolve, reject) => {
@@ -155,6 +163,16 @@ export function PhotoUpload({ value, onChange, className }: { value: string; onC
 
   return (
     <div className="flex flex-col gap-1.5">
+      {hasCaptcha && (
+        <Turnstile
+          ref={captchaRef}
+          siteKey={siteKey!}
+          theme="light"
+          appearance="interaction-only"
+          onVerify={setCaptchaToken}
+          onExpire={() => { setCaptchaToken(null); captchaRef.current?.reset(); }}
+        />
+      )}
       <div className={cn("relative", className ?? "aspect-square w-full max-w-[200px]")}>
         {/* El input real va dentro de la etiqueta: se abre con teclado y con toque. */}
         <label

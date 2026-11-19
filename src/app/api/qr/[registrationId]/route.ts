@@ -29,7 +29,7 @@ export const GET = ruta(async (
   return new Response(new Uint8Array(qrBuffer), {
     headers: {
       "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=31536000, immutable",
+      "Cache-Control": "private, max-age=31536000, immutable",
     },
   });
 });

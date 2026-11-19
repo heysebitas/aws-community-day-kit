@@ -58,7 +58,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
 
   const loadPassport = useCallback(async (withPin?: string) => {
     try {
-      const res  = await pedirJson<RespuestaPasaporte>(`/api/passport/${shortId}${withPin ? `?pin=${withPin}` : ""}`);
+      const res  = await pedirJson<RespuestaPasaporte>(`/api/passport/${shortId}`, withPin ? { method: "POST", body: { pin: withPin } } : {});
       const data = res.data;
       if (res.status === 404 || res.status === 0) { setNotFound(true); return; }
       if (data.passport) {

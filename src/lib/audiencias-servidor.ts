@@ -68,7 +68,7 @@ async function resolverSegmento(
 
   switch (segmento.publico) {
     case "asistentes": {
-      const q = Registration.find(consulta).select("firstName lastName email attendance qrCode").sort({ _id: 1 });
+      const q = Registration.find(consulta).select("firstName lastName email attendance qrCode tokenConfirmacion").sort({ _id: 1 });
       if (limite) q.limit(limite);
       return (await q.lean()).map((r) => {
         const nombre = `${r.firstName} ${r.lastName}`.trim();
@@ -79,7 +79,7 @@ async function resolverSegmento(
         const delPase: Record<string, string> = r.qrCode && r.attendance !== "online"
           ? {
               pase: `${APP_URL}/api/passes/${r.qrCode}`,
-              confirmar: `${APP_URL}/confirmar/${r.qrCode}`,
+              confirmar: `${APP_URL}/confirmar/${r.tokenConfirmacion ?? r.qrCode}`,
               qr: `${APP_URL}/api/pass-qr/${r.qrCode}`,
             }
           : {};

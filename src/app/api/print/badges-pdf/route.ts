@@ -23,7 +23,7 @@ async function tituloDelPdf(): Promise<string> {
   return `${m.Panel!.escarapelas} ${EVENTO.nombreCompleto}`;
 }
 
-type Person = { shortId: string; role: string; firstName: string; lastName: string; company?: string; jobTitle?: string; viewPin?: string; badgeFirstName?: string; badgeLastName?: string };
+type Person = { shortId: string; role: string; firstName: string; lastName: string; company?: string; jobTitle?: string; badgeFirstName?: string; badgeLastName?: string };
 type Align = "left" | "center" | "right";
 type Layout = "side" | "stacked";
 type Cfg = { qrPct: number; fontScale: number; showQr: boolean; showRole: boolean; showCompany: boolean; showJobTitle: boolean; alignName: Align; alignJobTitle: Align; alignCompany: Align; alignRole: Align; layout: Layout };
@@ -44,7 +44,7 @@ async function drawBadgeSide(pdf: InstanceType<typeof PDFDocument>, p: Person, x
       const png = await QRCode.toBuffer(`${APP_URL}/pasaporte/${p.shortId}`, { width: 320, margin: 0, color: { dark: "#000000", light: "#ffffff" } });
       const qx = x + w - qrSize, qy = y + Math.max(0, (h - qrSize) / 2) - h * 0.04;
       pdf.image(png, qx, qy, { width: qrSize, height: qrSize });
-      const idTxt = p.viewPin || p.shortId.slice(0, 6).toUpperCase();
+      const idTxt = p.shortId.slice(0, 6).toUpperCase(); // el PIN no se imprime: va en el correo
       pdf.font("Helvetica").fontSize(Math.max(5, qrSize * 0.1)).fillColor("#555555")
         .text(idTxt, qx, qy + qrSize + 2, { width: qrSize, align: "center", lineBreak: false });
     } catch { /* sin QR */ }
@@ -129,7 +129,7 @@ async function drawBadgeStacked(pdf: InstanceType<typeof PDFDocument>, p: Person
     try {
       const png = await QRCode.toBuffer(`${APP_URL}/pasaporte/${p.shortId}`, { width: 320, margin: 0, color: { dark: "#000000", light: "#ffffff" } });
       pdf.image(png, qx, ty, { width: qrSize, height: qrSize });
-      const idTxt = p.viewPin || p.shortId.slice(0, 6).toUpperCase();
+      const idTxt = p.shortId.slice(0, 6).toUpperCase(); // el PIN no se imprime: va en el correo
       pdf.font("Helvetica").fontSize(Math.max(5, qrSize * 0.12)).fillColor("#555555")
         .text(idTxt, qx, ty + qrSize + 2, { width: qrSize, align: "center", lineBreak: false });
     } catch { /* sin QR */ }
@@ -171,7 +171,7 @@ export const POST = ruta(async (req: NextRequest) => {
   };
 
   const docs = await Passport.find({ shortId: { $in: shortIds } })
-    .select("shortId role firstName lastName company jobTitle viewPin badgeFirstName badgeLastName")
+    .select("shortId role firstName lastName company jobTitle badgeFirstName badgeLastName")
     .lean<Person[]>();
   const byId = new Map(docs.map((d) => [d.shortId, d]));
   const people = shortIds.map((id) => byId.get(id)).filter(Boolean) as Person[];

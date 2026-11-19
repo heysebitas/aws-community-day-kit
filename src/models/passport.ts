@@ -32,6 +32,8 @@ export interface SessionAttendanceEntry {
 
 export interface IPassport extends Document {
   shortId: string;
+  /** El identificador de antes de la migración: su página redirige al nuevo mientras dura el evento. */
+  shortIdAnterior?: string;
   role: "attendee" | "speaker" | "volunteer" | "organizer";
   firstName: string;
   lastName: string;
@@ -63,6 +65,7 @@ export interface IPassport extends Document {
 const PassportSchema = new Schema<IPassport>(
   {
     shortId: { type: String, required: true, unique: true, index: true },
+    shortIdAnterior: { type: String, index: { sparse: true } },
     role: { type: String, enum: ["attendee", "speaker", "volunteer", "organizer"], required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, default: "" },

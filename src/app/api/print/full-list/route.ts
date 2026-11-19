@@ -17,7 +17,7 @@ export const GET = ruta(async (req: NextRequest) => {
 
   const [passports, regs] = await Promise.all([
     Passport.find(filter)
-      .select("shortId role firstName lastName company jobTitle viewPin confirmed badgePrinted badgeFirstName badgeLastName linkedRegistrationId")
+      .select("shortId role firstName lastName company jobTitle confirmed badgePrinted badgeFirstName badgeLastName linkedRegistrationId")
       .lean() as Promise<Array<Record<string, unknown>>>,
     Registration.find({}).select("firstName lastName email documentNumber").lean(),
   ]);

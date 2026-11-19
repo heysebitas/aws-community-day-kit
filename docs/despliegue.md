@@ -129,6 +129,29 @@ Crea un widget en [Cloudflare Turnstile](https://www.cloudflare.com/products/tur
 para tu dominio y pon las dos llaves. En producción, sin la llave secreta los
 formularios públicos rechazan todo: es a propósito.
 
+## Migrar el pasaporte (bases que ya tenían registros)
+
+Hasta esta versión el `shortId` del pasaporte era el `qrCode` del registro. Si tu
+base ya tiene registros, córrela una vez antes de publicar el cambio:
+
+```bash
+# 1. Copia de seguridad de la base (registrations, passports, passportedittokens).
+# 2. En seco: sólo cuenta, no escribe.
+node scripts/migrar-pasaporte.mjs --dry-run
+# 3. Aplica. Es idempotente: repetirlo no cambia nada.
+node scripts/migrar-pasaporte.mjs
+```
+
+Lee `MONGODB_URI` de `.env.local`. Da a cada pasaporte un `shortId` nuevo (guarda
+el viejo en `shortIdAnterior`) y a cada registro un `tokenConfirmacion`. Hasta el fin
+del evento (`fecha.fin`), `/pasaporte/<viejo>` redirige al nuevo y los enlaces de
+confirmación ya enviados siguen abriendo; después dejan de valer.
+
+Las plantillas ya guardadas en la base no se actualizan solas con la semilla: para que
+el correo del pase lleve el PIN y el enlace del pasaporte, añade a «Registro confirmado ·
+presencial» las variables `{pin}` y `{pasaporte}` (o restaura su texto de fábrica).
+Las escarapelas ya impresas llevan el PIN: reimprímelas.
+
 ## Después
 
 - Envíate un registro de prueba de punta a punta: formulario → correo → pase → check-in.

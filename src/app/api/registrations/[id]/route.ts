@@ -24,10 +24,7 @@ export const DELETE = ruta(async (
   const name = `${registration.firstName} ${registration.lastName}`.trim();
 
   // En cascada: borra el pasaporte (con sus sellos, asistencia, comidas y stats).
-  // Está ligado por linkedRegistrationId o por shortId === qrCode.
-  const passportResult = await Passport.deleteMany({
-    $or: [{ linkedRegistrationId: id }, { shortId: registration.qrCode }],
-  });
+  const passportResult = await Passport.deleteMany({ linkedRegistrationId: id });
 
   await Registration.findByIdAndDelete(id);
   await sincronizarCupo("attendee");

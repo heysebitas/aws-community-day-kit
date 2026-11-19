@@ -1,3 +1,4 @@
+import { nuevoShortId } from "@/lib/identidad";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -59,6 +60,7 @@ export const POST = ruta(async (req: NextRequest) => {
   await connectDB();
 
   const items: Item[] = [];
+  let fallidosAMano = 0;
   const parteNombre = (n?: string) => {
     const parts = (n || "").trim().split(" ");
     return { firstName: parts[0] || "Sin", lastName: parts.slice(1).join(" ") || "Nombre" };
@@ -66,10 +68,16 @@ export const POST = ruta(async (req: NextRequest) => {
 
   if (role === "attendee") {
     const regs = await Registration.find({}).lean();
+    // Un pasaporte hecho a mano para esa persona no se pisa: se cuenta como fallido.
+    const aMano = new Set(
+      (await Passport.find({ isManual: true, linkedRegistrationId: { $in: regs.map((r) => r._id.toString()) } }).select("linkedRegistrationId").lean())
+        .map((p) => String(p.linkedRegistrationId)),
+    );
     for (const reg of regs) {
+      if (aMano.has(reg._id.toString())) { fallidosAMano++; continue; }
       items.push({
-        filtro: { shortId: reg.qrCode, isManual: { $ne: true } },
-        alta: { shortId: reg.qrCode, role: "attendee", linkedRegistrationId: reg._id.toString(), isManual: false },
+        filtro: { linkedRegistrationId: reg._id.toString(), isManual: { $ne: true } },
+        alta: { shortId: nuevoShortId(), role: "attendee", linkedRegistrationId: reg._id.toString(), isManual: false },
         campos: {
           firstName: reg.firstName || "Sin",
           lastName: reg.lastName || "Nombre",
@@ -127,5 +135,5 @@ export const POST = ruta(async (req: NextRequest) => {
 
   const { created, skipped, failed } = await volcar(items);
 
-  return Response.json({ ok: true, created, skipped, failed });
+  return Response.json({ ok: true, created, skipped, failed: failed + fallidosAMano });
 });

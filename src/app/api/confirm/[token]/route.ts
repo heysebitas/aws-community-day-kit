@@ -6,6 +6,18 @@ import { badgeNameOptions, maskEmail } from "@/lib/utils";
 import { createLog } from "@/lib/log";
 import { EVENTO } from "@/config";
 import { getIp, rateLimit } from "@/lib/rate-limit";
+import { enlacesViejosVigentes } from "@/lib/identidad";
+
+/**
+ * El enlace lleva `tokenConfirmacion`. Los que se mandaron antes del cambio
+ * llevan el `qrCode` y valen hasta que acaba el evento. El `shortId` del
+ * pasaporte no abre nada aquí.
+ */
+async function registroDelEnlace(token: string) {
+  const nuevo = await Registration.findOne({ tokenConfirmacion: token });
+  if (nuevo) return nuevo;
+  return enlacesViejosVigentes() ? Registration.findOne({ qrCode: token }) : null;
+}
 
 function isExpired(): boolean {
   return Date.now() > new Date(EVENTO.confirmacionHasta).getTime();
@@ -27,13 +39,13 @@ export async function GET(
     const { token } = await params;
     await connectDB();
 
-    const reg = await Registration.findOne({ qrCode: token }).lean();
+    const reg = await registroDelEnlace(token);
     if (!reg) return Response.json({ found: false }, { status: 404 });
 
     const { options } = badgeNameOptions(reg.firstName, reg.lastName);
 
-    // Normalized display fields come from the linked passport (shortId === qrCode)
-    const passport = await Passport.findOne({ shortId: token })
+    // Los campos normalizados salen del pasaporte ligado al registro
+    const passport = await Passport.findOne({ linkedRegistrationId: String(reg._id) })
       .select("firstName lastName company jobTitle role")
       .lean() as Record<string, unknown> | null;
 
@@ -81,7 +93,7 @@ export async function POST(
     const body = await req.json().catch(() => ({})) as { badgeFirstName?: string; badgeLastName?: string };
 
     await connectDB();
-    const reg = await Registration.findOne({ qrCode: token });
+    const reg = await registroDelEnlace(token);
     if (!reg) return Response.json({ error: "No encontrado" }, { status: 404 });
 
     if (reg.confirmation?.confirmed) {
@@ -106,7 +118,7 @@ export async function POST(
 
     // Mirror to the passport so printing is trivial
     await Passport.updateOne(
-      { shortId: token },
+      { linkedRegistrationId: String(reg._id) },
       { $set: { confirmed: true, confirmedAt: now, badgeFirstName, badgeLastName } },
     );
 
@@ -117,7 +129,7 @@ export async function POST(
       userRole: "attendee",
       action: "ATTENDANCE_CONFIRMED",
       target: fullName,
-      targetId: token,
+      targetId: String(reg._id),
       details: `Escarapela: ${badgeFirstName} ${badgeLastName}`,
     });
 

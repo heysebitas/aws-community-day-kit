@@ -54,10 +54,22 @@ async function resolveOwnerContact(role: string, linkedId?: string): Promise<{ e
 
 const demasiados = (ms: number) => `Demasiados intentos. Intenta en ${Math.max(1, Math.ceil(ms / 60000))} min.`;
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
+/**
+ * GET es lo público. Para entrar como dueño el PIN va en el cuerpo de un POST:
+ * en la URL quedaría en los registros del servidor y en el historial.
+ */
+export async function GET(req: NextRequest, ctx: { params: Promise<{ shortId: string }> }) {
+  return leer(req, ctx, null);
+}
+
+export async function POST(req: NextRequest, ctx: { params: Promise<{ shortId: string }> }) {
+  const { pin } = await leerCuerpo(req);
+  return leer(req, ctx, typeof pin === "string" && pin ? pin : null);
+}
+
+async function leer(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }, pin: string | null) {
   try {
     const { shortId } = await params;
-    const pin = req.nextUrl.searchParams.get("pin");
 
     const leido = await leerPasaporte(shortId);
     if (!leido) return Response.json({ error: "Pasaporte no encontrado" }, { status: 404 });

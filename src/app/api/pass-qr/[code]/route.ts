@@ -33,7 +33,7 @@ export async function GET(
       });
       return new Response(new Uint8Array(buf));
     });
-    return respuestaPng(png, "public, max-age=86400");
+    return respuestaPng(png, "private, max-age=86400");
   } catch {
     return Response.json({ error: "Error interno" }, { status: 500 });
   }
