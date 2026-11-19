@@ -59,6 +59,15 @@ export default function CheckInPage() {
   const { user } = useAuth();
   const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [totalCheckedIn, setTotalCheckedIn] = useState(0);
+  // Quien abre la puerta a media mañana ve cuántos hay dentro, no un 0.
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/check-in/scan")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (vivo && typeof d?.totalCheckedIn === "number") setTotalCheckedIn((n) => Math.max(n, d.totalCheckedIn)); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, []);
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [manualCode, setManualCode] = useState("");

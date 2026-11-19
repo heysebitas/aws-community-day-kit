@@ -20,7 +20,7 @@ export function PasaporteVista({ shortId, inicial }: { shortId: string; inicial?
       <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-surface-900)" }}>
         <div style={{ textAlign: "center" }}>
           <div style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid transparent", borderTopColor: "var(--color-acento)", animation: "spin 1s linear infinite", margin: "0 auto 14px" }} />
-          <p style={{ fontFamily: "monospace", fontSize: 9, letterSpacing: "0.3em", color: "#374151", textTransform: "uppercase" }}>{t("loading")}</p>
+          <p style={{ fontFamily: "monospace", fontSize: 9, letterSpacing: "0.3em", color: "#9ca3af", textTransform: "uppercase" }}>{t("loading")}</p>
         </div>
       </div>
     </>

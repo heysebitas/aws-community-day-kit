@@ -1,4 +1,5 @@
 import { avatarUrl } from "@/lib/avatar";
+import { EVENTO, PAIS } from "@/config";
 
 /* ── Social platforms ──
    atSign: el handle se muestra con @ (Builder Center, Instagram, TikTok).
@@ -121,6 +122,8 @@ export function calcular(passport: PassportData, sponsors: Sponsor[], shortId: s
   /* MRZ */
   const pad = (s: string, n: number) => s.toUpperCase().replace(/[^A-Z0-9]/g, "<").padEnd(n, "<").slice(0, n);
   const mrz1 = `AWSSCD<<${pad(passport.lastName, 18)}<<${pad(passport.firstName, 10)}`;
-  const mrz2 = `${shortId.toUpperCase().padEnd(12, "<")}CHL261024${pad(passport.role, 9)}`;
+  // País y fecha del evento, como en una MRZ real: código de país a 3 y fecha AAMMDD.
+  const fechaMrz = EVENTO.fecha.inicio.slice(2, 10).replace(/-/g, "");
+  const mrz2 = `${shortId.toUpperCase().padEnd(12, "<")}${pad(PAIS.codigo, 3)}${fechaMrz}${pad(passport.role, 9)}`;
   return { collectedIds, totalSponsors, totalCollected, progressPct, roleStyle, avatarSrc, activeSocials, mrz1, mrz2 };
 }

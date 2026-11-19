@@ -62,7 +62,7 @@ export function PinOverlay({ v }: { v: Vista }) {
                   <Loader2 style={{ width: 18, height: 18, color: "var(--color-acento)", animation: "spin 1s linear infinite" }} />
                 </div>
               ) : (
-                <p style={{ fontFamily: "monospace", fontSize: 9, color: "#1f2937", margin: 0, textAlign: "center" }}>
+                <p style={{ fontFamily: "monospace", fontSize: 9, color: "#9ca3af", margin: 0, textAlign: "center" }}>
                   {pinBlocked ? "Demasiados intentos, espera un momento" : "Se desbloquea automáticamente al completar el PIN"}
                 </p>
               )}
@@ -184,9 +184,9 @@ export function Sellos({ v }: { v: Vista }) {
           <Perf />
           <div style={{ padding: "14px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#374151", textTransform: "uppercase", margin: 0 }}>{t("stamps")}</p>
+              <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#9ca3af", textTransform: "uppercase", margin: 0 }}>{t("stamps")}</p>
               <span style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: "var(--color-acento)" }}>
-                {totalCollected}<span style={{ color: "#1f2937", fontWeight: 400 }}> / {totalSponsors}</span>
+                {totalCollected}<span style={{ color: "#9ca3af", fontWeight: 400 }}> / {totalSponsors}</span>
               </span>
             </div>
             <div style={{ height: 3, borderRadius: 3, background: "rgba(255,255,255,.05)", marginBottom: 14, overflow: "hidden" }}>
@@ -219,7 +219,8 @@ export function Sellos({ v }: { v: Vista }) {
 
       {/* === MRZ ZONE === */}
       <div style={{ borderTop:"1px solid rgb(var(--tema-acento-rgb) / .07)", padding:"11px 20px 13px", background:"rgba(0,0,0,.25)", textAlign:"center" }}>
-        <p style={{ fontFamily:"'Courier New',monospace", fontSize:8, letterSpacing:"0.08em", color:"rgb(var(--tema-acento-rgb) / .16)", lineHeight:1.9, wordBreak:"break-all", margin:0, userSelect:"none" }}>
+        {/* Decoración: la tira de un pasaporte real, no un texto que leer. */}
+        <p aria-hidden="true" style={{ fontFamily:"'Courier New',monospace", fontSize:8, letterSpacing:"0.08em", color:"rgb(var(--tema-acento-rgb) / .16)", lineHeight:1.9, wordBreak:"break-all", margin:0, userSelect:"none" }}>
           {mrz1}<br />{mrz2}
         </p>
       </div>

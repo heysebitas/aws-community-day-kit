@@ -22,6 +22,17 @@ async function totalDentro(): Promise<number> {
   return total.n;
 }
 
+/** El total al abrir la puerta: sin esto el contador decía 0 hasta el primer escaneo. */
+export const GET = ruta(async () => {
+  await requireAnyAccess(["checkin", "escaner_checkin"], "ver", ["admin", "organizer", "volunteer"]);
+  await connectDB();
+  const ahora = Date.now();
+  if (!total || ahora - total.en > TTL_TOTAL_MS) {
+    total = { n: await Registration.countDocuments({ checkedIn: true }), en: ahora };
+  }
+  return Response.json({ totalCheckedIn: total.n });
+});
+
 export const POST = ruta(async (request: NextRequest) => {
   const user = await requireAnyAccess(["checkin", "escaner_checkin"], "editar", ["admin", "organizer", "volunteer"]);
   // El código va directo al filtro de Mongo: si no es texto, `{"$ne":null}`

@@ -12,7 +12,7 @@ export function Redes({ v }: { v: Vista }) {
       {/* === SOCIAL (visitantes: solo lectura) === */}
       {!isOwner && (
         <div style={{ padding: "14px 18px" }}>
-          <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#374151", textTransform: "uppercase", margin: "0 0 10px" }}>
+          <p style={{ fontFamily: "monospace", fontSize: 9, fontWeight: 700, letterSpacing: "0.35em", color: "#9ca3af", textTransform: "uppercase", margin: "0 0 10px" }}>
             {t("connect")}
           </p>
           {activeSocials.length > 0 ? (
@@ -33,7 +33,7 @@ export function Redes({ v }: { v: Vista }) {
               ))}
             </div>
           ) : (
-            <p style={{ fontFamily: "monospace", fontSize: 11, color: "#1f2937", textAlign: "center", padding: "6px 0" }}>
+            <p style={{ fontFamily: "monospace", fontSize: 11, color: "#9ca3af", textAlign: "center", padding: "6px 0" }}>
               {t("no_social")}
             </p>
           )}
@@ -95,7 +95,7 @@ export function Redes({ v }: { v: Vista }) {
                   ) : (
                     <div key={plat.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 10, opacity: .3 }}>
                       <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, background: plat.bg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>{plat.icon}</div>
-                      <span style={{ fontFamily: "monospace", fontSize: 11, color: "#374151" }}>—</span>
+                      <span style={{ fontFamily: "monospace", fontSize: 11, color: "#9ca3af" }}>—</span>
                     </div>
                   );
                 })}

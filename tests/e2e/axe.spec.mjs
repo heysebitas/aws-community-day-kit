@@ -11,6 +11,8 @@ const PAGINAS = [
   ["check-in", "/admin/check-in"],
   // Un pasaporte que no existe: la pantalla pública de error también tiene que ser accesible.
   ["pasaporte", "/pasaporte/ejemplo-inexistente"],
+  // Y uno de verdad: la tarjeta tiene sus propios colores en línea.
+  ["pasaporte de la demo", "/pasaporte/demo00000001"],
 ];
 
 for (const [nombre, ruta] of PAGINAS) {
