@@ -91,7 +91,7 @@ export function PasaporteVista({ shortId, inicial }: { shortId: string; inicial?
             )}
             <img src="/images/logos/aws-logo.svg" alt="AWS" style={{ height: 32, width: "auto" }} />
             <p style={{ fontFamily: "monospace", fontSize: 10, fontWeight: 700, color: "#9ca3af", margin: 0 }}>{EVENTO.marca.lineas.join(" ")}</p>
-            <p style={{ fontFamily: "monospace", fontSize: 8, letterSpacing: "0.25em", color: "var(--color-surface-400)", margin: 0 }}>{`${EVENTO.edicion} ${EVENTO.anio}`.toUpperCase()}</p>
+            <p style={{ fontFamily: "monospace", fontSize: 8, letterSpacing: "0.25em", color: "#9ca3af", margin: 0 }}>{`${EVENTO.edicion} ${EVENTO.anio}`.toUpperCase()}</p>
           </Link>
 
         </div>{/* /card area */}

@@ -2,6 +2,9 @@
 const config = {
   testDir: "./tests/e2e",
   timeout: 60_000,
+  // Todas entran con la misma cuenta demo y el panel admite una sesión por cuenta:
+  // en paralelo, una prueba cierra la sesión de otra.
+  workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["list"]] : "list",
   use: {
