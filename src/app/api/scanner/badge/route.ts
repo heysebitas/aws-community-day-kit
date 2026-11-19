@@ -17,14 +17,14 @@ export const POST = ruta(async (request: NextRequest) => {
   const shortId = textoDe(cuerpo, "shortId");
   const sponsorId = textoDe(cuerpo, "sponsorId");
   if (!shortId || !sponsorId) {
-    return NextResponse.json({ error: "shortId y sponsorId requeridos" }, { status: 400 });
+    return NextResponse.json({ code: "datos_invalidos", error: "shortId y sponsorId requeridos" }, { status: 400 });
   }
 
   // Permiso por usuario (admin no se restringe)
   if (user.role !== "admin") {
     const allowed = new Set((user.allowedBadges ?? []).map(String));
     if (!allowed.has(String(sponsorId))) {
-      return NextResponse.json({ error: "No tienes permiso para dar este badge" }, { status: 403 });
+      return NextResponse.json({ code: "sin_permiso", error: "No tienes permiso para dar este badge" }, { status: 403 });
     }
   }
 
@@ -32,7 +32,7 @@ export const POST = ruta(async (request: NextRequest) => {
 
   const sponsor = await SponsorPin.findById(sponsorId);
   if (!sponsor || !sponsor.isActive) {
-    return NextResponse.json({ found: false, error: "Badge inválido o inactivo" }, { status: 404 });
+    return NextResponse.json({ found: false, code: "badge_invalido", error: "Badge inválido o inactivo" }, { status: 404 });
   }
 
   // El filtro exige que el sello aún no esté: solo un escaneo lo agrega.

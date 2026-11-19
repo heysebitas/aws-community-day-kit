@@ -32,13 +32,13 @@ export const POST = ruta(async (request: NextRequest) => {
     const rl = rateLimit(`vol:${getIp(request)}`, 30, 15 * 60 * 1000);
     if (!rl.ok) {
       return Response.json(
-        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { code: "demasiados_intentos", error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
         { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
       );
     }
     const captchaToken = typeof body.captchaToken === "string" ? body.captchaToken : "";
     if (!(await verifyCaptcha(captchaToken))) {
-      return Response.json({ error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
+      return Response.json({ code: "captcha_invalido", error: "Captcha inválido. Por favor intenta de nuevo." }, { status: 400 });
     }
   }
 
@@ -49,7 +49,7 @@ export const POST = ruta(async (request: NextRequest) => {
   if (!manual) {
     const form = await Form.findOne({ formType: "volunteer", isOpen: true });
     if (!form) {
-      return Response.json({ error: "El formulario no está disponible" }, { status: 404 });
+      return Response.json({ code: "formulario_no_disponible", error: "El formulario no está disponible" }, { status: 404 });
     }
     maxSubmissions = form.maxSubmissions;
   }
@@ -59,7 +59,7 @@ export const POST = ruta(async (request: NextRequest) => {
     { manual },
   );
   if ("error" in parsed) {
-    return Response.json({ error: parsed.error }, { status: 400 });
+    return Response.json({ code: "datos_invalidos", error: parsed.error }, { status: 400 });
   }
   const data = parsed.data;
 
@@ -67,7 +67,7 @@ export const POST = ruta(async (request: NextRequest) => {
   const existing = await VolunteerSubmission.findOne({ email: data.email });
   if (existing) {
     return Response.json(
-      { error: "Ya enviaste una solicitud como voluntario" },
+      { code: "ya_voluntario", error: "Ya enviaste una solicitud como voluntario" },
       { status: 409 },
     );
   }
@@ -76,12 +76,12 @@ export const POST = ruta(async (request: NextRequest) => {
   if (!manual) {
     const cross = await checkAlreadyAttendee(data.email);
     if (cross.blocked) {
-      return Response.json({ error: cross.error }, { status: 409 });
+      return Response.json({ code: "ya_registrado_asistente", error: cross.error }, { status: 409 });
     }
   }
 
   if (!(await reservarCupo("volunteer", maxSubmissions))) {
-    return Response.json({ error: "Se alcanzó el límite de respuestas" }, { status: 400 });
+    return Response.json({ code: "cupo_lleno", error: "Se alcanzó el límite de respuestas" }, { status: 400 });
   }
 
   // El índice único cierra la carrera entre el findOne y el create.
@@ -99,7 +99,7 @@ export const POST = ruta(async (request: NextRequest) => {
     await devolverCupo("volunteer", maxSubmissions);
     if ((e as { code?: number }).code === 11000) {
       return Response.json(
-        { error: "Ya enviaste una solicitud como voluntario" },
+        { code: "ya_voluntario", error: "Ya enviaste una solicitud como voluntario" },
         { status: 409 },
       );
     }

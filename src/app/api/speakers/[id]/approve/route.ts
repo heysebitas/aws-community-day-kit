@@ -11,7 +11,7 @@ import { createLog } from "@/lib/log";
 import { subirTarjetaDeSpeaker } from "@/lib/speaker-card";
 import { Setting } from "@/models/setting";
 import { SITIO, SLUG } from "@/config";
-import { ruta } from "@/lib/api";
+import { ruta, logError } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -90,7 +90,7 @@ export const POST = ruta(async (
       ],
     );
     if (!correo) {
-      console.error("[approve] plantilla speaker_aprobado no disponible");
+      logError("[approve] plantilla speaker_aprobado no disponible");
       return Response.json({ error: "No se pudo armar el correo" }, { status: 500 });
     }
     const html = correo.html;

@@ -10,7 +10,7 @@ export const GET = ruta(async (req: NextRequest) => {
   await requireAnyAccess(["checkin", "escaner_checkin"], "ver", ["admin", "organizer", "volunteer"]);
 
   const qr = req.nextUrl.searchParams.get("qr")?.trim();
-  if (!qr) return NextResponse.json({ error: "QR requerido" }, { status: 400 });
+  if (!qr) return NextResponse.json({ code: "qr_requerido", error: "QR requerido" }, { status: 400 });
 
   await connectDB();
   const registration = await Registration.findOne({ qrCode: qr })
@@ -18,7 +18,7 @@ export const GET = ruta(async (req: NextRequest) => {
     .lean();
 
   if (!registration) {
-    return NextResponse.json({ found: false, error: "No encontrado" }, { status: 404 });
+    return NextResponse.json({ found: false, code: "no_encontrado", error: "No encontrado" }, { status: 404 });
   }
 
   const firstName = registration.firstName;

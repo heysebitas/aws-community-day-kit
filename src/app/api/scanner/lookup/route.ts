@@ -7,7 +7,7 @@ import { ruta } from "@/lib/api";
 export const GET = ruta(async (request: NextRequest) => {
   await requireAnyAccess(["checkin", "escaner_checkin", "escaner_salas", "escaner_almuerzos", "escaner_badges"], "ver", ["admin", "organizer", "volunteer"]);
   const shortId = request.nextUrl.searchParams.get("shortId");
-  if (!shortId) return NextResponse.json({ error: "shortId requerido" }, { status: 400 });
+  if (!shortId) return NextResponse.json({ code: "datos_invalidos", error: "shortId requerido" }, { status: 400 });
 
   await connectDB();
   const passport = await Passport.findOne({ shortId }).lean() as Record<string, unknown> | null;

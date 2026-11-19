@@ -30,7 +30,7 @@ export const POST = ruta(async (request: NextRequest) => {
   const qrCode = textoDe(cuerpo, "qrCode");
 
   if (!qrCode) {
-    return Response.json({ error: "Código QR requerido" }, { status: 400 });
+    return Response.json({ code: "qr_requerido", error: "Código QR requerido" }, { status: 400 });
   }
 
   await connectDB();
@@ -43,7 +43,7 @@ export const POST = ruta(async (request: NextRequest) => {
   );
   const registration = marcada ?? await Registration.findOne({ qrCode });
   if (!registration) {
-    return Response.json({ error: "Registro no encontrado", status: "not_found" }, { status: 404 });
+    return Response.json({ code: "registro_no_encontrado", error: "Registro no encontrado", status: "not_found" }, { status: 404 });
   }
 
   const name = `${registration.firstName} ${registration.lastName}`.trim()
@@ -65,7 +65,7 @@ export const POST = ruta(async (request: NextRequest) => {
 
   if (!marcada) {
     return Response.json({
-      error: "Ya hizo check-in",
+      code: "ya_hizo_checkin", error: "Ya hizo check-in",
       status: "already_checked_in",
       name,
       email,
