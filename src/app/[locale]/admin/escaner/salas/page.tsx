@@ -4,9 +4,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Camera, CameraOff, ShieldAlert, ScanLine, Search } from "lucide-react";
-import { ScanStatus, type ScanResult } from "../_scan-status";
+import { ScanStatus, resultadoDeFallo, type ScanResult } from "../_scan-status";
 import { ScanManual } from "../_scan-manual";
 import { PAIS } from "@/config";
+import { useTranslations } from "next-intl";
+import { postEscaneo, configCamara, pausarEnSegundoPlano } from "@/lib/escaneo-cliente";
 
 interface AgendaSession {
   _id: string;
@@ -61,6 +63,7 @@ function extractShortId(raw: string): string {
 
 export default function SalasPage() {
   const { toast } = useToast();
+  const t = useTranslations("Panel");
   const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [sessions, setSessions] = useState<AgendaSession[]>([]);
   const [selectedSession, setSelectedSession] = useState<AgendaSession | null>(null);
@@ -89,21 +92,20 @@ export default function SalasPage() {
   // conteo, y devuelve el resultado para mostrarlo.
   const submit = useCallback(async (shortId: string): Promise<ScanResult> => {
     if (!selectedSession) return { outcome: "error", primary: "Selecciona una sesión" };
-    const res = await fetch("/api/scanner/attendance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        shortId,
-        sessionId: selectedSession._id,
-        sessionTitle: selectedSession.title,
-        room: selectedSession.room,
-      }),
-    });
-    const data = await res.json() as {
+    const { estado, data } = await postEscaneo<{
       found?: boolean; alreadyScanned?: boolean; firstName?: string; lastName?: string; scannedAt?: string; role?: string;
-    };
+    }>("/api/scanner/attendance", {
+      shortId,
+      sessionId: selectedSession._id,
+      sessionTitle: selectedSession.title,
+      room: selectedSession.room,
+    });
 
-    if (!res.ok || !data.found) {
+    if (estado === "sesion" || estado === "permiso" || estado === "reintenta") {
+      playSound("not_found");
+      return resultadoDeFallo(estado, t);
+    }
+    if (estado !== "ok" || !data.found) {
       playSound("not_found");
       return { outcome: "not_found", primary: "No encontrado", secondary: "Esta escarapela no está en pasaportes" };
     }
@@ -116,15 +118,21 @@ export default function SalasPage() {
     playSound("success");
     setLocalCount((c) => c + 1);
     return { outcome: "success", primary: "Asistencia registrada", name, role: data.role };
-  }, [selectedSession]);
+  }, [selectedSession, t]);
 
   const handleScan = useCallback(async (raw: string) => {
     const shortId = extractShortId(raw);
     setProcessing(true);
-    const r = await submit(shortId).catch((): ScanResult => ({ outcome: "error", primary: "Error de conexión" }));
+    const r = await submit(shortId).catch((): ScanResult => resultadoDeFallo("reintenta", t));
     setResult(r);
     setProcessing(false);
-  }, [submit]);
+  }, [submit, t]);
+
+  // La cámara no corre con la pestaña oculta; al volver se reanuda salvo que haya un resultado a la vista.
+  useEffect(
+    () => pausarEnSegundoPlano(() => html5QrRef.current, () => result !== null),
+    [result],
+  );
 
   const startScanner = async () => {
     if (!selectedSession) { toast("Selecciona una sesión primero", "error"); return; }
@@ -149,7 +157,7 @@ export default function SalasPage() {
       html5QrRef.current = scanner;
       await scanner.start(
         { facingMode: "environment" },
-        { fps: 20 },
+        configCamara(),
         async (decoded) => {
           await scanner.pause();
           await handleScan(decoded);

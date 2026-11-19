@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Camera, CameraOff, ShieldAlert, Keyboard, Send, ScanLine, Search } from "lucide-react";
 import { StatusCard, type CheckInResult } from "./_status-card";
 import { ManualCheckIn } from "./_manual";
+import { useTranslations } from "next-intl";
+import { useAuth } from "@/contexts/auth-context";
+import { postEscaneo, configCamara, pausarEnSegundoPlano, esRepeticionPropia } from "@/lib/escaneo-cliente";
 
 /* ── Sound feedback via Web Audio API ── */
 
@@ -45,8 +48,15 @@ function playSound(type: "success" | "already" | "not_found") {
   }
 }
 
+type CheckInRespuesta = {
+  name?: string; online?: boolean; confirmed?: boolean; badgeName?: string;
+  checkedInAt?: string | null; checkedInBy?: string | null; totalCheckedIn?: number;
+};
+
 export default function CheckInPage() {
   const { toast } = useToast();
+  const t = useTranslations("Panel");
+  const { user } = useAuth();
   const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [totalCheckedIn, setTotalCheckedIn] = useState(0);
   const [scanning, setScanning] = useState(false);
@@ -99,7 +109,7 @@ export default function CheckInPage() {
 
       await scanner.start(
         { facingMode: "environment" },
-        { fps: 20 },
+        configCamara(),
         async (decodedText) => {
           await scanner.pause();
           await handleScan(decodedText);
@@ -138,27 +148,24 @@ export default function CheckInPage() {
     const qrCode = extractCode(raw.trim());
     setProcessing(true);
     try {
-      const res = await fetch("/api/check-in/scan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qrCode }),
-      });
-      const data = await res.json();
+      const { estado, data } = await postEscaneo<CheckInRespuesta>("/api/check-in/scan", { qrCode });
 
-      if (res.ok) {
+      if (estado === "ok" || (estado === "ya" && esRepeticionPropia(data, user?.id))) {
         setResult({ outcome: "new", name: data.name, online: data.online, confirmed: data.confirmed, badgeName: data.badgeName, checkedInAt: data.checkedInAt });
         if (typeof data.totalCheckedIn === "number") setTotalCheckedIn(data.totalCheckedIn);
         playSound("success");
-      } else if (res.status === 409) {
+      } else if (estado === "ya") {
         setResult({ outcome: "already", name: data.name, online: data.online, confirmed: data.confirmed, badgeName: data.badgeName, checkedInAt: data.checkedInAt });
         playSound("already");
-      } else {
+      } else if (estado === "no_encontrado") {
         setResult({ outcome: "not_found" });
+        playSound("not_found");
+      } else {
+        setResult({ outcome: "error", aviso: t(`escaneo.${estado}`), detalle: t(`escaneo.${estado}_detalle`) });
         playSound("not_found");
       }
     } catch {
-      setResult({ outcome: "error" });
-      toast("Error de conexión", "error");
+      setResult({ outcome: "error", aviso: t("escaneo.reintenta"), detalle: t("escaneo.reintenta_detalle") });
     }
     setProcessing(false);
   };
@@ -186,6 +193,11 @@ export default function CheckInPage() {
     setResult(null);
     setMode(m);
   };
+
+  useEffect(
+    () => pausarEnSegundoPlano(() => html5QrRef.current, () => result !== null),
+    [result],
+  );
 
   useEffect(() => {
     return () => { stopScanner(); };

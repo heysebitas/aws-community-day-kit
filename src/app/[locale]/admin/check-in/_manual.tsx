@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Search, X, Loader2, UserCheck, BadgeCheck, Printer, CheckCircle2, ChevronLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useAuth } from "@/contexts/auth-context";
+import { postEscaneo, esRepeticionPropia } from "@/lib/escaneo-cliente";
 import { StatusCard, type CheckInResult } from "./_status-card";
 
 type SearchHit = {
@@ -29,6 +32,8 @@ function BadgeChip({ confirmed }: { confirmed: boolean }) {
 }
 
 export function ManualCheckIn({ onCheckedIn }: { onCheckedIn?: (total: number) => void }) {
+  const t = useTranslations("Panel");
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchHit[]>([]);
   const [searching, setSearching] = useState(false);
@@ -61,22 +66,22 @@ export function ManualCheckIn({ onCheckedIn }: { onCheckedIn?: (total: number) =
   const doCheckIn = async (hit: SearchHit) => {
     setChecking(true);
     try {
-      const res = await fetch("/api/check-in/scan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qrCode: hit.qrCode }),
-      });
-      const data = await res.json();
-      if (res.ok) {
+      const { estado, data } = await postEscaneo<{
+        name?: string; online?: boolean; confirmed?: boolean; badgeName?: string;
+        checkedInAt?: string | null; checkedInBy?: string | null; totalCheckedIn?: number;
+      }>("/api/check-in/scan", { qrCode: hit.qrCode });
+      if (estado === "ok" || (estado === "ya" && esRepeticionPropia(data, user?.id))) {
         setResult({ outcome: "new", name: data.name, online: data.online, confirmed: data.confirmed, badgeName: data.badgeName, checkedInAt: data.checkedInAt });
         if (typeof data.totalCheckedIn === "number") onCheckedIn?.(data.totalCheckedIn);
-      } else if (res.status === 409) {
+      } else if (estado === "ya") {
         setResult({ outcome: "already", name: data.name, online: data.online, confirmed: data.confirmed, badgeName: data.badgeName, checkedInAt: data.checkedInAt });
-      } else {
+      } else if (estado === "no_encontrado") {
         setResult({ outcome: "not_found", name: hit.name });
+      } else {
+        setResult({ outcome: "error", aviso: t(`escaneo.${estado}`), detalle: t(`escaneo.${estado}_detalle`) });
       }
     } catch {
-      setResult({ outcome: "error" });
+      setResult({ outcome: "error", aviso: t("escaneo.reintenta"), detalle: t("escaneo.reintenta_detalle") });
     } finally {
       setChecking(false);
     }

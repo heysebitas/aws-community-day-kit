@@ -4,8 +4,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Camera, CameraOff, ShieldAlert, ScanLine, Search } from "lucide-react";
-import { ScanStatus, type ScanResult } from "../_scan-status";
+import { ScanStatus, resultadoDeFallo, type ScanResult } from "../_scan-status";
 import { ScanManual } from "../_scan-manual";
+import { useTranslations } from "next-intl";
+import { postEscaneo, configCamara, pausarEnSegundoPlano } from "@/lib/escaneo-cliente";
 
 interface Badge { id: string; sponsorName: string; logoUrl: string; }
 
@@ -46,6 +48,7 @@ function extractShortId(raw: string): string {
 
 export default function BadgesScannerPage() {
   const { toast } = useToast();
+  const t = useTranslations("Panel");
   const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [badges, setBadges] = useState<Badge[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
@@ -72,29 +75,31 @@ export default function BadgesScannerPage() {
 
   const submit = useCallback(async (shortId: string): Promise<ScanResult> => {
     if (!selectedBadge) return { outcome: "error", primary: "Selecciona un badge" };
-    const res = await fetch("/api/scanner/badge", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shortId, sponsorId: selectedBadge.id }),
-    });
-    const data = await res.json() as {
+    const { estado, data } = await postEscaneo<{
       found?: boolean; alreadyHas?: boolean; firstName?: string; lastName?: string; role?: string; sponsorName?: string;
-    };
-    if (res.status === 403) { playSound("not_found"); return { outcome: "error", primary: "Sin permiso", secondary: "No puedes dar este badge" }; }
-    if (!res.ok || !data.found) { playSound("not_found"); return { outcome: "not_found", primary: "No encontrado", secondary: "Esta escarapela no está en pasaportes" }; }
+    }>("/api/scanner/badge", { shortId, sponsorId: selectedBadge.id });
+    if (estado === "sesion" || estado === "permiso" || estado === "reintenta") { playSound("not_found"); return resultadoDeFallo(estado, t); }
+    if (estado !== "ok" || !data.found) { playSound("not_found"); return { outcome: "not_found", primary: "No encontrado", secondary: "Esta escarapela no está en pasaportes" }; }
     const name = `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim();
     if (data.alreadyHas) { playSound("already"); return { outcome: "already", primary: "Ya tenía este badge", name, role: data.role }; }
     playSound("success");
     setLocalCount((c) => c + 1);
     return { outcome: "success", primary: `Badge entregado: ${selectedBadge.sponsorName}`, name, role: data.role };
-  }, [selectedBadge]);
+  }, [selectedBadge, t]);
 
   const handleScan = useCallback(async (raw: string) => {
     const shortId = extractShortId(raw);
     setProcessing(true);
-    const r = await submit(shortId).catch((): ScanResult => ({ outcome: "error", primary: "Error de conexión" }));
+    const r = await submit(shortId).catch((): ScanResult => resultadoDeFallo("reintenta", t));
     setResult(r);
     setProcessing(false);
-  }, [submit]);
+  }, [submit, t]);
+
+  // La cámara no corre con la pestaña oculta; al volver se reanuda salvo que haya un resultado a la vista.
+  useEffect(
+    () => pausarEnSegundoPlano(() => html5QrRef.current, () => result !== null),
+    [result],
+  );
 
   const startScanner = async () => {
     if (!selectedBadge) { toast("Selecciona un badge primero", "error"); return; }
@@ -109,7 +114,7 @@ export default function BadgesScannerPage() {
       const { Html5Qrcode } = await import("html5-qrcode");
       const scanner = new Html5Qrcode("badges-qr-reader");
       html5QrRef.current = scanner;
-      await scanner.start({ facingMode: "environment" }, { fps: 20 }, async (decoded) => { await scanner.pause(); await handleScan(decoded); }, () => {});
+      await scanner.start({ facingMode: "environment" }, configCamara(), async (decoded) => { await scanner.pause(); await handleScan(decoded); }, () => {});
       setScanning(true);
     } catch (err) { setCameraError(`No se pudo iniciar: ${(err as Error).message}`); }
   };
