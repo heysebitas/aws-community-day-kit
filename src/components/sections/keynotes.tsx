@@ -63,7 +63,7 @@ function KeynoteBody({ kn, size = "sm" }: { kn: Keynote; size?: "sm" | "lg" }) {
 
       <div className="flex flex-wrap items-center gap-3 mt-1">
         {kn.linkedin && (
-          <Link
+          <Link prefetch={false}
             href={kn.linkedin}
             target="_blank"
             rel="noopener noreferrer"
@@ -75,7 +75,7 @@ function KeynoteBody({ kn, size = "sm" }: { kn: Keynote; size?: "sm" | "lg" }) {
           </Link>
         )}
         {kn.perfil && (
-          <Link
+          <Link prefetch={false}
             href={`/speakers/${kn.perfil}`}
             onClick={(e) => e.stopPropagation()}
             className={`self-start inline-flex items-center gap-1.5 font-mono font-semibold text-acento border-2 border-acento/40 bg-acento/8 transition-all hover:bg-acento hover:text-surface-900 ${size === "lg" ? "text-sm px-4 py-1.5" : "text-xs px-3 py-1"}`}
@@ -215,7 +215,7 @@ export function Keynotes() {
             <p className="text-surface-300 leading-relaxed max-w-[38ch] m-0 text-base md:text-lg">
               {t("speakers_cta_desc")}
             </p>
-            <Link
+            <Link prefetch={false}
               href={localePath(locale, "/directorio")}
               className="inline-flex items-center gap-2 font-mono text-sm font-semibold text-acento border-2 border-acento/40 bg-acento/8 px-5 py-2.5 transition-all duration-300 hover:bg-acento hover:text-surface-900 hover:border-acento group"
             >

@@ -103,7 +103,7 @@ function EventCard({ event, onClick }: { event: AgendaEvent; onClick: () => void
         <div className="flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-center gap-1">
           <p className="font-mono text-[13px] font-bold leading-snug line-clamp-3">{event.title}</p>
           {event.speaker && (
-            <p className="font-mono text-xs opacity-60 line-clamp-1">{event.speaker}</p>
+            <p className="font-mono text-xs opacity-80 line-clamp-1">{event.speaker}</p>
           )}
           {event.sessionType === "online" && (
             <div className="mt-0.5"><OnlineBadge /></div>

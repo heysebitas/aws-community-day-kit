@@ -4,7 +4,6 @@ import { useTranslations, useLocale } from "next-intl";
 import { esTrack, trackCorto, trackPublico } from "@/data/session-tracks";
 import { EnlaceLigero as Link } from "@/components/ui/enlace-ligero";
 import { Foto } from "@/components/ui/foto";
-import { motion } from "motion/react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { localePath } from "@/lib/utils";
@@ -92,17 +91,13 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
   const hasSocial = !!(profile.social?.linkedin || profile.social?.twitter || profile.social?.github || profile.social?.website);
 
   return (
-    <motion.div
-      className="group relative flex h-full w-full flex-col"
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    >
+    <div className="group relative flex h-full w-full flex-col transition-transform duration-200 hover:-translate-y-1">
 
       {/* Card — flex-col so info section fills remaining height */}
       <div className="relative flex h-full flex-col overflow-hidden border-2 border-surface-600 bg-surface-800 transition-all duration-200 group-hover:border-acento group-hover:shadow-[6px_6px_0_0_var(--color-acento)]">
 
         {/* Photo — fixed by aspect ratio, never grows */}
-        <Link href={href} className="mx-6 mt-6 block shrink-0">
+        <Link prefetch={false} href={href} className="mx-6 mt-6 block shrink-0">
           <div className="relative aspect-square overflow-hidden border-2 border-surface-600">
             {profile.photo ? (
               <Foto
@@ -124,7 +119,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
         {/* Info — grows to fill card height, pins social to bottom */}
         <div className="relative flex flex-1 flex-col px-5 pb-5 pt-3 text-center">
           {/* Name + tagline */}
-          <Link href={href} className="block shrink-0">
+          <Link prefetch={false} href={href} className="block shrink-0">
             <h3 className="font-display text-lg font-semibold leading-tight tracking-tight text-surface-50 md:text-xl">{profile.name}</h3>
             <p className="mt-1 font-mono text-xs font-semibold text-acento line-clamp-2 leading-snug md:text-sm">
               {profile.tagline || profile.role}
@@ -132,7 +127,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
           </Link>
 
           {/* Company logo OR track badge — always same height */}
-          <Link href={href} className="mt-3 flex shrink-0 min-h-[56px] items-center justify-center">
+          <Link prefetch={false} href={href} className="mt-3 flex shrink-0 min-h-[56px] items-center justify-center">
             {profile.companyLogo ? (
               <Foto
                 src={profile.companyLogo}
@@ -175,7 +170,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -219,7 +214,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
 
         <ScrollReveal delay={0.05}>
           <div className="mt-6 flex justify-center">
-            <Link
+            <Link prefetch={false}
               href={localePath(locale, "/directorio")}
               className="inline-flex min-h-11 items-center gap-2 border-2 border-acento bg-acento/10 px-6 py-3 font-mono text-sm font-semibold text-acento transition-all hover:bg-acento hover:text-surface-900"
             >
@@ -248,9 +243,9 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
                 p,
                 ...(p.coSpeakers ?? []).map((co) => coSpeakerAsProfile(co, p)),
               ]).map((profile, i) => (
-                <motion.div key={profile._id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                <div key={profile._id} className="entra-y" style={{ "--d": `${i * 0.04}s` } as React.CSSProperties}>
                   <SpeakerCard profile={profile} locale={locale} />
-                </motion.div>
+                </div>
               ))}
             </div>
           </ScrollReveal>
@@ -260,7 +255,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
         {(
           <ScrollReveal delay={0.1}>
             <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Link
+              <Link prefetch={false}
                 href={localePath(locale, "/directorio")}
                 className="inline-flex min-h-11 items-center gap-2 border-2 border-acento bg-acento px-8 py-3.5 font-mono text-sm font-bold text-tinta transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_var(--color-acento-fuerte)] active:translate-x-0 active:translate-y-0 active:shadow-none"
               >
@@ -269,7 +264,7 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               {showSpeakerCta && (
-                <Link
+                <Link prefetch={false}
                   href={localePath(locale, "/speakers")}
                   className="inline-flex min-h-11 items-center gap-2 border-2 border-acento bg-acento/10 px-6 py-3 font-mono text-sm font-semibold text-acento transition-all hover:bg-acento hover:text-surface-900"
                 >

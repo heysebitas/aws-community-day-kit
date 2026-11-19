@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { MotionConfig } from "motion/react";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { HashScroll } from "@/components/layout/hash-scroll";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -31,9 +30,8 @@ export function SiteChrome({
   const { esAdmin, esInmersiva } = modoDe(usePathname() ?? "");
   const pelada = esAdmin || esInmersiva;
 
-  // Con movimiento reducido, motion quita los desplazamientos y deja la opacidad.
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       {!pelada && <ScrollProgress />}
       {!pelada && <HashScroll />}
       {!pelada && navbar}
@@ -41,6 +39,6 @@ export function SiteChrome({
       {!pelada && footer}
       {!pelada && <ScrollToTop />}
       {!pelada && jsonLd}
-    </MotionConfig>
+    </>
   );
 }

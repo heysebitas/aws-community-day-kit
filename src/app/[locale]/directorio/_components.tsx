@@ -194,7 +194,7 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
 
   return (
     <motion.div
-      className={`group relative overflow-hidden rounded-none border bg-glass backdrop-blur-xl transition-all duration-300 ${
+      className={`group relative overflow-hidden rounded-none border bg-surface-900 transition-all duration-300 ${
         isLive
           ? "border-yellow-400/60 shadow-[0_0_30px_rgba(250,204,21,0.18)] ring-1 ring-yellow-400/40"
           : "border-glass-border hover:border-glass-border-hover hover:shadow-[0_0_30px_rgb(var(--tema-acento-rgb)_/_0.08)]"
@@ -226,7 +226,7 @@ export function DirectoryCard({ profile, locale, appUrl, isLive }: { profile: Pu
             <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface-900/80 to-transparent" />
             {profile.companyLogo && (
               <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-start">
-                <div className="rounded-lg border border-glass-border bg-surface-900/80 px-2 py-1 backdrop-blur-sm">
+                <div className="rounded-lg border border-glass-border bg-surface-900/80 px-2 py-1">
                   <Foto
                     src={profile.companyLogo}
                     alt="Company"
@@ -328,7 +328,7 @@ export function AgendaSessionCard({ event, startLabel, endLabel, isLive }: { eve
   const sessionLabel = event.sessionType ? AG_SESSION_LABEL[event.sessionType] : undefined;
   return (
     <motion.div
-      className={`group relative overflow-hidden rounded-none border bg-glass backdrop-blur-xl transition-all duration-300 ${
+      className={`group relative overflow-hidden rounded-none border bg-surface-900 transition-all duration-300 ${
         isLive
           ? "border-yellow-400/60 shadow-[0_0_30px_rgba(250,204,21,0.18)] ring-1 ring-yellow-400/40"
           : "border-glass-border hover:border-glass-border-hover hover:shadow-[0_0_30px_rgb(var(--tema-acento-rgb)_/_0.08)]"

@@ -2,7 +2,6 @@
 
 import { useId } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScrollLock } from "@/hooks/use-scroll-lock";
@@ -38,9 +37,7 @@ export function Modal(props: ModalProps) {
   if (typeof window === "undefined") return null;
 
   return createPortal(
-    <AnimatePresence>
-      {open && <Caja {...props} />}
-    </AnimatePresence>,
+    open ? <Caja {...props} /> : null,
     document.body,
   );
 }
@@ -52,19 +49,13 @@ function Caja({ onClose, title, labelledBy, children, className, size = "md" }: 
   return (
     <dialog ref={ref} aria-labelledby={title ? idTitulo : labelledBy} className={CLASE_DIALOGO}>
         <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm sm:backdrop-blur-none"
+          <div
+            className="entra-fundido absolute inset-0 bg-black/70 backdrop-blur-sm sm:backdrop-blur-none"
             onClick={onClose}
           />
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
-            transition={{ type: "spring", damping: 26, stiffness: 320 }}
+          <div
             className={cn(
+              "entra-modal",
               "relative flex max-h-[92vh] w-full flex-col border-2 border-surface-500 bg-surface-800",
               "shadow-[0_-8px_0_0_rgba(0,0,0,0.35)] sm:max-h-[88vh] sm:shadow-[8px_8px_0_0_rgba(0,0,0,0.55)]",
               sizeStyles[size],
@@ -92,7 +83,7 @@ function Caja({ onClose, title, labelledBy, children, className, size = "md" }: 
             >
               {children}
             </div>
-          </motion.div>
+          </div>
         </div>
     </dialog>
   );

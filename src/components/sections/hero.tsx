@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { motion } from "motion/react";
 import { useEventConfig } from "@/components/providers/event-config-provider";
 import { WireGlobe } from "@/components/effects/wire-globe";
 import { MarqueeStrip } from "@/components/ui/marquee-strip";
@@ -52,7 +51,6 @@ function HeroCountdown() {
   );
 }
 
-const ease = [0.22, 1, 0.36, 1] as const;
 
 /** El nombre partido en dos renglones: «aws student» / «community day». */
 function renglones(nombre: string): [string, string] {
@@ -77,22 +75,18 @@ export function Hero() {
     <section id="home" className="relative flex min-h-svh flex-col overflow-hidden bg-surface-900">
       <div className="relative z-10 mx-auto grid w-full max-w-[1240px] flex-1 grid-cols-1 items-center gap-8 px-6 pb-10 pt-28 lg:grid-cols-[1.05fr_0.95fr] lg:gap-4">
         <div className="order-2 lg:order-1">
-          <motion.p
-            initial={{ y: 14 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.6, ease }}
-            className="dot-matrix flex flex-wrap gap-x-6 gap-y-1 text-3xl leading-none text-acento md:text-4xl"
+          <p
+            style={{ "--y": "14px", "--d": "0s" } as React.CSSProperties}
+            className="entra-y dot-matrix flex flex-wrap gap-x-6 gap-y-1 text-3xl leading-none text-acento md:text-4xl"
           >
             {/* El letrero dice cuándo y dónde, como un panel de salidas. */}
             <span>{confirmada ? fechaCorta(EVENTO.inicio) : t("coming_soon")}</span>
             <span>{EVENTO.ciudad}</span>
-          </motion.p>
+          </p>
 
-          <motion.h1
-            initial={{ y: 24 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.8, delay: 0.08, ease }}
-            className="mt-4 font-display text-[13vw] font-medium lowercase leading-[0.85] tracking-tighter text-surface-50 sm:text-[10vw] lg:text-[6.4vw] xl:text-[5.375rem]"
+          <h1
+            style={{ "--y": "24px", "--d": "0.08s" } as React.CSSProperties}
+            className="entra-y mt-4 font-display text-[13vw] font-medium lowercase leading-[0.85] tracking-tighter text-surface-50 sm:text-[10vw] lg:text-[6.4vw] xl:text-[5.375rem]"
           >
             {arriba}
             {abajo && (
@@ -101,35 +95,29 @@ export function Hero() {
                 {abajo}
               </>
             )}
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ y: 16 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="mt-5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-base text-surface-300 md:text-lg"
+          <p
+            style={{ "--y": "16px", "--d": "0.2s" } as React.CSSProperties}
+            className="entra-y mt-5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-base text-surface-300 md:text-lg"
           >
             {confirmada && <span>{hora(EVENTO.inicio, locale)}</span>}
             <span className="text-surface-100">{t("tagline_short")}</span>
             <span>{EVENTO.edicion.toLowerCase()} {EVENTO.anio}</span>
-          </motion.p>
+          </p>
 
           {confirmada && (
-            <motion.div
-              initial={{ y: 18 }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.7, delay: 0.32, ease }}
-              className="mt-8"
+            <div
+            style={{ "--y": "18px", "--d": "0.32s" } as React.CSSProperties}
+            className="entra-y mt-8"
             >
               <HeroCountdown />
-            </motion.div>
+            </div>
           )}
 
-          <motion.div
-            initial={{ y: 18 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.7, delay: 0.44, ease }}
-            className="mt-8 flex flex-wrap items-center gap-4"
+          <div
+            style={{ "--y": "18px", "--d": "0.44s" } as React.CSSProperties}
+            className="entra-y mt-8 flex flex-wrap items-center gap-4"
           >
             {isPostEvent ? (
               <>
@@ -199,14 +187,12 @@ export function Hero() {
                 )}
               </div>
             )}
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div
-          initial={{ scale: 0.94 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.1, delay: 0.15, ease }}
-          className="order-1 lg:order-2"
+        <div
+          style={{ "--d": "0.15s" } as React.CSSProperties}
+          className="entra-escala order-1 lg:order-2"
         >
           <div className="relative mx-auto w-full max-w-[260px] sm:max-w-[360px] lg:max-w-[560px]">
             <WireGlobe
@@ -219,7 +205,7 @@ export function Hero() {
               {coordenadas(locale)} · {t("globe_hint")}
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       <div className="relative z-20">

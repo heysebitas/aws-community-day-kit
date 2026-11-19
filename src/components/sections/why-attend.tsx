@@ -47,13 +47,13 @@ function WhyRow({ num, titleKey, tagKey, descKey, t }: {
       <div className={`absolute left-0 bottom-[-1px] h-px bg-acento transition-[width] duration-700 ${lit ? "w-full" : "w-0 group-hover:w-full"}`} />
 
       {/* Number — outline → fills on hover (desktop) or scroll-enter (mobile) */}
+      {/* El número va en un pseudo-elemento: es decoración, no texto que leer. */}
       <span
         aria-hidden="true"
-        className={`font-display font-medium leading-none tracking-tight select-none transition-colors duration-500 ${lit ? "text-acento" : "text-white/10 group-hover:text-acento"} [-webkit-text-stroke:1.5px_rgba(255,255,255,0.22)] group-hover:[-webkit-text-stroke-color:var(--color-acento)] [transition:color_0.5s_ease,_-webkit-text-stroke-color_0.5s_ease]`}
+        data-n={num}
+        className={`before:content-[attr(data-n)] font-display font-medium leading-none tracking-tight select-none transition-colors duration-500 ${lit ? "text-acento" : "text-white/10 group-hover:text-acento"} [-webkit-text-stroke:1.5px_rgba(255,255,255,0.22)] group-hover:[-webkit-text-stroke-color:var(--color-acento)] [transition:color_0.5s_ease,_-webkit-text-stroke-color_0.5s_ease]`}
         style={{ fontSize: "clamp(2rem,4.5vw,3.625rem)" }}
-      >
-        {num}
-      </span>
+      />
 
       {/* Title + tag */}
       <div className="flex flex-col gap-2.5">

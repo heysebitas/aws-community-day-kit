@@ -102,7 +102,7 @@ export function HardButton({
   }
 
   return (
-    <Link href={href} className={cls}>
+    <Link prefetch={false} href={href} className={cls}>
       {inner}
     </Link>
   );

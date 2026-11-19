@@ -1,23 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useScroll, motion, useSpring } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
 const ESTILO = {
   background: "linear-gradient(90deg, var(--color-acento), var(--color-acento))",
 };
 
-// Firefox y Safari 16 no tienen `animation-timeline`: ahí queda Motion.
+// Firefox y Safari 16 no tienen `animation-timeline`: ahí se actualiza al hacer scroll.
 const soportaLineaDeTiempo = () =>
   typeof CSS !== "undefined" && CSS.supports("animation-timeline: scroll()");
 
-function BarraMotion() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+function BarraScroll() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const act = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+      if (ref.current) ref.current.style.transform = `scaleX(${p})`;
+    };
+    act();
+    window.addEventListener("scroll", act, { passive: true });
+    return () => window.removeEventListener("scroll", act);
+  }, []);
   return (
-    <motion.div
+    <div
+      ref={ref}
       className="scroll-progress-bar fixed top-0 left-0 right-0 h-[2px] z-[100] origin-left"
-      style={{ scaleX, ...ESTILO }}
+      style={{ transform: "scaleX(0)", ...ESTILO }}
     />
   );
 }
@@ -26,7 +35,7 @@ export function ScrollProgress() {
   const [css, setCss] = useState<boolean | null>(null);
   useEffect(() => setCss(soportaLineaDeTiempo()), []);
   if (css === null) return null;
-  if (!css) return <BarraMotion />;
+  if (!css) return <BarraScroll />;
   return (
     <>
       <style>{"@keyframes progreso-scroll{to{transform:scaleX(1)}}"}</style>
