@@ -1,4 +1,5 @@
-import { datosDelEvento, idiomaPedido } from "@/lib/llm";
+import { idiomaPedido } from "@/lib/llm";
+import { datosDelEventoCacheados } from "@/lib/lectores-evento";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: Request) {
   const idioma = idiomaPedido(new URL(request.url).searchParams.get("lang"));
-  return Response.json(await datosDelEvento(idioma), {
+  return Response.json(await datosDelEventoCacheados(idioma), {
     headers: { "Cache-Control": "public, max-age=300", "Access-Control-Allow-Origin": "*" },
   });
 }

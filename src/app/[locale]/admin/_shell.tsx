@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import { AuthProvider } from "@/contexts/auth-context";
+import { AuthProvider, type AuthUser } from "@/contexts/auth-context";
 import { ToastProvider } from "@/components/ui/toast";
 import { Sidebar } from "@/components/admin/sidebar";
 import { useRouter, usePathname } from "next/navigation";
@@ -78,9 +78,9 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AdminShell({ children }: { children: React.ReactNode }) {
+export default function AdminShell({ children, usuarioInicial }: { children: React.ReactNode; usuarioInicial?: AuthUser | null }) {
   return (
-    <AuthProvider>
+    <AuthProvider inicial={usuarioInicial}>
       <ToastProvider>
         <AdminGate>{children}</AdminGate>
       </ToastProvider>

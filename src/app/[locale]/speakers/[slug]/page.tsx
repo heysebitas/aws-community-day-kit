@@ -8,6 +8,8 @@ import { PerfilSpeaker } from "./_perfil";
 import type { Metadata } from "next";
 import { EVENTO, PAIS, SITIO } from "@/config";
 
+export const revalidate = 300;
+
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }

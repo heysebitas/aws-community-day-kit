@@ -1,4 +1,5 @@
 import { getAuthUser } from "@/lib/auth";
+import { usuarioParaCliente } from "@/lib/lectores";
 
 export async function GET() {
   try {
@@ -6,14 +7,7 @@ export async function GET() {
     if (!user) {
       return Response.json({ error: "No autenticado" }, { status: 401 });
     }
-    return Response.json({
-      user: {
-        id: user._id, name: user.name, email: user.email, role: user.role,
-        // El menú y las páginas los usan para esconder lo que no corresponde.
-        // Esconder es cortesía: quien manda es `requireAccess` en el servidor.
-        permisos: user.permisos ?? [],
-      },
-    });
+    return Response.json({ user: usuarioParaCliente(user) });
   } catch {
     return Response.json({ error: "No autenticado" }, { status: 401 });
   }
