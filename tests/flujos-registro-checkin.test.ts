@@ -219,7 +219,13 @@ describe("el día del evento, de punta a punta", () => {
     assert.ok(rs.filter((r) => r.status === 409).every((r) => r.body.status === "already_checked_in"));
     assert.equal(await Registration.countDocuments({ checkedIn: true }), 1);
     const { Log } = await import("@/models/log");
-    assert.equal(await Log.countDocuments({ action: "CHECK_IN" }), 1);
+    // El log se escribe después de responder: se espera a que aparezca.
+    let logs = 0;
+    for (let i = 0; i < 50 && logs === 0; i++) {
+      logs = await Log.countDocuments({ action: "CHECK_IN" });
+      if (logs === 0) await new Promise((r) => setTimeout(r, 20));
+    }
+    assert.equal(logs, 1);
   });
 
   test("check-in: un código que no es texto no marca a nadie", async () => {

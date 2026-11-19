@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: Promise<{ qrCode: string }> },
 ) {
   try {
-    const limite = rateLimit(`pase-pdf:${getIp(_request)}`, 30, 10 * 60 * 1000);
+    const limite = rateLimit(`pase-pdf:${getIp(_request)}`, 300, 10 * 60 * 1000);
     if (!limite.ok) {
       return Response.json(
         { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
@@ -20,6 +20,13 @@ export async function GET(
     }
 
     const { qrCode } = await params;
+    const porCodigo = rateLimit(`pase-pdf:codigo:${qrCode}`, 5, 10 * 60 * 1000);
+    if (!porCodigo.ok) {
+      return Response.json(
+        { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(porCodigo.retryAfterMs / 1000)) } },
+      );
+    }
     await connectDB();
 
     const registration = await Registration.findOne({ qrCode });

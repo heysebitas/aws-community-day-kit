@@ -4,9 +4,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Camera, CameraOff, ShieldAlert, ScanLine, Search } from "lucide-react";
-import { ScanStatus, type ScanResult } from "../_scan-status";
+import { ScanStatus, resultadoDeFallo, type ScanResult } from "../_scan-status";
 import { ScanManual } from "../_scan-manual";
 import { PAIS } from "@/config";
+import { useTranslations } from "next-intl";
+import { postEscaneo, configCamara, pausarEnSegundoPlano } from "@/lib/escaneo-cliente";
 
 type MealType = "lunch" | "snack";
 
@@ -56,6 +58,7 @@ function extractShortId(raw: string): string {
 
 export default function AlmuerzosPage() {
   const { toast } = useToast();
+  const t = useTranslations("Panel");
   const [mode, setMode] = useState<"scan" | "manual">("scan");
   const [mealType, setMealType] = useState<MealType>("lunch");
   const [scanning, setScanning] = useState(false);
@@ -72,16 +75,15 @@ export default function AlmuerzosPage() {
   // Entrega la comida (compartido por cámara y manual). Usa el tipo activo (ref).
   const submit = useCallback(async (shortId: string): Promise<ScanResult> => {
     const type = mealTypeRef.current;
-    const res = await fetch("/api/scanner/meals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shortId, type }),
-    });
-    const data = await res.json() as {
+    const { estado, data } = await postEscaneo<{
       found?: boolean; alreadyClaimed?: boolean; firstName?: string; lastName?: string; claimedAt?: string; claimedBy?: string; role?: string;
-    };
+    }>("/api/scanner/meals", { shortId, type });
 
-    if (!res.ok || !data.found) {
+    if (estado === "sesion" || estado === "permiso" || estado === "reintenta") {
+      playSound("not_found");
+      return resultadoDeFallo(estado, t);
+    }
+    if (estado !== "ok" || !data.found) {
       playSound("not_found");
       return { outcome: "not_found", primary: "No encontrado", secondary: "Esta escarapela no está en pasaportes" };
     }
@@ -100,15 +102,21 @@ export default function AlmuerzosPage() {
     playSound("success");
     setCounts((c) => ({ ...c, [type]: c[type] + 1 }));
     return { outcome: "success", primary: `${MEAL_LABELS[type]} entregado`, name, role: data.role };
-  }, []);
+  }, [t]);
 
   const handleScan = useCallback(async (raw: string) => {
     const shortId = extractShortId(raw);
     setProcessing(true);
-    const r = await submit(shortId).catch((): ScanResult => ({ outcome: "error", primary: "Error de conexión" }));
+    const r = await submit(shortId).catch((): ScanResult => resultadoDeFallo("reintenta", t));
     setResult(r);
     setProcessing(false);
-  }, [submit]);
+  }, [submit, t]);
+
+  // La cámara no corre con la pestaña oculta; al volver se reanuda salvo que haya un resultado a la vista.
+  useEffect(
+    () => pausarEnSegundoPlano(() => html5QrRef.current, () => result !== null),
+    [result],
+  );
 
   const startScanner = async () => {
     if (!scannerRef.current) return;
@@ -132,7 +140,7 @@ export default function AlmuerzosPage() {
       html5QrRef.current = scanner;
       await scanner.start(
         { facingMode: "environment" },
-        { fps: 20 },
+        configCamara(),
         async (decoded) => {
           await scanner.pause();
           await handleScan(decoded);

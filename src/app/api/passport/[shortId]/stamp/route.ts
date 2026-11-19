@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
-import { getIp, isBlocked, recordFail } from "@/lib/rate-limit";
+import { isBlocked, recordFail } from "@/lib/rate-limit";
 import { Passport } from "@/models/passport";
 import { SponsorPin } from "@/models/sponsor-pin";
 import { leerCuerpo } from "@/lib/cuerpo";
@@ -10,8 +10,8 @@ const VENTANA = 15 * 60 * 1000;
 
 /**
  * Pone el sello de un stand en un pasaporte: el asistente escribe el PIN que
- * le dicta quien atiende. Los fallos se cuentan por pasaporte y por IP, para
- * que nadie se selle la cartilla entera probando números.
+ * le dicta quien atiende. Los fallos se cuentan solo por pasaporte: en la sede
+ * todos comparten una IP y un límite por IP bloquearía a todos.
  */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ shortId: string }> }) {
   try {
@@ -19,9 +19,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sho
     const { pin } = await leerCuerpo(req);
     if (!pin || typeof pin !== "string") return Response.json({ error: "PIN requerido" }, { status: 400 });
 
-    const claves = [`sello:${getIp(req)}`, `sello:*:${shortId}`];
-    const bloqueo = claves.map((c) => isBlocked(c, LIMITE)).find((b) => b.blocked);
-    if (bloqueo) {
+    const clave = `sello:*:${shortId}`;
+    const bloqueo = isBlocked(clave, LIMITE);
+    if (bloqueo.blocked) {
       return Response.json(
         { error: `Demasiados intentos. Intenta en ${Math.ceil(bloqueo.retryAfterMs / 60000)} min.` },
         { status: 429, headers: { "Retry-After": String(Math.ceil(bloqueo.retryAfterMs / 1000)) } },
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sho
 
     const sponsor = await SponsorPin.findOne({ pin: pin.trim().slice(0, 32), isActive: true });
     if (!sponsor) {
-      claves.forEach((c) => recordFail(c, LIMITE, VENTANA));
+      recordFail(clave, LIMITE, VENTANA);
       return Response.json({ error: "PIN incorrecto o sponsor inactivo" }, { status: 400 });
     }
 

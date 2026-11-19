@@ -5,6 +5,7 @@ import { Registration } from "@/models/registration";
 import { createLog } from "@/lib/log";
 import { leerCuerpo, textoDe } from "@/lib/cuerpo";
 import { ruta } from "@/lib/api";
+import { despuesDeResponder } from "@/lib/registro-correo";
 
 // El total se cuenta de la base cada 30 s y entre tanto sube con cada escaneo
 // propio: un conteo completo por escaneo es lo más caro de la puerta.
@@ -72,12 +73,13 @@ export const POST = ruta(async (request: NextRequest) => {
       confirmed,
       badgeName,
       checkedInAt: registration.checkedInAt,
+      checkedInBy: registration.checkedInBy ?? null,
     }, { status: 409 });
   }
 
   const totalCheckedIn = await totalDentro();
 
-  await createLog({
+  despuesDeResponder(() => createLog({
     userId: user._id.toString(),
     userName: user.name,
     userRole: user.role,
@@ -88,7 +90,7 @@ export const POST = ruta(async (request: NextRequest) => {
       confirmed ? "Escarapela lista" : "Sin confirmar — imprimir escarapela",
       online ? "REGISTRO ONLINE" : null,
     ].filter(Boolean).join(" · "),
-  });
+  }));
 
   return Response.json({
     status: "success",
@@ -98,6 +100,7 @@ export const POST = ruta(async (request: NextRequest) => {
     confirmed,
     badgeName,
     checkedInAt: registration.checkedInAt,
+    checkedInBy: user._id.toString(),
     totalCheckedIn,
   });
 });

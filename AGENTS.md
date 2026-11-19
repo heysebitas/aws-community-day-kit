@@ -38,6 +38,7 @@ pierden al cerrar la demo. Nunca apuntes la demo a una base real.
 | Colores o un tema nuevo | [`docs/temas.md`](docs/temas.md) | `src/config/temas.ts` |
 | Un país: documentos, teléfono, ley de datos | [`docs/paises.md`](docs/paises.md) | `src/config/paises.ts` |
 | Roles y permisos del panel | [`docs/panel.md`](docs/panel.md) | `src/lib/permisos.ts` |
+| El día del evento (puerta, escáneres, límites de la sede) | [`docs/dia-del-evento.md`](docs/dia-del-evento.md) | `src/lib/escaneo-cliente.ts` |
 | Los modelos y la base | [`docs/datos.md`](docs/datos.md) | [`docs/base-de-datos.md`](docs/base-de-datos.md) |
 | Publicarlo | [`docs/despliegue.md`](docs/despliegue.md) | [`docs/bucket.md`](docs/bucket.md) |
 | Rendimiento o Lighthouse | `.claude/skills/kit-medir/SKILL.md` | [`docs/rendimiento.md`](docs/rendimiento.md) |

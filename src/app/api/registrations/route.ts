@@ -85,7 +85,7 @@ export const POST = ruta(async (request: NextRequest) => {
   // Rate limit + captcha solo para registros públicos
   // (los manuales los crea el staff ya autenticado).
   if (!manual) {
-    const rl = rateLimit(`reg:${getIp(request)}`, 50, 15 * 60 * 1000);
+    const rl = rateLimit(`reg:${getIp(request)}`, 300, 15 * 60 * 1000);
     if (!rl.ok) {
       return Response.json(
         { error: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." },

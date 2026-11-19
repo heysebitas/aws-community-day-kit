@@ -1,5 +1,6 @@
 "use client";
 
+import type { FalloEscaneo } from "@/lib/escaneo-cliente";
 import { CheckCircle2, AlertTriangle, XCircle, ArrowRight } from "lucide-react";
 
 export type ScanOutcome = "success" | "already" | "not_found" | "error";
@@ -19,6 +20,13 @@ const ROLE_LABEL: Record<string, string> = {
   organizer: "Organizador",
 };
 
+type Traductor = (clave: string) => string;
+
+/** Lo que se muestra ante un fallo que no es «no encontrado»: sin sesión, sin permiso o reintentar. */
+export function resultadoDeFallo(fallo: FalloEscaneo | "reintenta", t: Traductor): ScanResult {
+  return { outcome: fallo === "no_encontrado" ? "not_found" : "error", primary: t(`escaneo_${fallo}`), secondary: t(`escaneo_${fallo}_detalle`) };
+}
+
 // Card grande de resultado tras escanear / registrar manualmente.
 export function ScanStatus({ result, onNext, nextLabel = "Siguiente" }: {
   result: ScanResult;
@@ -36,7 +44,7 @@ export function ScanStatus({ result, onNext, nextLabel = "Siguiente" }: {
   const Icon = s.Icon;
 
   return (
-    <div className={`border-2 p-6 text-center sm:p-8 ${s.border} ${s.bg}`}>
+    <div role="status" className={`border-2 p-6 text-center sm:p-8 ${s.border} ${s.bg}`}>
       <div className={`mx-auto flex h-24 w-24 items-center justify-center ${s.iconBg}`}>
         <Icon className={`h-14 w-14 ${s.text}`} />
       </div>

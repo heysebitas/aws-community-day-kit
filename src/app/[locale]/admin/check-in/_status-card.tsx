@@ -11,6 +11,9 @@ export type CheckInResult = {
   confirmed?: boolean;   // escarapela lista (confirmó asistencia)
   badgeName?: string;
   checkedInAt?: string | null;
+  /** Fallo que no es «no encontrado»: sesión, permiso o reintentar. */
+  aviso?: string;
+  detalle?: string;
 };
 
 function hora(iso?: string | null): string {
@@ -35,15 +38,15 @@ export function StatusCard({ result, onNext, nextLabel = "Siguiente" }: {
   if (outcome === "not_found" || outcome === "error") {
     const isError = outcome === "error";
     return (
-      <div className="border-2 border-red-500/50 bg-red-500/10 p-6 text-center sm:p-8">
+      <div role="status" className="border-2 border-red-500/50 bg-red-500/10 p-6 text-center sm:p-8">
         <div className="mx-auto flex h-24 w-24 items-center justify-center bg-red-500/20">
           <XCircle className="h-14 w-14 text-red-400" />
         </div>
         <p className="mt-5 font-mono text-3xl font-black text-red-400">
-          {isError ? "Error" : "No registrado"}
+          {isError ? (result.aviso ?? "Error") : "No registrado"}
         </p>
         <p className="mt-2 font-mono text-sm text-surface-300">
-          {isError ? "Reintenta o usa el check-in manual" : "Esta persona no está en la lista de registrados"}
+          {isError ? (result.detalle ?? "Reintenta o usa el check-in manual") : "Esta persona no está en la lista de registrados"}
         </p>
         <NextButton onNext={onNext} label={nextLabel} />
       </div>
@@ -53,7 +56,7 @@ export function StatusCard({ result, onNext, nextLabel = "Siguiente" }: {
   // Registrado → la escarapela es lo que define el color y la acción
   const ready = !!confirmed;
   return (
-    <div className={`border-2 p-6 text-center sm:p-8 ${ready ? "border-emerald-500/50 bg-emerald-500/10" : "border-amber-500/50 bg-amber-500/10"}`}>
+    <div role="status" className={`border-2 p-6 text-center sm:p-8 ${ready ? "border-emerald-500/50 bg-emerald-500/10" : "border-amber-500/50 bg-amber-500/10"}`}>
       {/* Resultado del check-in (secundario, arriba) */}
       <div className="mb-4 flex justify-center">
         {outcome === "new" ? (

@@ -416,7 +416,15 @@
     "config_post_title": "Post-Evento · después del [[fecha_dia]]",
     "config_notify_label": "Notificación [[anio_siguiente]]",
     "config_notify_hint": "Botón de aviso de la próxima edición — puede ser un Google Form o newsletter.",
-    "escarapelas": "Escarapelas"
+    "escarapelas": "Escarapelas",
+    "escaneo_sesion": "Sesión cerrada",
+    "escaneo_sesion_detalle": "Tu sesión se abrió en otro dispositivo. Inicia sesión otra vez.",
+    "escaneo_permiso": "Sin permiso",
+    "escaneo_permiso_detalle": "Tu cuenta no puede hacer esto. Avisa a quien organiza.",
+    "escaneo_reintenta": "Reintenta",
+    "escaneo_reintenta_detalle": "No hubo respuesta del servidor. Vuelve a escanear; si sigue, usa el modo manual.",
+    "escaneo_no_encontrado": "No encontrado",
+    "escaneo_no_encontrado_detalle": "Esta escarapela no está en pasaportes"
   },
   "Login": {
     "heading": "acceso",
@@ -428,7 +436,8 @@
     "captcha_error": "Error de captcha. Intenta de nuevo.",
     "submitting": "Verificando…",
     "submit": "Iniciar sesión",
-    "marquee": "[[ciudad]] · [[anio]] · acceso"
+    "marquee": "[[ciudad]] · [[anio]] · acceso",
+    "aviso_sesion": "Tu sesión se abrió en otro dispositivo"
   },
   "CreatePassword": {
     "title": "[[nombre]]",

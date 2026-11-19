@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/user";
 import { createSession, setAuthCookie } from "@/lib/auth";
 import { createLog } from "@/lib/log";
-import { rateLimit, getIp } from "@/lib/rate-limit";
+import { rateLimit, getIp, isBlocked, recordFail, clearFails } from "@/lib/rate-limit";
 import { verifyCaptcha } from "@/lib/captcha";
 import { normalizeEmail } from "@/lib/normalize";
 
@@ -14,7 +14,10 @@ const HASH_DE_RELLENO = () => (hashDeRelleno ??= bcrypt.hash("relleno", 12));
 
 export async function POST(request: NextRequest) {
   try {
-    const rl = rateLimit(`login:${getIp(request)}`, 10, 15 * 60 * 1000);
+    // La sede entera sale por una IP: por IP solo hay un tope alto contra barridos,
+    // y los fallos se cuentan por IP y correo.
+    const ip = getIp(request);
+    const rl = rateLimit(`login-ip:${ip}`, 100, 15 * 60 * 1000);
     if (!rl.ok) {
       return Response.json(
         { error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
@@ -53,15 +56,26 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: checked.reason }, { status: 400 });
     }
 
+    const claveFallos = `login:${ip}:${checked.value}`;
+    const bloqueo = isBlocked(claveFallos, 10);
+    if (bloqueo.blocked) {
+      return Response.json(
+        { error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(bloqueo.retryAfterMs / 1000)) } },
+      );
+    }
+
     await connectDB();
 
     const user = await User.findOne({ email: checked.value });
     // Se compara siempre, haya cuenta o no: si no, el tiempo de respuesta delata qué correos existen.
     const valid = await bcrypt.compare(password, user?.passwordHash || await HASH_DE_RELLENO());
     if (!user || !user.passwordHash || !valid) {
+      recordFail(claveFallos, 10, 15 * 60 * 1000);
       return Response.json({ error: "Credenciales inválidas" }, { status: 401 });
     }
 
+    clearFails(claveFallos);
     const sessionId = await createSession(user._id.toString());
     await setAuthCookie(user._id.toString(), sessionId);
     await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });

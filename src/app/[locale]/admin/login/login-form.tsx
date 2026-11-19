@@ -37,6 +37,11 @@ export function LoginForm() {
     if (user) router.replace(localePath(locale, "/admin"));
   }, [user, router, locale]);
 
+  // Un escáner que recibió 401 manda aquí con ?aviso=sesion.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("aviso") === "sesion") setError(t("aviso_sesion"));
+  }, [t]);
+
   /**
    * Se valida al salir del campo y no en cada tecla: avisar mientras la persona
    * todavía escribe la dirección es ruido, porque está incompleta por

@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "La convocatoria de speakers está cerrada." }, { status: 403 });
     }
 
-    const limite = rateLimit(`postulacion:${getIp(request)}`, 8, 60 * 60 * 1000);
+    const limite = rateLimit(`postulacion:${getIp(request)}`, 40, 60 * 60 * 1000);
     if (!limite.ok) {
       return Response.json({ error: "Demasiadas postulaciones seguidas. Intenta más tarde." }, { status: 429 });
     }
