@@ -139,3 +139,13 @@ formularios públicos rechazan todo: es a propósito.
 ## Navegadores soportados
 
 Chrome y Edge 111, Firefox 128 y Safari 16.4 en adelante (`browserslist` de `package.json`). Son los mínimos con los que Tailwind 4 genera el CSS (`@layer`, `color-mix`): por debajo el sitio sale sin estilos aunque el JS funcione. Con estos mínimos se pueden usar `<dialog>`, `inert`, `svh`/`dvh`, `color-mix` y `oklch` sin respaldo; `:has()`, `scrollbar-color` y `popover` todavía no entran y solo van como mejora progresiva.
+
+## Que la imagen no lleve datos de ejemplo
+
+El `Dockerfile` compila con `MODO_DEMO=1 BUILD_SIN_SEMILLA=1`: la base en memoria del build
+arranca vacía, así que el HTML prerenderizado no trae nombres de la demo. Para comprobarlo
+(con `.next/cache` limpio, que puede guardar datos de un build anterior):
+
+```bash
+BUILD_SIN_SEMILLA=1 MODO_DEMO=1 JWT_SECRET=x npm run build && node scripts/comprobar-sin-semilla.mjs
+```
