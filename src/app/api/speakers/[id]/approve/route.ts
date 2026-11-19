@@ -90,7 +90,7 @@ export const POST = ruta(async (
       ],
     );
     if (!correo) {
-      logError("[approve] plantilla speaker_aprobado no disponible");
+      logError("speakers/[id]/approve", new Error("plantilla speaker_aprobado no disponible"));
       return Response.json({ error: "No se pudo armar el correo" }, { status: 500 });
     }
     const html = correo.html;
