@@ -1,11 +1,15 @@
 {
-  "fecha": "2026-11-16T00:00:00.000Z",
+  "fecha": "2026-11-19T00:00:00.000Z",
   "pasadas": 3,
   "dispositivo": "móvil",
+  "origen": "runner de GitHub Actions; peor valor de dos corridas sobre main tras fusionar #81–#89",
   "paginas": {
-    "/": { "rendimiento": 90, "fcp": 1059, "lcp": 3675, "tbt": 4, "cls": 0.001 },
-    "/speakers": { "rendimiento": 90, "fcp": 1057, "lcp": 3671, "tbt": 3.5, "cls": 0.001 },
-    "/registro": { "rendimiento": 92, "fcp": 1056, "lcp": 3368, "tbt": 3.5, "cls": 0 },
-    "/directorio": { "rendimiento": 91, "fcp": 1057, "lcp": 3524, "tbt": 4.5, "cls": 0 }
+    "/": { "rendimiento": 78, "fcp": 1318, "lcp": 3658, "tbt": 460, "cls": 0.002 },
+    "/speakers": { "rendimiento": 82, "fcp": 1230, "lcp": 3823, "tbt": 302, "cls": 0.002 },
+    "/registro": { "rendimiento": 88, "fcp": 1232, "lcp": 3651, "tbt": 127, "cls": 0 },
+    "/directorio": { "rendimiento": 89, "fcp": 1226, "lcp": 3608, "tbt": 254, "cls": 0 },
+    "/admin": { "rendimiento": 37, "fcp": 3066, "lcp": 7324, "tbt": 2113, "cls": 0.003 },
+    "/admin/check-in": { "rendimiento": 37, "fcp": 3001, "lcp": 7309, "tbt": 2227, "cls": 0.003 },
+    "/pasaporte/demo00000001": { "rendimiento": 88, "fcp": 2480, "lcp": 2497, "tbt": 280, "cls": 0 }
   }
 }
