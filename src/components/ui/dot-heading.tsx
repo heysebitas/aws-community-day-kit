@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { useEnVista } from "@/hooks/use-en-vista";
 import { cn } from "@/lib/utils";
 import type { Tone } from "./block-section";
 
@@ -14,7 +14,7 @@ function Wave({ text, invert }: { text: string; invert: boolean }) {
   const letters = [...text];
   // Fuera de pantalla la onda se pausa: hay más de cien letras animándose.
   const ref = useRef<HTMLSpanElement>(null);
-  const enVista = useInView(ref, { margin: "100px" });
+  const enVista = useEnVista(ref, { margen: "100px" });
   return (
     <span ref={ref} data-quieta={enVista ? undefined : ""}>
       {letters.map((ch, i) => (
@@ -54,9 +54,6 @@ export function DotHeading({
   className?: string;
   as?: "h1" | "h2" | "h3" | "p" | "div" | "span";
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
   // La onda sólo se puede aplicar si el contenido es texto plano.
   const text = typeof children === "string" ? children : null;
   const inverted = variant === "inverted";
@@ -90,15 +87,7 @@ export function DotHeading({
     // Con barrido: se revela de izquierda a derecha en vez de aparecer, para
     // que se encienda como un letrero que arranca y no como un texto que llega.
     return (
-      <motion.div
-        ref={ref}
-        initial={{ clipPath: "inset(0 100% 0 0)" }}
-        animate={inView ? { clipPath: "inset(0 0% 0 0)" } : undefined}
-        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-        className="scroll-reveal inline-block"
-      >
-        {caja}
-      </motion.div>
+      <div className="scroll-reveal barrido inline-block">{caja}</div>
     );
   }
 

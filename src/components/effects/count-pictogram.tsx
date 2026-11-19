@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { animate, useInView } from "motion/react";
+import { useEnVista } from "@/hooks/use-en-vista";
 import { cn } from "@/lib/utils";
 import type { Tone } from "@/components/ui/block-section";
 
@@ -71,12 +71,14 @@ function useCountUp(value: string, active: boolean) {
     if (!m) return;
     const target = Number(m[1]);
     const suffix = m[2];
-    const controls = animate(0, target, {
-      duration: 1.4,
-      ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => setShown(`${Math.round(v)}${suffix}`),
+    const duracion = 1400;
+    const t0 = performance.now();
+    let id = requestAnimationFrame(function paso(ahora) {
+      const p = Math.min(1, (ahora - t0) / duracion);
+      setShown(`${Math.round(target * (1 - (1 - p) ** 4))}${suffix}`);
+      if (p < 1) id = requestAnimationFrame(paso);
     });
-    return () => controls.stop();
+    return () => cancelAnimationFrame(id);
   }, [value, active]);
   return shown;
 }
@@ -105,7 +107,7 @@ export function CountPictogram({
   const items = Array.from({ length: count }, (_, i) => i);
 
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useEnVista(ref, { margen: "-80px", una: true });
 
   // El label llega como "800+ Asistentes": se separa la cifra para contarla.
   const [num, ...rest] = label.split(" ");

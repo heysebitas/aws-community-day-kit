@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "motion/react";
 import { useTranslations, useLocale } from "next-intl";
 import { usePathname } from "next/navigation";
 import { navItems } from "@/data/navigation";
@@ -20,12 +19,10 @@ interface MobileNavProps {
   onClose: () => void;
 }
 
-const ease = [0.22, 1, 0.36, 1] as const;
-
 export function MobileNav({ isOpen, onClose, id }: MobileNavProps) {
   useScrollLock(isOpen);
 
-  return <AnimatePresence>{isOpen && <Panel id={id} onClose={onClose} />}</AnimatePresence>;
+  return isOpen ? <Panel id={id} onClose={onClose} /> : null;
 }
 
 function Panel({ id, onClose }: { id?: string; onClose: () => void }) {
@@ -46,12 +43,8 @@ function Panel({ id, onClose }: { id?: string; onClose: () => void }) {
 
   return (
     <dialog ref={ref} id={id} aria-label={t("menu")} className={CLASE_DIALOGO}>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex flex-col bg-surface-900"
+        <div
+          className="entra-fundido fixed inset-0 z-50 flex flex-col bg-surface-900"
         >
           <div className="flex items-center justify-between border-b-2 border-acento/25 px-5 py-4">
             <a href={resolveHref("#home")} onClick={onClose} className="flex items-center">
@@ -89,14 +82,12 @@ function Panel({ id, onClose }: { id?: string; onClose: () => void }) {
 
           <nav className="flex-1 overflow-y-auto px-5 py-4">
             {links.map((link, i) => (
-              <motion.a
+              <a
                 key={link.href}
                 href={link.href}
                 onClick={onClose}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.04 + i * 0.035, ease }}
-                className="group flex items-baseline gap-4 border-b border-acento/20 py-3.5 transition-colors hover:bg-acento/10"
+                style={{ "--d": `${0.04 + i * 0.035}s` } as React.CSSProperties}
+                className="entra-x group flex items-baseline gap-4 border-b border-acento/20 py-3.5 transition-colors hover:bg-acento/10"
               >
                 <span className="etiqueta w-7 shrink-0 text-acento">
                   {String(i + 1).padStart(2, "0")}
@@ -104,7 +95,7 @@ function Panel({ id, onClose }: { id?: string; onClose: () => void }) {
                 <span className="font-display text-2xl font-medium lowercase tracking-tight text-surface-50 transition-colors group-hover:text-acento">
                   {link.label}
                 </span>
-              </motion.a>
+              </a>
             ))}
           </nav>
 
@@ -129,7 +120,7 @@ function Panel({ id, onClose }: { id?: string; onClose: () => void }) {
               </span>
             )}
           </div>
-        </motion.div>
+        </div>
     </dialog>
   );
 }

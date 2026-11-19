@@ -2,7 +2,6 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { localePath } from "@/lib/utils";
-import { motion } from "motion/react";
 import {
   Mic,
   Laptop,
@@ -228,13 +227,9 @@ export function CallForSpeakers() {
         {cfpCriteria.map((c, i) => {
           const Icon = ICONS[c.icon] ?? ClipboardList;
           return (
-            <motion.div
+            <div
               key={c.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="border-2 border-tinta p-6 transition-colors duration-300 hover:bg-tinta/5"
+              className="reveal-sube border-2 border-tinta p-6 transition-colors duration-300 hover:bg-tinta/5"
             >
               <Icon className="mb-3 h-6 w-6 text-tinta" />
               <p className="m-0 font-display text-lg font-medium lowercase tracking-tight text-tinta">
@@ -243,7 +238,7 @@ export function CallForSpeakers() {
               <p className="mt-1.5 font-mono text-sm leading-relaxed text-tinta/70">
                 {t(c.descKey)}
               </p>
-            </motion.div>
+            </div>
           );
         })}
       </div>

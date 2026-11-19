@@ -4,7 +4,6 @@ import { useTranslations, useLocale } from "next-intl";
 import { esTrack, trackCorto, trackPublico } from "@/data/session-tracks";
 import { EnlaceLigero as Link } from "@/components/ui/enlace-ligero";
 import { Foto } from "@/components/ui/foto";
-import { motion } from "motion/react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { localePath } from "@/lib/utils";
@@ -92,11 +91,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
   const hasSocial = !!(profile.social?.linkedin || profile.social?.twitter || profile.social?.github || profile.social?.website);
 
   return (
-    <motion.div
-      className="group relative flex h-full w-full flex-col"
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    >
+    <div className="group relative flex h-full w-full flex-col transition-transform duration-200 hover:-translate-y-1">
 
       {/* Card — flex-col so info section fills remaining height */}
       <div className="relative flex h-full flex-col overflow-hidden border-2 border-surface-600 bg-surface-800 transition-all duration-200 group-hover:border-acento group-hover:shadow-[6px_6px_0_0_var(--color-acento)]">
@@ -175,7 +170,7 @@ export function SpeakerCard({ profile, locale }: { profile: PublicProfile; local
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -248,9 +243,9 @@ export function SpeakersView({ profiles }: { profiles: PublicProfile[] }) {
                 p,
                 ...(p.coSpeakers ?? []).map((co) => coSpeakerAsProfile(co, p)),
               ]).map((profile, i) => (
-                <motion.div key={profile._id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                <div key={profile._id} className="entra-y" style={{ "--d": `${i * 0.04}s` } as React.CSSProperties}>
                   <SpeakerCard profile={profile} locale={locale} />
-                </motion.div>
+                </div>
               ))}
             </div>
           </ScrollReveal>

@@ -3,7 +3,6 @@
 
 import { useId, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "motion/react";
 import { X, Copy, Check, Download, Share2, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -207,17 +206,12 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
 
   return (
     <dialog ref={ref} aria-labelledby={idTitulo} className={CLASE_DIALOGO}>
-    <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
+    <div
+      className="entra-fundido fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 16 }}
-        transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        className="relative w-full max-w-md overflow-hidden border-2 border-surface-600 bg-surface-900 shadow-[8px_8px_0_0_var(--color-acento)]"
+      <div
+        className="entra-modal relative w-full max-w-md overflow-hidden border-2 border-surface-600 bg-surface-900 shadow-[8px_8px_0_0_var(--color-acento)]"
       >
         {/* Sticky header */}
         <div className="flex items-center justify-between border-b-2 border-surface-600 px-4 py-3">
@@ -333,8 +327,8 @@ function ShareModal({ name, talkTitle = "", profileUrl, cardUrl, slug, onClose }
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
     </dialog>
   );
 }
@@ -357,7 +351,7 @@ export function ShareButton({
         Compartir tarjeta
       </button>
       {mounted && createPortal(
-        <AnimatePresence>
+        <>
           {open && (
             <ShareModal
               name={name}
@@ -368,7 +362,7 @@ export function ShareButton({
               onClose={() => setOpen(false)}
             />
           )}
-        </AnimatePresence>,
+        </>,
         document.body,
       )}
     </>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "motion/react";
 import { X, CheckCircle, AlertCircle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -72,11 +71,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       aria-atomic="false"
       className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2"
     >
-      <AnimatePresence>
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onRemove={removeToast} />
-        ))}
-      </AnimatePresence>
+      {toasts.map((t) => (
+        <ToastItem key={t.id} toast={t} onRemove={removeToast} />
+      ))}
     </div>
   );
 
@@ -120,16 +117,13 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   }, [arrancar]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 40, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: 40, scale: 0.95 }}
+    <div
       onMouseEnter={pausar}
       onMouseLeave={soltar}
       onFocus={pausar}
       onBlur={soltar}
       className={cn(
-        "flex items-center gap-3 border-2 px-4 py-3 shadow-[4px_4px_0_0_rgba(0,0,0,0.6)]",
+        "entra-pop flex items-center gap-3 border-2 px-4 py-3 shadow-[4px_4px_0_0_rgba(0,0,0,0.6)]",
         styles[toast.type],
       )}
     >
@@ -143,6 +137,6 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       >
         <X aria-hidden="true" className="h-4 w-4" />
       </button>
-    </motion.div>
+    </div>
   );
 }
