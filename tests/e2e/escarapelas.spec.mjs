@@ -23,4 +23,9 @@ test("el preset de impresión enseña una muestra en PDF y la CSP deja enmarcarl
   expect(r.status()).toBe(200);
   expect(r.headers()["content-type"]).toBe("application/pdf");
   await expect(page.getByRole("link", { name: "Abrir la muestra en PDF" })).toBeVisible();
+
+  // En hoja dice cuántas caben antes de imprimir, y la prueba gasta una sola.
+  await page.getByRole("button", { name: "Hoja A4" }).click();
+  await expect(page.getByText(/Caben 2 por hoja/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Imprimir una de prueba" })).toBeVisible();
 });

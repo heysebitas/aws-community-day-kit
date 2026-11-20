@@ -9,6 +9,7 @@ export interface IPrintConfig extends Document {
   qrPct: number;       // ancho del QR como % del ancho de la etiqueta
   fontScale: number;   // multiplicador del tamaño de fuente
   perLabel: number;    // 1 = una escarapela por etiqueta; 2 = dos (arriba/abajo) para cortar
+  papel: string;       // rollo (una página por etiqueta) | a4 | carta (varias por hoja)
   rotate: number;      // giro del contenido en grados: 0, 90, 180, 270
   layout: string;      // side (nombre+QR lado a lado) | stacked (nombre arriba, QR abajo)
   alignName: string;     // left | center | right
@@ -32,6 +33,7 @@ const schema = new Schema<IPrintConfig>(
     qrPct: { type: Number, default: 32 },
     fontScale: { type: Number, default: 1 },
     perLabel: { type: Number, default: 1, enum: [1, 2] },
+    papel: { type: String, default: "rollo", enum: ["rollo", "a4", "carta"] },
     rotate: { type: Number, default: 0, enum: [0, 90, 180, 270] },
     layout: { type: String, default: "side", enum: ["side", "stacked"] },
     alignName: { type: String, default: "left", enum: ["left", "center", "right"] },
