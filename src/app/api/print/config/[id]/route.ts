@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/auth";
 import { PrintConfig } from "@/models/print-config";
 import { createLog } from "@/lib/log";
 import { ruta } from "@/lib/api";
+import { papelDe } from "@/lib/hoja-escarapelas";
 
 // Editar preset (solo admin)
 export const PATCH = ruta(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
@@ -22,6 +23,7 @@ export const PATCH = ruta(async (req: NextRequest, { params }: { params: Promise
   if (b.qrPct != null) doc.qrPct = Number(b.qrPct) || 32;
   if (b.fontScale != null) doc.fontScale = Number(b.fontScale) || 1;
   if (b.perLabel != null) doc.perLabel = Number(b.perLabel) === 2 ? 2 : 1;
+  if (b.papel != null) doc.papel = papelDe(b.papel);
   if (b.rotate != null) doc.rotate = [90, 180, 270].includes(Number(b.rotate)) ? Number(b.rotate) : 0;
   if (b.layout != null) doc.layout = b.layout === "stacked" ? "stacked" : "side";
   const AL = (v: unknown) => (["left", "center", "right"].includes(String(v)) ? String(v) : "left");

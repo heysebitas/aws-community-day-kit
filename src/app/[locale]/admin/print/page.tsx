@@ -7,13 +7,14 @@ import { useAuth } from "@/contexts/auth-context";
 import { Modal } from "@/components/ui/modal";
 import { useUrlFilters, useDebounce } from "@/hooks/use-url-filters";
 import { useConfirm } from "@/components/admin/confirm";
+import { paginasDeLote, papelDe, planDeHoja, porPagina } from "@/lib/hoja-escarapelas";
 
 type RoleFilter = "all" | "attendee" | "volunteer" | "speaker" | "organizer";
 
 interface PrintCfg {
   id: string; name: string;
   widthMm: number; heightMm: number; marginMm: number;
-  qrPct: number; fontScale: number; perLabel: number; rotate: number; layout: string;
+  qrPct: number; fontScale: number; perLabel: number; rotate: number; layout: string; papel?: string;
   alignName: string; alignJobTitle: string; alignCompany: string; alignRole: string;
   showQr: boolean; showRole: boolean; showCompany: boolean; showJobTitle: boolean;
   isDefault: boolean;
@@ -64,10 +65,14 @@ function effBadgeName(p: Person) {
 }
 
 /* ── Imprime vía PDF al tamaño exacto de la etiqueta (sin encabezados del navegador) ── */
-async function printBadges(people: Person[], configId: string) {
+async function printBadges(people: Person[], configId: string, saltar = 0) {
+  await imprimirPdf({ shortIds: people.map((p) => p.shortId), configId: configId || undefined, saltar });
+}
+
+async function imprimirPdf(cuerpo: Record<string, unknown>) {
   const res = await fetch("/api/print/badges-pdf", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ shortIds: people.map((p) => p.shortId), configId: configId || undefined }),
+    body: JSON.stringify(cuerpo),
   });
   if (!res.ok) throw new Error("No se pudo generar el PDF");
   const blob = await res.blob();
@@ -99,6 +104,13 @@ function BulkPrintTab() {
   const [configs, setConfigs] = useState<PrintCfg[]>([]);
   const [configId, setConfigId] = useState<string>("");
   const [showConfig, setShowConfig] = useState(false);
+  // Casillas ya gastadas de una hoja de etiquetas empezada.
+  const [saltar, setSaltar] = useState(0);
+  const { confirm, dialog } = useConfirm();
+  const cfg = configs.find((c) => c.id === configId);
+  const enHoja = !!cfg && papelDe(cfg.papel) !== "rollo";
+  const porPag = cfg ? porPagina(cfg) : 1;
+  const saltarUtil = enHoja ? Math.min(saltar, Math.max(0, porPag - 1)) : 0;
 
   const fetchConfigs = useCallback(async () => {
     try {
@@ -175,10 +187,26 @@ function BulkPrintTab() {
     if (subset.length === 0) return;
     if (!configId) { toast("Crea o elige un preset de impresión primero", "error"); return; }
     setPrinting(true);
-    try { await printBadges(subset, configId); }
-    catch { toast("No se pudo generar el PDF", "error"); }
-    finally { setPrinting(false); }
+    try { await printBadges(subset, configId, saltarUtil); }
+    catch { toast("No se pudo generar el PDF", "error"); setPrinting(false); return; }
+    setPrinting(false);
+    // Marcarlas al salir evita que alguien las vuelva a imprimir sin querer.
+    if (vista !== "pendientes") return;
+    const ok = await confirm({
+      title: "¿Salieron bien?",
+      message: `Si las ${subset.length} escarapelas se imprimieron bien, las paso a «Impresas» para que nadie las vuelva a imprimir.`,
+      confirmLabel: "Sí, marcar impresas", cancelLabel: "Todavía no", tone: "accent",
+    });
+    if (ok) { setPrinted(subset.map((p) => p.shortId), true); setSaltar(0); }
   }
+
+  /** Lo que gasta imprimir `n` escarapelas con el preset elegido. */
+  const gasto = (n: number) => {
+    if (!cfg || n === 0) return "";
+    if (porPag === 0) return "no cabe en la hoja";
+    const pags = paginasDeLote(n, porPag, saltarUtil);
+    return enHoja ? `${pags} hoja${pags === 1 ? "" : "s"}` : `${pags} etiqueta${pags === 1 ? "" : "s"}`;
+  };
 
   const selectedPeople = visibles.filter((p) => selected.has(p.shortId));
 
@@ -229,6 +257,21 @@ function BulkPrintTab() {
                 {configs.map((c) => <option key={c.id} value={c.id}>{c.name} · {c.widthMm}×{c.heightMm}mm{c.isDefault ? " ★" : ""}</option>)}
               </select>
             )}
+            {cfg && (
+              <span className="font-mono text-[11px] text-surface-300">
+                {enHoja
+                  ? (porPag > 0 ? `${porPag} por hoja ${papelDe(cfg.papel) === "a4" ? "A4" : "carta"}` : "No cabe en la hoja: revisa la medida")
+                  : cfg.perLabel === 2 ? "2 por etiqueta" : "1 por etiqueta"}
+              </span>
+            )}
+            {enHoja && porPag > 1 && (
+              <label className="flex items-center gap-1.5 font-mono text-[11px] text-surface-400">
+                Casillas ya usadas en la primera hoja
+                <input type="number" min={0} max={porPag - 1} value={saltarUtil}
+                  onChange={(e) => setSaltar(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
+                  className="min-h-11 w-16 border-2 border-surface-600 bg-surface-900 px-2 font-mono text-xs text-surface-100" />
+              </label>
+            )}
             {isAdmin && (
               <button onClick={() => setShowConfig(true)} className="ml-auto inline-flex items-center gap-1.5 border-2 border-surface-600 px-2.5 py-1 font-mono text-[11px] text-surface-300 transition-colors hover:border-acento hover:text-acento">
                 <Settings className="h-3 w-3" /> Configurar
@@ -274,13 +317,13 @@ function BulkPrintTab() {
                 <button onClick={() => handlePrint(selectedPeople)} disabled={printing}
                   className="inline-flex items-center gap-1.5 border-2 border-acento/40 bg-acento/10 px-4 py-2 font-mono text-xs font-semibold text-acento hover:bg-acento/20 disabled:opacity-50 transition-colors">
                   {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
-                  Imprimir seleccionados ({selected.size})
+                  Imprimir seleccionados ({selected.size}) {gasto(selected.size) && `· ${gasto(selected.size)}`}
                 </button>
               )}
               <button onClick={() => handlePrint(visibles)} disabled={printing || visibles.length === 0}
                 className="inline-flex items-center gap-1.5 bg-acento px-4 py-2 font-mono text-xs font-bold text-surface-900 hover:shadow-[0_0_16px_rgb(var(--tema-acento-rgb)_/_0.4)] disabled:opacity-50 transition-all">
                 {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
-                Imprimir todos ({visibles.length})
+                Imprimir todos ({visibles.length}) {gasto(visibles.length) && `· ${gasto(visibles.length)}`}
               </button>
             </div>
           </div>
@@ -358,6 +401,7 @@ function BulkPrintTab() {
       {isAdmin && showConfig && (
         <PrintConfigModal open={showConfig} onClose={() => setShowConfig(false)} configs={configs} onChanged={fetchConfigs} />
       )}
+      {dialog}
     </div>
   );
 }
@@ -424,9 +468,18 @@ function MuestraEscarapela({ url, cargando, error }: { url: string | null; carga
   );
 }
 
+/** Cuántas caben y cómo van, para decidir el papel antes de imprimir. */
+function resumenPapel(d: Omit<PrintCfg, "id">) {
+  const papel = papelDe(d.papel);
+  if (papel === "rollo") return "Una página por etiqueta, al tamaño exacto del rollo.";
+  const plan = planDeHoja(papel, d.widthMm, d.heightMm);
+  if (plan.porHoja === 0) return "Esta medida no cabe en la hoja.";
+  return `Caben ${plan.porHoja} por hoja (${plan.cols} × ${plan.rows}${plan.girada ? ", giradas" : ""}), pegadas y con líneas de corte.`;
+}
+
 /* ── Modal de configuración de impresión (presets por modelo de impresora) ── */
 function emptyDraft(): Omit<PrintCfg, "id"> {
-  return { name: "", widthMm: 101.6, heightMm: 152.4, marginMm: 3, qrPct: 32, fontScale: 1, perLabel: 1, rotate: 0, layout: "side", alignName: "left", alignJobTitle: "left", alignCompany: "left", alignRole: "left", showQr: true, showRole: true, showCompany: true, showJobTitle: true, isDefault: false };
+  return { name: "", widthMm: 101.6, heightMm: 152.4, marginMm: 3, qrPct: 32, fontScale: 1, perLabel: 1, papel: "rollo", rotate: 0, layout: "side", alignName: "left", alignJobTitle: "left", alignCompany: "left", alignRole: "left", showQr: true, showRole: true, showCompany: true, showJobTitle: true, isDefault: false };
 }
 
 function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean; onClose: () => void; configs: PrintCfg[]; onChanged: () => void }) {
@@ -436,6 +489,13 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
   const [draft, setDraft] = useState<Omit<PrintCfg, "id">>(emptyDraft());
   const [saving, setSaving] = useState(false);
   const muestra = useMuestra(draft, open);
+  const [probando, setProbando] = useState(false);
+  const pruebaUna = async () => {
+    setProbando(true);
+    try { await imprimirPdf({ muestra: true, prueba: true, preset: { ...draft, name: "", isDefault: false } }); }
+    catch { toast("No se pudo generar la prueba", "error"); }
+    finally { setProbando(false); }
+  };
 
   const startNew = () => { setEditingId(null); setDraft(emptyDraft()); };
   const startEdit = (c: PrintCfg) => { setEditingId(c.id); const { id: _id, ...rest } = c; void _id; setDraft(rest); };
@@ -539,6 +599,18 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
             {numField("Escala texto", "fontScale", 0.05)}
           </div>
           <div className="flex flex-col gap-1">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-surface-400">Papel</span>
+            <div className="grid grid-cols-3 gap-2">
+              {([["rollo", "Rollo de etiquetas"], ["a4", "Hoja A4"], ["carta", "Hoja carta"]] as const).map(([v, label]) => (
+                <button key={v} type="button" onClick={() => setDraft((d) => ({ ...d, papel: v }))} aria-pressed={papelDe(draft.papel) === v}
+                  className={`min-h-11 px-3 py-2 font-mono text-xs font-semibold transition-colors ${papelDe(draft.papel) === v ? "border-2 border-acento/50 bg-acento/15 text-acento" : "border-2 border-surface-600 bg-surface-800 text-surface-400"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <span className="font-mono text-[10px] text-surface-300">{resumenPapel(draft)}</span>
+          </div>
+          {papelDe(draft.papel) === "rollo" && <div className="flex flex-col gap-1">
             <span className="font-mono text-[10px] uppercase tracking-wider text-surface-400">Escarapelas por etiqueta</span>
             <div className="grid grid-cols-2 gap-2">
               {[1, 2].map((n) => (
@@ -548,7 +620,7 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
                 </button>
               ))}
             </div>
-          </div>
+          </div>}
           <div className="flex flex-col gap-1">
             <span className="font-mono text-[10px] uppercase tracking-wider text-surface-400">Disposición</span>
             <div className="grid grid-cols-2 gap-2">
@@ -588,6 +660,12 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
             {checkField("Predeterminado", "isDefault")}
           </div>
           <MuestraEscarapela {...muestra} />
+          <button type="button" onClick={pruebaUna} disabled={probando}
+            className="inline-flex min-h-11 items-center justify-center gap-2 border-2 border-surface-600 px-3 font-mono text-xs text-surface-200 hover:border-acento hover:text-acento disabled:opacity-50">
+            {probando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+            Imprimir una de prueba
+          </button>
+          <span className="font-mono text-[10px] text-surface-300">Gasta una sola {papelDe(draft.papel) === "rollo" ? "etiqueta" : "hoja"}: calibra con esta antes de mandar el lote.</span>
           <p className="font-mono text-[10px] leading-relaxed text-surface-300">
             Tip: mide tu sticker real y pon ancho×alto en mm. Pruebas 4×6&quot; = 101.6 × 152.4 mm. Dymo 350: usa el tamaño del rollo que traiga la agencia.
           </p>

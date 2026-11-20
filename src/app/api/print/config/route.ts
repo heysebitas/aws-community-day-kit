@@ -4,6 +4,7 @@ import { requireAccess } from "@/lib/auth";
 import { PrintConfig } from "@/models/print-config";
 import { createLog } from "@/lib/log";
 import { ruta } from "@/lib/api";
+import { papelDe } from "@/lib/hoja-escarapelas";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,7 @@ export const POST = ruta(async (req: NextRequest) => {
     qrPct: Number(b.qrPct) || 32,
     fontScale: Number(b.fontScale) || 1,
     perLabel: Number(b.perLabel) === 2 ? 2 : 1,
+    papel: papelDe(b.papel),
     rotate: [90, 180, 270].includes(Number(b.rotate)) ? Number(b.rotate) : 0,
     layout: b.layout === "stacked" ? "stacked" : "side",
     alignName: AL(b.alignName),
