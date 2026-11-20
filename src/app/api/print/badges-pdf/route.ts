@@ -29,8 +29,10 @@ export const POST = ruta(async (req: NextRequest) => {
   const { shortIds: crudo, configId: idCrudo } = cuerpo;
 
   // Vista previa del preset que se está editando: personas de muestra, sin tocar la base.
+  // Con `prueba`, una sola (la del nombre largo), para gastar una etiqueta al calibrar.
   if (cuerpo.muestra === true && cuerpo.preset && typeof cuerpo.preset === "object") {
-    const buffer = await generarEscarapelas(MUESTRA, presetDesde(cuerpo.preset as Record<string, unknown>), { sitio: SITIO, ...(await textos()) });
+    const personas = cuerpo.prueba === true ? MUESTRA.slice(1) : MUESTRA;
+    const buffer = await generarEscarapelas(personas, presetDesde(cuerpo.preset as Record<string, unknown>), { sitio: SITIO, ...(await textos()) });
     return new Response(new Uint8Array(buffer), { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
   }
   const shortIds = listaDeTextos(crudo);
@@ -54,7 +56,9 @@ export const POST = ruta(async (req: NextRequest) => {
   const byId = new Map(docs.map((d) => [d.shortId, d]));
   const people = shortIds.map((id) => byId.get(id)).filter(Boolean) as PersonaEscarapela[];
 
-  const buffer = await generarEscarapelas(people, cfg, { sitio: SITIO, ...(await textos()) });
+  // Casillas ya usadas de una hoja empezada; generarEscarapelas lo acota a la hoja.
+  const saltar = Number.isInteger(cuerpo.saltar) && (cuerpo.saltar as number) > 0 ? (cuerpo.saltar as number) : 0;
+  const buffer = await generarEscarapelas(people, cfg, { sitio: SITIO, ...(await textos()) }, saltar);
   return new Response(new Uint8Array(buffer), {
     headers: { "Content-Type": "application/pdf", "Content-Disposition": "inline; filename=escarapelas.pdf" },
   });

@@ -2,6 +2,7 @@ import "server-only";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
 import { pdfToBuffer, registrarMono, type Doc } from "./common";
+import { BORDE_HOJA_MM, papelDe, planDeHoja } from "@/lib/hoja-escarapelas";
 
 /**
  * Escarapelas al tamaño exacto de la etiqueta. Todo va en negro sobre blanco
@@ -25,7 +26,7 @@ type Cfg = {
 
 /** Lo que se guarda en un preset; todo opcional porque puede no haber ninguno. */
 export type PresetEscarapela = Partial<Omit<Cfg, "alignName" | "alignJobTitle" | "alignCompany" | "alignRole" | "layout">> & {
-  widthMm?: number; heightMm?: number; marginMm?: number; perLabel?: number; rotate?: number;
+  widthMm?: number; heightMm?: number; marginMm?: number; perLabel?: number; rotate?: number; papel?: string;
   layout?: string; alignName?: string; alignJobTitle?: string; alignCompany?: string; alignRole?: string;
 };
 
@@ -220,11 +221,20 @@ function apilada(l: Lienzo, p: PersonaEscarapela, x: number, y: number, w: numbe
   }
 }
 
-/** El PDF con una página por etiqueta (o dos escarapelas por etiqueta, para cortar). */
-export function generarEscarapelas(personas: PersonaEscarapela[], preset: PresetEscarapela | null, o: OpcionesEscarapela): Promise<Buffer> {
+/**
+ * El PDF del lote. En rollo, una página por etiqueta (o dos escarapelas por
+ * etiqueta, para cortar). En hoja (A4 o carta), tantas escarapelas por hoja
+ * como quepan, pegadas para compartir cortes, y `saltar` deja libres las
+ * primeras casillas de la primera hoja para aprovechar una hoja ya empezada.
+ */
+export function generarEscarapelas(
+  personas: PersonaEscarapela[], preset: PresetEscarapela | null, o: OpcionesEscarapela, saltar = 0,
+): Promise<Buffer> {
   const widthMm = preset?.widthMm ?? POR_DEFECTO.widthMm, heightMm = preset?.heightMm ?? POR_DEFECTO.heightMm;
   const marginMm = preset?.marginMm ?? POR_DEFECTO.marginMm;
-  const perLabel = preset?.perLabel === 2 ? 2 : 1;
+  const papel = papelDe(preset?.papel);
+  // En hoja cada casilla es una escarapela: partirla en dos no ahorra papel.
+  const perLabel = papel === "rollo" && preset?.perLabel === 2 ? 2 : 1;
   const rotate = [90, 180, 270].includes(Number(preset?.rotate)) ? Number(preset?.rotate) : 0;
   const c: Cfg = {
     qrPct: preset?.qrPct ?? POR_DEFECTO.qrPct, fontScale: preset?.fontScale ?? 1,
@@ -243,8 +253,8 @@ export function generarEscarapelas(personas: PersonaEscarapela[], preset: Preset
   const pdf = new PDFDocument({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 }, autoFirstPage: false, info: { Title: o.titulo } });
   const l = new Lienzo(pdf, registrarMono(pdf));
 
-  const pagina = (dentro: () => void) => {
-    pdf.addPage({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
+  /** Una etiqueta de W×H con su esquina superior izquierda en el origen actual. */
+  const etiqueta = (dentro: () => void) => {
     if (rotate) {
       pdf.save();
       pdf.translate(W / 2, H / 2).rotate(rotate).translate(-LW / 2, -LH / 2);
@@ -252,7 +262,48 @@ export function generarEscarapelas(personas: PersonaEscarapela[], preset: Preset
     dentro();
     if (rotate) pdf.restore();
   };
+  const una = (p: PersonaEscarapela) => etiqueta(() => dibujar(l, p, M, M, LW - 2 * M, LH - 2 * M, c, o));
+  const corte = (x1: number, y1: number, x2: number, y2: number) =>
+    pdf.save().dash(4, { space: 3 }).moveTo(x1, y1).lineTo(x2, y2).lineWidth(0.5).strokeColor(CORTE).stroke().undash().restore();
 
+  if (papel !== "rollo") {
+    const plan = planDeHoja(papel, widthMm, heightMm);
+    const [SW, SH] = [plan.hoja[0] * MM, plan.hoja[1] * MM];
+    if (plan.porHoja === 0) {
+      // No cabe: una por hoja, arriba a la izquierda, para que se vea qué medida falla.
+      for (const p of personas) {
+        pdf.addPage({ size: [SW, SH], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
+        pdf.save().translate(BORDE_HOJA_MM * MM, BORDE_HOJA_MM * MM);
+        una(p);
+        pdf.restore();
+      }
+      return pdfToBuffer(pdf);
+    }
+    const cw = plan.girada ? H : W, ch = plan.girada ? W : H;
+    // La rejilla va centrada: así el sobrante se reparte y nada cae en el borde que no se imprime.
+    const x0 = (SW - plan.cols * cw) / 2, y0 = (SH - plan.rows * ch) / 2;
+    const casillas = [...Array<null>(Math.min(Math.max(0, Math.floor(saltar)), plan.porHoja - 1)).fill(null), ...personas];
+    for (let i = 0; i < casillas.length; i += plan.porHoja) {
+      pdf.addPage({ size: [SW, SH], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
+      casillas.slice(i, i + plan.porHoja).forEach((p, k) => {
+        if (!p) return;
+        const x = x0 + (k % plan.cols) * cw, y = y0 + Math.floor(k / plan.cols) * ch;
+        pdf.save().translate(x, y);
+        if (plan.girada) pdf.translate(cw, 0).rotate(90);
+        una(p);
+        pdf.restore();
+      });
+      // Líneas de corte a todo lo largo: un solo tajo con regla separa una fila o una columna entera.
+      for (let k = 0; k <= plan.cols; k++) corte(x0 + k * cw, 0, x0 + k * cw, SH);
+      for (let k = 0; k <= plan.rows; k++) corte(0, y0 + k * ch, SW, y0 + k * ch);
+    }
+    return pdfToBuffer(pdf);
+  }
+
+  const pagina = (dentro: () => void) => {
+    pdf.addPage({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
+    etiqueta(dentro);
+  };
   if (perLabel === 2) {
     const gap = 4 * MM;
     const halfH = (LH - 2 * M - gap) / 2;
@@ -261,11 +312,14 @@ export function generarEscarapelas(personas: PersonaEscarapela[], preset: Preset
         dibujar(l, personas[i]!, M, M, LW - 2 * M, halfH, c, o);
         if (personas[i + 1]) dibujar(l, personas[i + 1]!, M, M + halfH + gap, LW - 2 * M, halfH, c, o);
         const cutY = M + halfH + gap / 2;
-        pdf.save().dash(4, { space: 3 }).moveTo(M, cutY).lineTo(LW - M, cutY).lineWidth(0.5).strokeColor(CORTE).stroke().undash().restore();
+        corte(M, cutY, LW - M, cutY);
       });
     }
   } else {
-    for (const p of personas) pagina(() => dibujar(l, p, M, M, LW - 2 * M, LH - 2 * M, c, o));
+    for (const p of personas) {
+      pdf.addPage({ size: [W, H], margins: { top: 0, bottom: 0, left: 0, right: 0 } });
+      una(p);
+    }
   }
   return pdfToBuffer(pdf);
 }
@@ -284,6 +338,7 @@ export function presetDesde(b: Record<string, unknown>): PresetEscarapela {
     qrPct: num(b.qrPct, POR_DEFECTO.qrPct, 5, 90),
     fontScale: num(b.fontScale, 1, 0.3, 3),
     perLabel: Number(b.perLabel) === 2 ? 2 : 1,
+    papel: papelDe(b.papel),
     rotate: [90, 180, 270].includes(Number(b.rotate)) ? Number(b.rotate) : 0,
     layout: b.layout === "stacked" ? "stacked" : "side",
     alignName: AL(b.alignName), alignJobTitle: AL(b.alignJobTitle), alignCompany: AL(b.alignCompany), alignRole: AL(b.alignRole),
