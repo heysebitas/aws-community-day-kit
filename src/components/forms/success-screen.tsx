@@ -142,7 +142,7 @@ export function SuccessScreen({
             {copy.kicker}
           </p>
           <div className="flex justify-center">
-            <DotHeading tone="block" variant="inverted" flicker>
+            <DotHeading as="h1" tone="block" variant="inverted" flicker>
               {copy.heading}
             </DotHeading>
           </div>

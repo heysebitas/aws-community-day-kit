@@ -98,3 +98,17 @@ const TODOS: NavGroup[] = [
 export const navGroups: NavGroup[] = TODOS
   .map((g) => ({ ...g, items: g.items.filter((i) => i.si !== false) }))
   .filter((g) => g.items.length > 0);
+
+/**
+ * Los roles que pueden abrir una ruta del panel: los de la entrada del menú que
+ * más se le parece, así `/admin/speakers/ajustes` hereda los de `/admin/speakers`.
+ * `null` si ninguna la cubre. El inicio (`/admin`) no cuenta: es la casa de todos.
+ */
+export function rolesDeRuta(ruta: string): string[] | null {
+  let mejor: NavItem | null = null;
+  for (const item of TODOS.flatMap((g) => g.items)) {
+    if (item.href === "/admin") continue;
+    if ((ruta === item.href || ruta.startsWith(`${item.href}/`)) && (!mejor || item.href.length > mejor.href.length)) mejor = item;
+  }
+  return mejor?.roles ?? null;
+}

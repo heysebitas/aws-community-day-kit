@@ -6,7 +6,7 @@ import { ROLE_LABEL } from "./_social";
 import { Perf, StampItem, PinDigits } from "./_piezas";
 
 export function PinOverlay({ v }: { v: Vista }) {
-  const { isOwner, showPinSection, setShowPinSection, pinDigits, setPinDigits, pinError, pinBlocked, verifyingPin, handleVerifyPin } = v;
+  const { isOwner, showPinSection, setShowPinSection, pinDigits, setPinDigits, pinError, pinBlocked, verifyingPin, handleVerifyPin, t } = v;
   return (
     <>
       {/* === PIN OVERLAY — centered in card, light blur on background === */}
@@ -44,6 +44,7 @@ export function PinOverlay({ v }: { v: Vista }) {
                 </span>
               </div>
               <button
+                aria-label={t("close")}
                 onClick={() => setShowPinSection(false)}
                 style={{ background: "none", border: "none", color: "var(--color-surface-400)", cursor: "pointer", display: "flex", padding: 4 }}
               >

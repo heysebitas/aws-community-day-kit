@@ -128,3 +128,16 @@ describe("a qué sección pertenece cada ruta", () => {
     assert.equal(seccionDeRuta("/admin/evento"), null);
   });
 });
+
+describe("los roles de cada pantalla del panel", () => {
+  test("una subpágina hereda los roles de su entrada del menú", async () => {
+    const { rolesDeRuta } = await import("@/components/admin/nav-config");
+    assert.deepEqual(rolesDeRuta("/admin/speakers/ajustes"), ["admin", "organizer"]);
+    assert.ok(!rolesDeRuta("/admin/logs")?.includes("organizer"));
+    assert.ok(!rolesDeRuta("/admin/correos/plantillas")?.includes("volunteer"));
+    assert.ok(rolesDeRuta("/admin/check-in")?.includes("volunteer"));
+    // La más larga gana: el escáner de check-in no es la pantalla de check-in.
+    assert.ok(rolesDeRuta("/admin/escaner/badges")?.includes("badges"));
+    assert.equal(rolesDeRuta("/admin"), null);
+  });
+});

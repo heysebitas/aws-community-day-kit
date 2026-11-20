@@ -120,7 +120,7 @@ export function CallForSpeakers() {
       {/* Head */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-8">
         <ScrollReveal inmediato>
-          <DotHeading tone="block" variant="inverted" flicker className="mb-6">
+          <DotHeading as="h1" tone="block" variant="inverted" flicker className="mb-6">
             {t("heading")}
           </DotHeading>
           <h2

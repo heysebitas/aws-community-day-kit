@@ -76,7 +76,7 @@ export function SpeakersScreen({ formOnly = false, pasoInicial = 0, textos }: { 
             volver a leerlas sin perder lo que ya escribio. */}
         {formOnly && (
           <div className="mx-auto mb-10 w-full max-w-3xl">
-            <DotHeading tone="block" variant="inverted">
+            <DotHeading as="h1" tone="block" variant="inverted">
               {t.step_apply}
             </DotHeading>
             <p className="mt-4 font-mono text-sm leading-relaxed text-tinta/70">
