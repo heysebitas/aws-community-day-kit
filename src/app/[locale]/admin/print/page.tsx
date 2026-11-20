@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { Search, Printer, X, CheckSquare, Square, Loader2, Settings, Plus, Trash2, Star, AlignLeft, AlignCenter, AlignRight, Check, Undo2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useAuth } from "@/contexts/auth-context";
@@ -362,6 +362,68 @@ function BulkPrintTab() {
   );
 }
 
+/** PDF de muestra del preset que se edita; se rehace medio segundo después del último cambio. */
+function useMuestra(draft: Omit<PrintCfg, "id">, activo: boolean) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState(false);
+  const ultima = useRef<string | null>(null);
+  const clave = JSON.stringify({ ...draft, name: "", isDefault: false });
+
+  useEffect(() => {
+    if (!activo) return;
+    let vivo = true;
+    const t = setTimeout(async () => {
+      setCargando(true);
+      try {
+        const res = await fetch("/api/print/badges-pdf", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ muestra: true, preset: JSON.parse(clave) }),
+        });
+        if (!res.ok) throw new Error();
+        const blob = await res.blob();
+        if (vivo) {
+          // Suelta el PDF anterior al llegar uno nuevo.
+          if (ultima.current) URL.revokeObjectURL(ultima.current);
+          ultima.current = URL.createObjectURL(blob);
+          setUrl(ultima.current);
+          setError(false);
+        }
+      } catch {
+        if (vivo) setError(true);
+      } finally {
+        if (vivo) setCargando(false);
+      }
+    }, 500);
+    return () => { vivo = false; clearTimeout(t); };
+  }, [clave, activo]);
+
+  return { url, cargando, error };
+}
+
+function MuestraEscarapela({ url, cargando, error }: { url: string | null; cargando: boolean; error: boolean }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-surface-400">
+        Vista previa {cargando && <Loader2 className="h-3 w-3 animate-spin" />}
+      </span>
+      {error && <p className="font-mono text-[11px] text-surface-300">No se pudo generar la muestra.</p>}
+      {/* Sin visor de PDF (móviles, algunos navegadores) queda el enlace. */}
+      {url && navigator.pdfViewerEnabled && (
+        <iframe src={`${url}#toolbar=0&navpanes=0&view=Fit`} title="Vista previa de la escarapela"
+          className="h-80 w-full border-2 border-surface-600 bg-white" />
+      )}
+      {url && (
+        <a href={url} target="_blank" rel="noopener"
+          className="inline-flex min-h-11 items-center justify-center gap-2 border-2 border-surface-600 px-3 font-mono text-xs text-surface-200 hover:border-acento hover:text-acento">
+          <Printer className="h-3.5 w-3.5" /> Abrir la muestra en PDF
+        </a>
+      )}
+      <span className="font-mono text-[10px] text-surface-300">Con dos personas de muestra: un nombre corto y uno largo.</span>
+    </div>
+  );
+}
+
 /* ── Modal de configuración de impresión (presets por modelo de impresora) ── */
 function emptyDraft(): Omit<PrintCfg, "id"> {
   return { name: "", widthMm: 101.6, heightMm: 152.4, marginMm: 3, qrPct: 32, fontScale: 1, perLabel: 1, rotate: 0, layout: "side", alignName: "left", alignJobTitle: "left", alignCompany: "left", alignRole: "left", showQr: true, showRole: true, showCompany: true, showJobTitle: true, isDefault: false };
@@ -373,6 +435,7 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<PrintCfg, "id">>(emptyDraft());
   const [saving, setSaving] = useState(false);
+  const muestra = useMuestra(draft, open);
 
   const startNew = () => { setEditingId(null); setDraft(emptyDraft()); };
   const startEdit = (c: PrintCfg) => { setEditingId(c.id); const { id: _id, ...rest } = c; void _id; setDraft(rest); };
@@ -420,7 +483,8 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
       <div className="flex gap-1">
         {([["left", AlignLeft], ["center", AlignCenter], ["right", AlignRight]] as const).map(([v, Icon]) => (
           <button key={v} type="button" onClick={() => setDraft((d) => ({ ...d, [key]: v }))}
-            className={`flex h-7 w-7 items-center justify-center border transition-colors ${draft[key] === v ? "border-acento/50 bg-acento/15 text-acento" : "border-surface-600 bg-surface-800 text-surface-400"}`}>
+            aria-label={`${label}: ${v}`} aria-pressed={draft[key] === v}
+            className={`flex h-11 w-11 items-center justify-center border-2 transition-colors ${draft[key] === v ? "border-acento/50 bg-acento/15 text-acento" : "border-surface-600 bg-surface-800 text-surface-400"}`}>
             <Icon className="h-3.5 w-3.5" />
           </button>
         ))}
@@ -430,8 +494,9 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
 
   const checkField = (label: string, key: "showQr" | "showRole" | "showCompany" | "showJobTitle" | "isDefault") => (
     <button type="button" onClick={() => setDraft((d) => ({ ...d, [key]: !d[key] }))}
-      className={`flex items-center gap-2 px-3 py-2 text-left font-mono text-xs transition-colors ${draft[key] ? "bg-acento/10 text-acento" : "bg-surface-800 text-surface-400"}`}>
-      <span className={`flex h-4 w-4 items-center justify-center rounded border ${draft[key] ? "border-acento bg-acento/20" : "border-surface-600"}`}>{draft[key] && "✓"}</span>
+      aria-pressed={draft[key]}
+      className={`flex min-h-11 items-center gap-2 px-3 py-2 text-left font-mono text-xs transition-colors ${draft[key] ? "bg-acento/10 text-acento" : "bg-surface-800 text-surface-400"}`}>
+      <span className={`flex h-4 w-4 items-center justify-center border-2 ${draft[key] ? "border-acento bg-acento/20" : "border-surface-600"}`}>{draft[key] && "✓"}</span>
       {label}
     </button>
   );
@@ -513,7 +578,6 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
             {alignField("Cargo", "alignJobTitle")}
             {alignField("Empresa", "alignCompany")}
             {alignField("Rol", "alignRole")}
-            <span className="font-mono text-[10px] text-surface-300">El nombre va arriba y el QR centrado abajo.</span>
           </div>
 
           <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
@@ -523,6 +587,7 @@ function PrintConfigModal({ open, onClose, configs, onChanged }: { open: boolean
             {checkField("Cargo", "showJobTitle")}
             {checkField("Predeterminado", "isDefault")}
           </div>
+          <MuestraEscarapela {...muestra} />
           <p className="font-mono text-[10px] leading-relaxed text-surface-300">
             Tip: mide tu sticker real y pon ancho×alto en mm. Pruebas 4×6&quot; = 101.6 × 152.4 mm. Dymo 350: usa el tamaño del rollo que traiga la agencia.
           </p>
