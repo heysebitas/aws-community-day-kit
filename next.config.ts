@@ -32,7 +32,8 @@ const csp = [
   "connect-src 'self' https:",
   "media-src 'self' blob:",
   "worker-src 'self' blob:",
-  "frame-src https://challenges.cloudflare.com",
+  // blob: para el PDF de escarapelas que el panel imprime y previsualiza desde un iframe.
+  "frame-src blob: https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

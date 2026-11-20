@@ -52,6 +52,13 @@ function cargarFuente(): Buffer | null {
   return fuente;
 }
 
+/** Registra la mono como «JetBrains» en un documento propio; false si no está. */
+export function registrarMono(doc: Doc): boolean {
+  const f = cargarFuente();
+  if (f) doc.registerFont("JetBrains", f);
+  return !!f;
+}
+
 /** La mono del sitio si se pudo cargar; si no, la de PDFKit. */
 export function mono(doc: Doc): Doc {
   return doc.font(cargarFuente() ? "JetBrains" : "Courier-Bold");

@@ -10,6 +10,12 @@ import { EVENTO, PAIS, SITIO } from "@/config";
 
 export const revalidate = 300;
 
+// Sin esto la ruta es dinámica y revalidate no aplica: cada perfil se genera
+// en la primera visita y se sirve en caché.
+export function generateStaticParams() {
+  return [];
+}
+
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
