@@ -43,7 +43,7 @@ export function FormShell({
           className="mb-8 flex flex-wrap items-end justify-between gap-6"
         >
           <div>
-            <DotHeading tone="block" variant="inverted" flicker reveal={false}>
+            <DotHeading as="h1" tone="block" variant="inverted" flicker reveal={false}>
               {title}
             </DotHeading>
             {lead && (

@@ -131,7 +131,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
       const data = res.data;
       if (res.status === 0) { setStampResult({ ok: false, msg: t("connection_error") }); setStampDigits(["","","",""]); return; }
       if (res.ok) {
-        setStampResult({ ok: true, msg: t("stamp_added", { sponsor: data.sponsorName ?? "" }) });
+        setStampResult({ ok: true, msg: t("stamp_added", { patrocinador: data.sponsorName ?? "" }) });
         const sv = readOwnerCookie(); if (sv) await loadPassport(sv);
         setTimeout(() => { setShowStampModal(false); setStampResult(null); setStampDigits(["","","",""]); }, 2000);
       } else {
@@ -172,7 +172,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
       const res  = await pedirJson<RespuestaSello>(`/api/passport/${shortId}/stamp`, { method: "POST", body: { pin: p } });
       const data = res.data;
       if (res.status === 0) { setStampResult({ ok: false, msg: t("connection_error") }); return; }
-      if (res.ok) { setStampResult({ ok: true, msg: t("stamp_added", { sponsor: data.sponsorName ?? "" }) }); setStampDigits(["","","",""]); const sv = readOwnerCookie(); if (sv) await loadPassport(sv); }
+      if (res.ok) { setStampResult({ ok: true, msg: t("stamp_added", { patrocinador: data.sponsorName ?? "" }) }); setStampDigits(["","","",""]); const sv = readOwnerCookie(); if (sv) await loadPassport(sv); }
       else        { setStampResult({ ok: false, msg: textoDeError(tErr, data, t("redeem_error")) }); setStampDigits(["","","",""]); }
     } catch { setStampResult({ ok: false, msg: t("connection_error") }); }
     finally { setStamping(false); }
@@ -209,7 +209,7 @@ export function usePasaporte(shortId: string, inicial: Inicial = {}) {
     let username: string | null;
     if (addMode === "link") {
       username = usernameFromLink(plat, addInput);
-      if (!username) { setAddError(t("bad_link", { platform: plat.label })); return; }
+      if (!username) { setAddError(t("bad_link", { plataforma: plat.label })); return; }
     } else {
       username = cleanUsername(addInput);
       if (!username) { setAddError(t("bad_user")); return; }

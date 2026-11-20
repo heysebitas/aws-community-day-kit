@@ -34,6 +34,20 @@ describe("los idiomas", () => {
       assert.deepEqual({ faltan, sobran }, { faltan: [], sobran: [] }, `${i}.json no coincide con es.json`);
     }
   });
+
+  // Si un idioma llama `{sponsor}` a lo que el otro llama `{patrocinador}`, en uno de los dos
+  // la pantalla revienta al formatear: el código sólo pasa uno de los nombres.
+  test("cada texto pide las mismas variables en todos los idiomas", () => {
+    const variables = (t: string) => [...new Set([...t.matchAll(/\{(\w+)/g)].map((m) => m[1]))].sort();
+    const es = leer("es");
+    for (const i of DISPONIBLES) {
+      const otro = leer(i);
+      const distintas = Object.entries(es).flatMap(([ns, v]) => Object.entries(v)
+        .filter(([k, t]) => typeof t === "string" && JSON.stringify(variables(t)) !== JSON.stringify(variables(String(otro[ns]?.[k] ?? ""))))
+        .map(([k]) => `${ns}.${k}`));
+      assert.deepEqual(distintas, [], `${i}.json pide otras variables que es.json`);
+    }
+  });
 });
 
 describe("los datos de la edición dentro de los textos", () => {

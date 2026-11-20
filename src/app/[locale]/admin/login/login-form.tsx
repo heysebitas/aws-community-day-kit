@@ -105,7 +105,7 @@ export function LoginForm() {
       <div className="flex flex-1 items-center justify-center px-5 py-16">
         <div className="w-full max-w-[400px]">
           <div className="mb-8">
-            <DotHeading tone="block" variant="inverted">
+            <DotHeading as="h1" tone="block" variant="inverted">
               {t("heading")}
             </DotHeading>
           </div>
