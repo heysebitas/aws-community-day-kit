@@ -8,6 +8,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { localePath, idiomaDeRuta } from "@/lib/utils";
 import { alcanza, seccionDeRuta } from "@/lib/permisos";
+import { rolesDeRuta } from "@/components/admin/nav-config";
 
 function AdminGate({ children }: { children: React.ReactNode }) {
   const { user, loading, sesionTomada } = useAuth();
@@ -24,7 +25,9 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   // La sección a la que pertenece esta página, si es de las que se pueden
   // recortar. El tablero y los números no tienen sección: los ve cualquiera.
   const seccion = seccionDeRuta(pathWithoutLocale);
-  const sinPermiso = !!user && !!seccion && !alcanza(user, seccion, "ver");
+  // La tabla de permisos sólo recorta a los organizadores; el rol manda antes, como en el menú.
+  const roles = rolesDeRuta(pathWithoutLocale);
+  const sinPermiso = !!user && ((!!roles && !roles.includes(user.role)) || (!!seccion && !alcanza(user, seccion, "ver")));
 
   useEffect(() => {
     if (loading) return;

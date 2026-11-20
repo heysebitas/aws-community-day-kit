@@ -117,6 +117,19 @@ MODO_DEMO=1 JWT_SECRET=$(openssl rand -base64 48) npx next start -p 3000 &
 PRUEBA_URL=http://localhost:3000 npx playwright test
 ```
 
+| Archivo | Qué recorre |
+|---|---|
+| `publico` | Cada página pública en español e inglés: abre con `<h1>`, sin errores en la consola y sin desborde a 390 px; 404, llms, sitemap, `/api/evento` y cabeceras |
+| `formularios` | Registro presencial y virtual llenado como una persona, vacío, correo repetido e inglés; postulación de voluntario completa; pasos de la de speaker (el envío necesita el bucket) |
+| `pasaporte` | PIN equivocado, modo propietario, canjear un sello, sello repetido (409) y PIN de stand falso |
+| `panel` | Las 28 pantallas con admin, login fallido, cerrar sesión, lo que ve y no ve cada rol de la demo, y 401/403 de la API |
+| `acciones-panel` | FAQ de punta a punta, exportar CSV, agendar y quitar una sesión, guardar una plantilla de correo, PDF de certificado, crear una cuenta y el Excel de Credly |
+| `flujo-registro`, `flujo-sesion`, `escarapelas`, `reposo`, `axe` | Registro → confirmación → check-in, la sesión única, la impresión, el panel en reposo y la accesibilidad |
+
+Las pruebas dejan datos en la base en memoria (registros, sellos, una cuenta nueva) y
+están hechas para poder repetirse sin reiniciar la demo. `tests/e2e/ayuda.mjs` tiene el
+login y el vigilante de errores de la consola que comparten.
+
 ## Medición en local
 
 ```bash

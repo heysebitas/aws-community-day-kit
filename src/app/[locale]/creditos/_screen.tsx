@@ -81,7 +81,7 @@ export function CreditosScreen() {
           <p className="dot-matrix m-0 mb-4 text-lg leading-none text-tinta/70">
             este sitio lo hice yo
           </p>
-          <DotHeading tone="block" variant="inverted" flicker>
+          <DotHeading as="h1" tone="block" variant="inverted" flicker>
             imagina lo que puedo hacer por ti
           </DotHeading>
 

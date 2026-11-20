@@ -100,7 +100,7 @@ export function Select({
   return (
     <div className={cn("flex flex-col gap-1.5", className)} ref={ref}>
       {label && (
-        <label htmlFor={id} className="font-mono text-xs font-bold uppercase tracking-widest text-surface-200">
+        <label id={`${id}-etiqueta`} htmlFor={id} className="font-mono text-xs font-bold uppercase tracking-widest text-surface-200">
           {label}
           {required && <span className="ml-1 text-acento">*</span>}
         </label>
@@ -109,7 +109,12 @@ export function Select({
         id={id}
         role="combobox"
         tabIndex={0}
+        // Un <label htmlFor> no nombra a un div: el nombre va por aria-labelledby.
+        aria-labelledby={label ? `${id}-etiqueta` : undefined}
+        aria-haspopup="listbox"
+        aria-controls={open ? `${id}-lista` : undefined}
         aria-expanded={open}
+        aria-disabled={disabled || undefined}
         className={cn(
           // Caja dura, como los campos: esquina viva, borde de 2px y el foco
           // engordando el borde en vez de un anillo difuminado alrededor.
@@ -154,9 +159,13 @@ export function Select({
             {filtered.length === 0 ? (
               <div className="px-4 py-3 font-mono text-sm text-surface-300">Sin resultados</div>
             ) : (
-              filtered.map((option, i) => (
+              // El buscador queda fuera: dentro de un listbox sólo van opciones.
+              <div id={`${id}-lista`} role="listbox">
+              {filtered.map((option, i) => (
                 <div
                   key={option.value}
+                  role="option"
+                  aria-selected={option.value === value}
                   className={cn(
                     "cursor-pointer px-4 py-2.5 font-mono text-sm transition-colors",
                     option.value === value
@@ -172,7 +181,8 @@ export function Select({
                 >
                   {option.label}
                 </div>
-              ))
+              ))}
+              </div>
             )}
           </div>
         )}

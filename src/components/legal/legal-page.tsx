@@ -29,7 +29,7 @@ export async function LegalPage({
       <div className="mx-auto w-full max-w-6xl flex-1 px-5 pb-20">
         {/* Cabecera */}
         <header className="mb-12 border-b-2 border-tinta/25 pb-8">
-          <DotHeading tone="block" variant="inverted">
+          <DotHeading as="h1" tone="block" variant="inverted">
             {title}
           </DotHeading>
           <p className="mt-4 font-mono text-sm text-tinta/70">{updated}</p>
