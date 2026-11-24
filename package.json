@@ -1,6 +1,6 @@
 {
   "name": "aws-community-day-kit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Sitio, registro y panel de operación para un Student Community Day. Configurable por país, tema e idioma.",
   "private": true,
   "license": "MIT",
