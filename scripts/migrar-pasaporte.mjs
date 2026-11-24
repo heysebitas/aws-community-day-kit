@@ -16,6 +16,7 @@
  * Lee `MONGODB_URI` de `.env.local`.
  */
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import mongoose from "mongoose";
 import { nanoid } from "nanoid";
 import { palabras } from "./rellenar-busqueda.mjs";
@@ -66,7 +67,7 @@ export async function migrar(conn, { dryRun = false } = {}) {
   return salida;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (fs.existsSync(".env.local")) process.loadEnvFile(".env.local");
   if (!process.env.MONGODB_URI) {
     console.error("Falta MONGODB_URI");

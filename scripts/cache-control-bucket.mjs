@@ -12,6 +12,7 @@
  * única forma de cambiar los metadatos sin volver a subir el archivo.
  */
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import { CopyObjectCommand, HeadObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 
 /** Un año: las fotos y los logos llevan un UUID en la key, su URL no cambia. */
@@ -186,7 +187,7 @@ async function main() {
   console.log(`\n${copiados.length} objeto(s) actualizados.`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {
     console.error(`No se pudo completar: ${e.message}`);
     process.exit(1);

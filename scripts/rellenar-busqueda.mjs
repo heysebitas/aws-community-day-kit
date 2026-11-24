@@ -9,6 +9,7 @@
  * tiene el campo.
  */
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import mongoose from "mongoose";
 
 const CAMPOS = {
@@ -56,7 +57,7 @@ export async function rellenar(conn, aplicar) {
   return salida;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (fs.existsSync(".env.local")) process.loadEnvFile(".env.local");
   if (!process.env.MONGODB_URI) {
     console.error("Falta MONGODB_URI");
