@@ -140,6 +140,10 @@ docs/                   la documentación; cada tema en un archivo corto
 - No envíes correos ni ejecutes acciones contra una base real para «probar»:
   para eso está `npm run demo`.
 - No hagas commit ni push si no te lo piden.
+- Ni los commits ni los PR llevan firma del asistente: nada de
+  `Co-Authored-By: Claude…`, «Generated with Claude Code» ni líneas parecidas
+  de otra herramienta. El autor es la persona que lo sube. `.claude/settings.json`
+  ya apaga esa atribución en Claude Code; en otras herramientas, quítala a mano.
 
 ## Antes de terminar
 
